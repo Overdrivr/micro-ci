@@ -18,6 +18,11 @@
       "type": "belongsTo",
       "model": "Client",
       "foreignKey": ""
+    },
+    "commits": {
+      "type": "hasMany",
+      "model": "Commit",
+      "foreignKey": ""
     }
   },
   "acls": [],
