@@ -1,0 +1,41 @@
+{
+  "name": "Build",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "outcome": {
+      "type": "boolean"
+    },
+    "log": {
+      "type": "string",
+      "required": true
+    },
+    "builddate": {
+      "type": "date",
+      "required": true
+    },
+    "buildtime": {
+      "type": "date",
+      "required": true
+    },
+    "text": {
+      "type": "number",
+      "required": true
+    },
+    "data": {
+      "type": "number",
+      "required": true
+    },
+    "bss": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

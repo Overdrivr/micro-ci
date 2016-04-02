@@ -43,5 +43,9 @@
   "Commit": {
     "dataSource": "db",
     "public": true
+  },
+  "Build": {
+    "dataSource": "db",
+    "public": true
   }
 }
