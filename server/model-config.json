@@ -39,5 +39,9 @@
   "Repository": {
     "dataSource": "db",
     "public": true
+  },
+  "Commit": {
+    "dataSource": "db",
+    "public": true
   }
 }
