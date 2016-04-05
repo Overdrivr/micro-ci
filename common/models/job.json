@@ -1,0 +1,24 @@
+{
+  "name": "Job",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "commit": {
+      "type": "belongsTo",
+      "model": "Commit",
+      "foreignKey": ""
+    },
+    "builds": {
+      "type": "hasMany",
+      "model": "Build",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

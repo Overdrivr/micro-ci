@@ -47,5 +47,9 @@
   "Build": {
     "dataSource": "db",
     "public": true
+  },
+  "Job": {
+    "dataSource": "db",
+    "public": true
   }
 }
