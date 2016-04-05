@@ -1,26 +1,21 @@
 {
-  "name": "Commit",
+  "name": "Job",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
-  "properties": {
-    "commithash": {
-      "type": "string",
-      "required": true
-    }
-  },
+  "properties": {},
   "validations": [],
   "relations": {
-    "repository": {
+    "commit": {
       "type": "belongsTo",
-      "model": "Repository",
+      "model": "Commit",
       "foreignKey": ""
     },
-    "jobs": {
+    "builds": {
       "type": "hasMany",
-      "model": "Job",
+      "model": "Build",
       "foreignKey": ""
     }
   },
