@@ -17,6 +17,11 @@
       "type": "belongsTo",
       "model": "Repository",
       "foreignKey": ""
+    },
+    "jobs": {
+      "type": "hasMany",
+      "model": "Job",
+      "foreignKey": ""
     }
   },
   "acls": [],
