@@ -6,8 +6,8 @@
     "validateUpsert": true
   },
   "properties": {
-    "outcome": {
-      "type": "boolean"
+    "status": {
+      "type": "string"
     },
     "log": {
       "type": "string",
@@ -35,7 +35,13 @@
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "job": {
+      "type": "belongsTo",
+      "model": "Job",
+      "foreignKey": ""
+    }
+  },
   "acls": [],
   "methods": {}
 }
