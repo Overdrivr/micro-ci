@@ -8,10 +8,15 @@
   "dependencies": {
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "express-flash": "0.0.2",
+    "express-session": "^1.13.0",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.1.0",
     "loopback-datasource-juggler": "^2.39.0",
+    "passport": "^0.3.2",
+    "passport-github2": "^0.1.10",
+    "passport-local": "^1.0.0",
     "serve-favicon": "^2.0.1"
   },
   "devDependencies": {
