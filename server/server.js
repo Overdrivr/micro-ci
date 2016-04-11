@@ -15,10 +15,14 @@ boot(app, __dirname);
 //// PASSPORT RELATED STUFF
 var passport = require('passport');
 var GitHubStrategy = require('passport-github2').Strategy;
+var GoogleOAuthStrategy = require('passport-google-oauth20').Strategy;
 var session = require('express-session');
 
 var GITHUB_CLIENT_ID = "4120fdd8fbdae8a65e2d";
 var GITHUB_CLIENT_SECRET = "c607f5e599b0b6dbf54228eeae8c388a73f5c98d";
+
+var GOOGLE_CLIENT_ID = "137968292615-degfvgs90u2c0r4e800tlrv0gti0dosf.apps.googleusercontent.com"
+var GOOGLE_CLIENT_SECRET = "NkPmr4_uv123GcCUGz_zdUBK"
 
 passport.use(new GitHubStrategy({
     clientID: GITHUB_CLIENT_ID,
@@ -34,6 +38,31 @@ passport.use(new GitHubStrategy({
       // to associate the GitHub account with a user record in your database,
       // and return that user instead.
       console.log("Called back from github.");
+      //console.log(Object.keys(profile));
+      console.log(profile.id);
+      console.log(profile.displayName);
+      console.log(profile.username);
+      console.log(profile.profileUrl);
+      console.log(profile.emails);
+      return done(null, profile);
+    });
+  }
+));
+
+passport.use(new GoogleOAuthStrategy({
+    clientID: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://127.0.0.1:3000/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+
+      // To keep the example simple, the user's GitHub profile is returned to
+      // represent the logged-in user.  In a typical application, you would want
+      // to associate the GitHub account with a user record in your database,
+      // and return that user instead.
+      console.log("Called back from google.");
       //console.log(Object.keys(profile));
       console.log(profile.id);
       console.log(profile.displayName);
@@ -109,7 +138,7 @@ app.get('/auth/github/callback',
 // GET /link/githu
 //  Use authorize to link a third party account to the account
 app.get('/link/github',
-   passport.authorize('github', { failureRedirect: '/account' }),
+   passport.authorize('github', { failureRedirect: '/login' }),
   function(req, res){
     // The request will be redirected to GitHub for authentication, so this
     // function will not be called.
@@ -121,9 +150,24 @@ app.get('/link/github',
 //   login page.  Otherwise, the primary route function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/link/github/callback',
-passport.authorize('github', { failureRedirect: '/account' }),
+passport.authorize('github', { failureRedirect: '/login' }),
   function(req, res) {
-    console.log("Linked successfully.")
+    console.log("Linked successfully.");
+    res.redirect('/account');
+  });
+
+// GET /auth/google
+app.get('/auth/google',
+  passport.authenticate('google', { scope: [ 'https://www.googleapis.com/auth/userinfo.email' ] }),
+  function(req, res){
+    // The request will be redirected to GitHub for authentication, so this
+    // function will not be called.
+  });
+
+// GET /auth/google/callback
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function(req, res) {
     res.redirect('/account');
   });
 /*
