@@ -1,0 +1,13 @@
+extends ../layouts/layout
+
+block content
+  h2 Third Party Profile(s)
+  p.small
+    each val in user
+      p.small= JSON.stringify(val)
+  h2 Linked Account(s)
+  ul.list-inline.list-unstyled
+    li
+      a.btn.btn-primary(href="/link/github") Link Github
+    li
+      a.btn.btn-primary(href="/link/google") Link Google
