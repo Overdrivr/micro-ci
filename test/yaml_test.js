@@ -1,41 +1,13 @@
 
-var yaml = require("yaml");
 var inArray = require("in-array");
-function yaml_parser (stringYaml)
-{
-  var parsed = [];
-  parsed = yaml.eval(stringYaml);
-  yaml_sanitycheck(parsed);
-  return parsed;
-}
 
-function yaml_sanitycheck(parsedYaml)
-{
-  //console.log(parsedYaml);
-  var supportedOptions = ["build", "after_success", "after_failure", "deploy", "platforms", "binary_file"];
-  var neededOptions = ["build", "after_success", "after_failure", "platforms"]
-
-  //Check all options are valid
-  for(var i in parsedYaml)
-  {
-    if(!inArray(supportedOptions, i ))
-      throw new SyntaxError("Unsupported option in yaml file: " + i);
-  }
-
-  //Check needed options
-  for(var i in neededOptions)
-  {
-    if(!(neededOptions[i] in parsedYaml))
-      throw new SyntaxError("Unspecified mandatory option in yaml file: " + neededOptions[i]);
-  }
-}
-
+var yaml = require("../server/yaml-parser")
 
 var assert = require('assert');
 
 describe('emptyYaml', function(){
   it('Empty yaml file', function(){
-    assert.throws( function() { yaml_parser(""); }, Error );
+    assert.throws( function() { yaml.yaml_parser(""); }, Error );
   });
 });
 
@@ -60,7 +32,7 @@ deploy:\n\
   -Do Stuff2\n\
 platforms: KL25Z\
 "
-    assert.deepEqual( yaml_parser(yamlContent), expected);
+    assert.deepEqual( yaml.yaml_parser(yamlContent), expected);
   });
 });
 
@@ -77,7 +49,7 @@ deploy:\n\
   -Do Stuff2\n\
 platforms: KL25Z\
 "
-    assert.throws( function() { yaml_parser(yamlContent); }, /Unspecified/ );
+    assert.throws( function() { yaml.yaml_parser(yamlContent); }, /Unspecified/ );
   });
 });
 
@@ -96,6 +68,6 @@ deploy:\n\
 unknowOption: toto\n\
 platforms: KL25Z\
 "
-    assert.throws( function() { yaml_parser(yamlContent); }, /Unsupported/ );
+    assert.throws( function() { yaml.yaml_parser(yamlContent); }, /Unsupported/ );
   });
 });
