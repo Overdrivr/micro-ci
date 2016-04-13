@@ -7,7 +7,6 @@ module.exports = function initPassportGoogle(app) {
   var GOOGLE_CLIENT_ID = "137968292615-degfvgs90u2c0r4e800tlrv0gti0dosf.apps.googleusercontent.com";
   var GOOGLE_CLIENT_SECRET = "NkPmr4_uv123GcCUGz_zdUBK";
 
-  // GET /auth/google
   app.get('/auth/google',
     passport.authenticate('google', { scope: [ 'https://www.googleapis.com/auth/userinfo.email' ] }),
     function(req, res){
@@ -15,7 +14,6 @@ module.exports = function initPassportGoogle(app) {
       // function will not be called.
     });
 
-  // GET /auth/google/callback
   app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     function(req, res) {
@@ -28,13 +26,7 @@ module.exports = function initPassportGoogle(app) {
       callbackURL: "http://127.0.0.1:3000/auth/google/callback"
     },
     function(accessToken, refreshToken, profile, done) {
-      // asynchronous verification, for effect...
       process.nextTick(function () {
-
-        // To keep the example simple, the user's GitHub profile is returned to
-        // represent the logged-in user.  In a typical application, you would want
-        // to associate the GitHub account with a user record in your database,
-        // and return that user instead.
         console.log("Called back from google.");
         //console.log(Object.keys(profile));
         console.log(profile.id);
