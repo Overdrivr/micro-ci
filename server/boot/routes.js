@@ -27,6 +27,13 @@ module.exports = function initRoutes(app) {
     });
   });
 
+  app.get('/signup', function (req, res, next) {
+    res.render('pages/signup', {user:
+      req.user,
+      url: req.url
+    });
+  });
+
   app.get('/account', ensureAuthenticated, function(req, res){
     res.render('pages/loginProfiles', {
        user: req.user,
