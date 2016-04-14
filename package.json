@@ -15,7 +15,9 @@
     "serve-favicon": "^2.0.1",
     "yaml": "~0.3.0",
     "in-array": "~0.1.2",
-    "mocha": "~2.4.5"
+    "mocha": "~2.4.5",
+    "jenkins": "~0.17.0",
+    "xml": "~1.0.1"
   },
   "devDependencies": {
     "jshint": "^2.5.6"
