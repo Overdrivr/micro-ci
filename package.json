@@ -18,7 +18,10 @@
     "passport-github2": "^0.1.10",
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
-    "serve-favicon": "^2.0.1"
+    "serve-favicon": "^2.0.1",
+    "yaml": "~0.3.0",
+    "in-array": "~0.1.2",
+    "mocha": "~2.4.5"
   },
   "devDependencies": {
     "jshint": "^2.5.6"
