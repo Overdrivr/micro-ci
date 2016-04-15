@@ -24,7 +24,8 @@
     "mocha": "~2.4.5"
   },
   "devDependencies": {
-    "jshint": "^2.5.6"
+    "jshint": "^2.5.6",
+    "url-parse": "^1.1.1"
   },
   "repository": {
     "type": "",
