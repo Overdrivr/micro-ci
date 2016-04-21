@@ -16,20 +16,12 @@ describe('Signup to micro-ci using Github', function() {
     browser.ignoreSynchronization = false;
 
     // Authenticate
+    //NOTE: the test user should have been authorized at least once
+    // If not, test will fail because there will be a second github page,
+    // before redirecting to micro-ci
     browser.driver.findElement(by.css('#login_field')).sendKeys(credentials.username);
     browser.driver.findElement(by.css('#password')).sendKeys(credentials.password);
     browser.driver.findElement(by.css('input[name="commit"]')).click();
-
-    // Check if redirected already or not
-    browser.ignoreSynchronization = true;
-    var url = parse(browser.getCurrentUrl());
-    browser.ignoreSynchronization = false;
-
-    if(url.hostame == "github.com")
-    {
-      // Account did not authorize micro-ci yet. Do it now.
-      browser.driver.findElement(by.css('button[type="submit"]')).click();
-    }
 
     // Check we are properly redirected back to micro-ci
     browser.ignoreSynchronization = true;
