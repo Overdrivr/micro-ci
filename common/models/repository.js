@@ -1,6 +1,6 @@
 module.exports = function(Repository) {
 
-  Repository.webhook = function(msg, cb) {
+  Repository.webhook = function(payload, cb) {
     // Call webhook logic from here
     cb();
   }
@@ -8,8 +8,7 @@ module.exports = function(Repository) {
   Repository.remoteMethod(
       'webhook',
       {
-          accepts: {payload: 'payload', type: 'Object'},
-          returns: {}
+          accepts: {arg: 'payload', type: 'Object'}
       }
   );
 
