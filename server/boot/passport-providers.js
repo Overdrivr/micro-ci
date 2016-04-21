@@ -1,4 +1,4 @@
-
+var debug = require('debug')('uci:boot:passport');
 var passport = require('passport');
 var providers = require('../providers.example.json');
 //
@@ -6,13 +6,12 @@ var providers = require('../providers.example.json');
 //
 
 module.exports = function initPassportProviders(app) {
-  console.log("Initializing providers.");
+  debug("Initializing providers.");
   for(var i = 0 ; i < providers.length ; i++) {
     initProvider(app, providers[i]);
-    console.log("Enabled provider : " + providers[i].name);
+    debug("Enabled provider : " + providers[i].name);
   }
 };
-
 
 function initProvider(app, provider) {
   var Strategy = require(provider.module).Strategy;
@@ -23,13 +22,6 @@ function initProvider(app, provider) {
     },
     function(accessToken, refreshToken, profile, done) {
       process.nextTick(function () {
-
-        console.log("Called back from " + provider.name);
-        console.log(profile.id);
-        console.log(profile.displayName);
-        console.log(profile.username);
-        console.log(profile.profileUrl);
-        console.log(profile.emails);
         return done(null, profile);
       });
     }
@@ -38,7 +30,7 @@ function initProvider(app, provider) {
   app.get('/auth/' + provider.name,
     passport.authenticate(provider.name, { scope: [ 'user:email' ] }),
     function(req, res){
-      // The request will be redirected, not called.
+      // The request will be redirected, this is not called.
     });
 
   app.get('/auth/' + provider.name + '/callback',
@@ -49,17 +41,15 @@ function initProvider(app, provider) {
 
     // If accounts can be linked to this provider
     if(provider.link) {
-
       app.get('/link/' + provider.name,
          passport.authorize(provider.name, { failureRedirect: '/login' }),
         function(req, res){
-          // The request will be redirected, not called.
+          // The request will be redirected, this is not called.
         });
 
       app.get('/link/' + provider.name + '/callback',
         passport.authorize(provider.name, { failureRedirect: '/login' }),
         function(req, res) {
-          console.log("Linked successfully.");
           res.redirect('/account');
         });
     }
