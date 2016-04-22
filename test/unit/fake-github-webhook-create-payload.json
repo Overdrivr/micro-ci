@@ -1,81 +1,58 @@
 {
-  "ref": "refs/heads/master",
-  "before": "0c27b8252227b3d0cb13afbfd2ae218ed9dcba3d",
-  "after": "cfa22e0d72fa316cb863bab2433260e33c07c8d3",
-  "created": false,
-  "deleted": false,
-  "forced": false,
-  "base_ref": null,
-  "compare": "https://github.com/miccibart/bartjs/compare/0c27b8252227...cfa22e0d72fa",
-  "commits": [
-    {
-      "id": "cfa22e0d72fa316cb863bab2433260e33c07c8d3",
-      "tree_id": "a25139358b6e9ff7f153312dab0e1bd112aed3db",
-      "distinct": true,
-      "message": "Create Hello.js",
-      "timestamp": "2016-04-22T13:41:30+02:00",
-      "url": "https://github.com/miccibart/bartjs/commit/cfa22e0d72fa316cb863bab2433260e33c07c8d3",
-      "author": {
-        "name": "miccibart",
-        "email": "bartmicci@gmail.com",
-        "username": "miccibart"
-      },
-      "committer": {
-        "name": "miccibart",
-        "email": "bartmicci@gmail.com",
-        "username": "miccibart"
-      },
-      "added": [
-        "Hello.js"
-      ],
-      "removed": [
-
-      ],
-      "modified": [
-
-      ]
+  "zen": "Mind your words, they are important.",
+  "hook_id": 8157037,
+  "hook": {
+    "type": "Repository",
+    "id": 8157037,
+    "name": "web",
+    "active": true,
+    "events": [
+      "push"
+    ],
+    "config": {
+      "content_type": "json",
+      "insecure_ssl": "0",
+      "url": "http://6b977d03.ngrok.io/api/Repositories/webhook"
+    },
+    "updated_at": "2016-04-22T11:39:12Z",
+    "created_at": "2016-04-22T11:39:12Z",
+    "url": "https://api.github.com/repos/miccibart/bartjs/hooks/8157037",
+    "test_url": "https://api.github.com/repos/miccibart/bartjs/hooks/8157037/test",
+    "ping_url": "https://api.github.com/repos/miccibart/bartjs/hooks/8157037/pings",
+    "last_response": {
+      "code": null,
+      "status": "unused",
+      "message": null
     }
-  ],
-  "head_commit": {
-    "id": "cfa22e0d72fa316cb863bab2433260e33c07c8d3",
-    "tree_id": "a25139358b6e9ff7f153312dab0e1bd112aed3db",
-    "distinct": true,
-    "message": "Create Hello.js",
-    "timestamp": "2016-04-22T13:41:30+02:00",
-    "url": "https://github.com/miccibart/bartjs/commit/cfa22e0d72fa316cb863bab2433260e33c07c8d3",
-    "author": {
-      "name": "miccibart",
-      "email": "bartmicci@gmail.com",
-      "username": "miccibart"
-    },
-    "committer": {
-      "name": "miccibart",
-      "email": "bartmicci@gmail.com",
-      "username": "miccibart"
-    },
-    "added": [
-      "Hello.js"
-    ],
-    "removed": [
-
-    ],
-    "modified": [
-
-    ]
   },
   "repository": {
     "id": 56851009,
     "name": "bartjs",
     "full_name": "miccibart/bartjs",
     "owner": {
-      "name": "miccibart",
-      "email": "bartmicci@gmail.com"
+      "login": "miccibart",
+      "id": 18532292,
+      "avatar_url": "https://avatars.githubusercontent.com/u/18532292?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/miccibart",
+      "html_url": "https://github.com/miccibart",
+      "followers_url": "https://api.github.com/users/miccibart/followers",
+      "following_url": "https://api.github.com/users/miccibart/following{/other_user}",
+      "gists_url": "https://api.github.com/users/miccibart/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/miccibart/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/miccibart/subscriptions",
+      "organizations_url": "https://api.github.com/users/miccibart/orgs",
+      "repos_url": "https://api.github.com/users/miccibart/repos",
+      "events_url": "https://api.github.com/users/miccibart/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/miccibart/received_events",
+      "type": "User",
+      "site_admin": false
     },
     "private": false,
     "html_url": "https://github.com/miccibart/bartjs",
     "description": "My first versionned codebase",
     "fork": false,
-    "url": "https://github.com/miccibart/bartjs",
+    "url": "https://api.github.com/repos/miccibart/bartjs",
     "forks_url": "https://api.github.com/repos/miccibart/bartjs/forks",
     "keys_url": "https://api.github.com/repos/miccibart/bartjs/keys{/key_id}",
     "collaborators_url": "https://api.github.com/repos/miccibart/bartjs/collaborators{/collaborator}",
@@ -112,9 +89,9 @@
     "labels_url": "https://api.github.com/repos/miccibart/bartjs/labels{/name}",
     "releases_url": "https://api.github.com/repos/miccibart/bartjs/releases{/id}",
     "deployments_url": "https://api.github.com/repos/miccibart/bartjs/deployments",
-    "created_at": 1461325082,
+    "created_at": "2016-04-22T11:38:02Z",
     "updated_at": "2016-04-22T11:38:02Z",
-    "pushed_at": 1461325290,
+    "pushed_at": "2016-04-22T11:38:02Z",
     "git_url": "git://github.com/miccibart/bartjs.git",
     "ssh_url": "git@github.com:miccibart/bartjs.git",
     "clone_url": "https://github.com/miccibart/bartjs.git",
@@ -134,13 +111,7 @@
     "forks": 0,
     "open_issues": 0,
     "watchers": 0,
-    "default_branch": "master",
-    "stargazers": 0,
-    "master_branch": "master"
-  },
-  "pusher": {
-    "name": "miccibart",
-    "email": "bartmicci@gmail.com"
+    "default_branch": "master"
   },
   "sender": {
     "login": "miccibart",
