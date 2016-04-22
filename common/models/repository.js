@@ -1,14 +1,24 @@
 module.exports = function(Repository) {
 
-  Repository.webhook = function(payload, cb) {
-    // Call webhook logic from here
-    cb();
+  Repository.webhookGithub = function(repository, cb) {
+    // Identify repository
+    Repository.find({
+      "where": {
+        "platform": "github",
+        "remoteId": repository.id
+      }
+    }, function(object, err){
+      //TODO: Validate commit id with github
+      //TODO:
+      cb();
+    });
   }
 
   Repository.remoteMethod(
-      'webhook',
+      'webhookGithub',
       {
-          accepts: {arg: 'payload', type: 'Object'}
+          http: {path: '/webhook/github', verb: 'post'},
+          accepts: {arg: 'repository', type: 'Object'}
       }
   );
 
