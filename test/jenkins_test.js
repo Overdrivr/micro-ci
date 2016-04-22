@@ -23,14 +23,14 @@ describe('jenkins', function() {
   });
 
  describe('build', function() {
-/*   describe('runBuild', function() {
+  describe('runBuild', function() {
   it('should run a build', function(done) {
     var build_id = 3;
     var jobName = 'build_' + build_id;
     this.nock
          .head('/job/' + jobName + '/api/json')
          .reply(404)
-         .post('/createItem?name=' + jobName, fixtures.jobCreate)
+         .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost/</url><event>all</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
          .reply(200)
          .post('/job/' + jobName + '/build')
          .reply(201, '', { location: this.url + '/queue/item/1/' })
@@ -59,7 +59,6 @@ describe('Job exist', function() {
         .post('/job/' + jobName + '/build')
         .reply(201, '', { location: this.url + '/queue/item/1/' })
 
-console.log(this.nock);
  var yaml = {build : ["echo 'Hello' ", "exit 0"]};
 
  this.jenkins.build(build_id, yaml, "http://localhost/",
@@ -133,7 +132,6 @@ describe('GetStatus', function() {
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              console.log( "TTTT" + data)
               assert(err == null);
               assert(data == "fail");
               done();
@@ -164,38 +162,27 @@ describe('GetStatus', function() {
             });
    });
 
-*/
   });
 
   describe('JobQueued', function() {
    it('Job queued', function(done) {
      var build_id = 3;
      var jobName = 'build_' + build_id;
-
           this.nock
             .head('/job/' + jobName + '/api/json')
             .reply(200)
             .get('/queue/api/json')
-            .reply(200, fixtures.jobQueue)
-            .post('/job/' + jobName + '/build')
-            .reply(201, '', { location: 'http://localhost:8080/queue/item/124/' });
+            .reply(201, fixtures.jobQueue)
+            .get('/job/'+jobName+'/1/api/json')
+            .reply(201);
 
-          console.log(this.nock);
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              console.log("Error", err);
               assert(err == null);
               assert(data == "waiting");
-              done();
             });
+              done();
    });
-
-
-
   });
-
-
-
-
 });
