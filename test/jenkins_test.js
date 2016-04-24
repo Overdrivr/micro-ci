@@ -110,7 +110,7 @@ describe('GetStatus', function() {
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              assert(err == null);
+              assert.equal(err, null);
               assert.equal(data, "success");
               done();
             });
@@ -133,7 +133,7 @@ describe('GetStatus', function() {
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              assert(err == null);
+              assert.equal(err, null);
               assert.equal(data, "fail");
               done();
             });
@@ -157,7 +157,7 @@ describe('GetStatus', function() {
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              assert(err == null);
+              assert.equal(err, null);
               assert.equal(data, "ongoing");
               done();
             });
@@ -180,7 +180,7 @@ describe('GetStatus', function() {
           this.jenkins.get_build_status(build_id,
             function(err, data)
             {
-              assert(err == null);
+              assert.equal(err, null);
               assert.equal(data, "waiting");
             });
               done();
@@ -209,6 +209,23 @@ describe('GetStatus', function() {
      });
    });
 
+  });
+
+  describe('Notexist', function() {
+   it('Job does not exist', function(done) {
+     var build_id = 3;
+     var jobName = 'build_' + build_id;
+     this.nock
+          .head('/job/' + jobName + '/api/json')
+          .reply(404)
+   this.jenkins.get_build_log(build_id,
+     function(err, data)
+     {
+       assert.throws(function(){throw (err);},/Job build_3 does not exist/);
+       assert.deepEqual(data, null);
+       done();
+     });
+   });
   });
 
   });
