@@ -64,7 +64,8 @@ describe('Job exist', function() {
  this.jenkins.build(build_id, yaml, "http://localhost/",
    function(err, data)
    {
-     assert(err != null);
+     assert.throws(function(){throw (err);},/Job build_3 already exist/);
+    assert.deepEqual(data, null);
      done();
    });
  });
@@ -85,8 +86,8 @@ describe('GetStatus', function() {
    this.jenkins.get_build_status(build_id,
      function(err, data)
      {
-       assert(err != null);
-       assert(data == null);
+       assert.throws(function(){throw (err);},/Job build_3 does not exist/);
+       assert.deepEqual(data, null);
        done();
      });
    });
