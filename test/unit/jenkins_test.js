@@ -1,7 +1,7 @@
 var assert = require('assert');
 
 var sinon = require('sinon');
-var Jenkins = require('../lib/jenkins');
+var Jenkins = require('../../lib/jenkins');
 var should = require('should');
 var nock = require('nock');
 
