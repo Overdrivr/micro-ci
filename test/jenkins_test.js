@@ -65,7 +65,7 @@ describe('Job exist', function() {
    function(err, data)
    {
      assert.throws(function(){throw (err);},/Job build_3 already exist/);
-    assert.deepEqual(data, null);
+     assert.deepEqual(data, null);
      done();
    });
  });
@@ -111,7 +111,7 @@ describe('GetStatus', function() {
             function(err, data)
             {
               assert(err == null);
-              assert(data == "success");
+              assert.equal(data, "success");
               done();
             });
    });
@@ -134,7 +134,7 @@ describe('GetStatus', function() {
             function(err, data)
             {
               assert(err == null);
-              assert(data == "fail");
+              assert.equal(data, "fail");
               done();
             });
    });
@@ -158,7 +158,7 @@ describe('GetStatus', function() {
             function(err, data)
             {
               assert(err == null);
-              assert(data == "ongoing");
+              assert.equal(data, "ongoing");
               done();
             });
    });
@@ -181,9 +181,35 @@ describe('GetStatus', function() {
             function(err, data)
             {
               assert(err == null);
-              assert(data == "waiting");
+              assert.equal(data, "waiting");
             });
               done();
    });
+  });
+
+  describe('log', function() {
+   describe('GetLog', function() {
+   it('Return build log', function(done) {
+     var build_id = 3;
+     var jobName = 'build_' + build_id;
+     this.nock
+        .head('/job/' + jobName + '/api/json')
+        .reply(200)
+        .get('/job/' + jobName + '/1/consoleText')
+        .reply(200, fixtures.buildLog, { 'Content-Type': 'text/plain;charset=UTF-8' });
+
+   var yaml = {build : ["echo 'Hello' ", "exit 0"]};
+
+   this.jenkins.get_build_log(build_id,
+     function(err, data)
+     {
+       should.not.exist(err);
+       assert.equal(data, fixtures.buildLog);
+       done();
+     });
+   });
+
+  });
+
   });
 });
