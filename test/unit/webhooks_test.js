@@ -45,7 +45,7 @@ describe('Fake github webhook', function(){
         done();
     });
   });
-  //TODO: Test with tampered data ? What is the expected outcome ?
+  //TODO: Test with tampered data (a wrong secret key)
   /*
   it('calls the endpoint with tampered data using a not-existing commit',
   function(done){
