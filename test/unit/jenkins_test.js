@@ -92,7 +92,7 @@ describe('GetStatus', function() {
      });
    });
   });
-  });
+
 
   describe('JobSucess', function() {
    it('Job succes', function(done) {
@@ -186,6 +186,7 @@ describe('GetStatus', function() {
               done();
    });
   });
+});
 
   describe('log', function() {
    describe('GetLog', function() {
