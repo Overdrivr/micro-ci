@@ -23,5 +23,6 @@
       "disableStackTrace": false
     }
   },
-  "legacyExplorer": false
+  "legacyExplorer": false,
+  "nbOfSlaves" : 1
 }
