@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "server/server.js",
   "scripts": {
-    "pretest": "jshint ."
+    "pretest": "jshint .",
+    "e2e": "protractor ./test/e2e/conf.js"
   },
   "dependencies": {
     "compression": "^1.0.3",
