@@ -1,21 +1,18 @@
 //var jenkins = require('../../lib/jenkins');
 
-var slaves = [];
-var maxNbOfSlaves = 0;
-var queuedJobs = [];
 
 
-//TODO Migrate all in strongloop by adding a slave mode l
+
 module.exports = function slavesManager(app) {
 
   console.log(app.get('nbOfSlaves'));
   console.log("Enabling slaves manager");
   app.get('/slaveManager/slave/:ip/boot',
-    function(req, res){
+    function(req, res){//Slave complete is booting operation 
       console.log(req.params.ip);
       res.status(200).end();
 
-      //Add the slave to jenkins and enable it TODO
+
     });
 
 
