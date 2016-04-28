@@ -1,6 +1,5 @@
 var assert = require('assert');
 
-var sinon = require('sinon');
 var Jenkins = require('../../lib/jenkins');
 var should = require('should');
 var nock = require('nock');
@@ -9,16 +8,14 @@ var assert = require('assert')
 var fixtures = require("fixturefiles")
 describe('jenkins', function() {
   beforeEach(function() {
-    this.sinon = sinon.sandbox.create();
     this.url = process.env.JENKINS_TEST_URL || 'http://localhost:8080';
     this.nock = nock(this.url);
 
-    this.jenkins = new Jenkins.Jenkins(this.url); //TODO review the naming issue
+    this.jenkins = new Jenkins(this.url); 
 
   });
 
   afterEach(function(done) {
-    this.sinon.restore();
     done();
   });
 
