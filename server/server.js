@@ -17,14 +17,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  console.log("Serializing User");
-  console.log(Object.keys(user));
   done(null, user);
 });
 
 passport.deserializeUser(function(obj, done) {
-  console.log("Deserializing User");
-  console.log(Object.keys(obj));
   done(null, obj);
 });
 
