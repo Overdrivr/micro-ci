@@ -11,13 +11,10 @@ describe('jenkins', function() {
     this.url = process.env.JENKINS_TEST_URL || 'http://localhost:8080';
     this.nock = nock(this.url);
 
-    this.jenkins = new Jenkins(this.url); 
+    this.jenkins = new Jenkins(this.url, "099c7823-795b-41b8-81b0-ad92f79492e0");
 
   });
 
-  afterEach(function(done) {
-    done();
-  });
 
  describe('build', function() {
   describe('runBuild', function() {
@@ -227,4 +224,50 @@ describe('GetStatus', function() {
   });
 
   });
+
+  describe('node', function() {
+   describe('CreateNode', function() {
+   it('Create a simple ssh node', function(done) {
+     var ip = "92.128.12.7";
+      var name = "Yellow"
+     this.nock
+      .head('/computer/' + name + '/api/json')
+      .reply(404)
+      .post("/computer/doCreateItem?" + fixtures.nodeCreateQuery )
+      .reply(302, '', { location: 'http://localhost:8080/computer/' });
+
+   this.jenkins.create_node(name, ip,
+     function(err, data)
+     {
+       should.not.exist(err);
+       should.not.exist(data);
+       done();
+     });
+   });
+
+  });
+
+  });
+
+  describe('node', function() {
+   describe('NodeExist', function() {
+   it('Node already exist', function(done) {
+     var ip = "92.128.12.7";
+      var name = "Yellow"
+     this.nock
+      .head('/computer/' + name + '/api/json')
+      .reply(200)
+   this.jenkins.create_node(name, ip,
+     function(err, data)
+     {
+       assert.throws(function(){throw (err);},/Node Yellow already exist/);
+       should.not.exist(data);
+       done();
+     });
+   });
+
+  });
+
+  });
+
 });
