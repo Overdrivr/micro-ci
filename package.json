@@ -20,7 +20,8 @@
     "should": "~8.3.1",
     "nock": "~8.0.0",
     "fixturefiles": "~0.3.0",
-    "papi": "~0.25.0"
+    "papi": "~0.25.0",
+    "jenkins": "~0.17.0"
   },
   "devDependencies": {
     "jshint": "^2.5.6"
