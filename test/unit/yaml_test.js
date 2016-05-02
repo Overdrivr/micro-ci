@@ -1,7 +1,7 @@
 
 var inArray = require("in-array");
 
-var yaml = require("../lib/yaml-parser")
+var yaml = require("../../lib/yaml-parser")
 
 var assert = require('assert');
 
