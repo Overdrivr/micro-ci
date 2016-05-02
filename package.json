@@ -4,6 +4,7 @@
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
+    "unit": "mocha ./test/unit",
     "e2e": "protractor ./test/e2e/conf.js"
   },
   "dependencies": {
