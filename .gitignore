@@ -17,3 +17,7 @@
 coverage
 node_modules
 npm-debug.log
+
+# Sensitive data files
+test-credentials.json
+providers.json
