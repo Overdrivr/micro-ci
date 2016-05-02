@@ -189,8 +189,6 @@ describe('GetStatus', function() {
         .get('/job/' + jobName + '/1/consoleText')
         .reply(200, fixtures.buildLog, { 'Content-Type': 'text/plain;charset=UTF-8' });
 
-   var yaml = {build : ["echo 'Hello' ", "exit 0"]};
-
    jenkins.get_build_log(build_id,
      function(err, data)
      {
