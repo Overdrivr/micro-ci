@@ -246,12 +246,8 @@ describe('GetStatus', function() {
    });
 
   });
-
-  });
-
-  describe('node', function() {
    describe('NodeExist', function() {
-   it('Node already exist', function(done) {
+   it('Create Node already exist', function(done) {
      var ip = "92.128.12.7";
       var name = "Yellow"
      this.nock
@@ -268,6 +264,39 @@ describe('GetStatus', function() {
 
   });
 
+ describe('RemoveNodeDoesNotExist', function() {
+   it('Remove a Node which does not exist', function(done) {
+      var name = "Yellow"
+     this.nock
+      .head('/computer/' + name + '/api/json')
+      .reply(404)
+
+      this.jenkins.remove_node(name,
+        function(err)
+        {
+          assert.throws(function(){throw (err);},/Node Yellow does not exist/);
+          done();
+        });
+    });
   });
+
+  describe('RemoveNode', function() {
+    it('Remove a node', function(done) {
+       var name = "Yellow"
+      this.nock
+       .head('/computer/' + name + '/api/json')
+       .reply(200)
+       .post('/computer/' + name + '/doDelete')
+       .reply(302, '')
+       this.jenkins.remove_node(name,
+         function(err)
+         {
+           should.not.exist(err);
+           done();
+         });
+     });
+   });
+
+});
 
 });
