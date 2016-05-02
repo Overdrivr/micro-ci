@@ -19,9 +19,14 @@ mocha ./test/unit
 
 ## end to end
 ### on Unix systems
+Install protractor: 
 ```
-webdriver-manager start &
-node . &
+npm install -g protractor 
+```
+And run in different consoles:
+```
+webdriver-manager start 
+node . 
 protractor conf.js
 ```
 ### on Windows
