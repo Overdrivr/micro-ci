@@ -17,11 +17,6 @@
       "type": "hasMany",
       "model": "Repository",
       "foreignKey": ""
-    },
-    "accounts": {
-      "type": "hasMany",
-      "model": "Account",
-      "foreignKey": ""
     }
   },
   "acls": [],
