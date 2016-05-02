@@ -59,7 +59,7 @@ describe('Job exist', function() {
    function(err, data)
    {
      assert.throws(function(){throw (err);},/Job build_3 already exist/);
-     assert.deepEqual(data, null);
+     assert.equal(data, null);
      done();
    });
  });
@@ -81,7 +81,7 @@ describe('GetStatus', function() {
      function(err, data)
      {
        assert.throws(function(){throw (err);},/Job build_3 does not exist/);
-       assert.deepEqual(data, null);
+       assert.equal(data, null);
        done();
      });
    });
@@ -217,7 +217,7 @@ describe('GetStatus', function() {
      function(err, data)
      {
        assert.throws(function(){throw (err);},/Job build_3 does not exist/);
-       assert.deepEqual(data, null);
+       assert.equal(data, null);
        done();
      });
    });
