@@ -1,0 +1,22 @@
+{
+  "name": "UserIdentity",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "provider": {
+      "type": "string",
+      "required": true
+    },
+    "provider_id": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
