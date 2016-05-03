@@ -22,9 +22,14 @@
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.0.1",
-    "yaml": "~0.3.0"
+    "yaml": "~0.3.0",
+    "in-array": "~0.1.2"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "jshint": "^2.5.6",
+    "mocha": "~2.4.5",
+    "supertest": "^1.2.0",
     "jshint": "^2.5.6",
     "url-parse": "^1.1.1",
     "mocha": "~2.4.5"
