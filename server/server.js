@@ -16,13 +16,35 @@ app.use(session({ secret: 'keyboard cat', resave: false, saveUninitialized: fals
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
+app.serializeUser = function(user, done) {
+  var userdata = {
+    "provider": user.provider,
+    "provider_id": user.id
+  };
+  //TODO: Check it cannot create two different users in the database with same provider and provider_id
+  app.models.UserIdentity.upsert(userdata, function(err, models) {
+    if (err) return done(err);
+    if (!models) return done(Error('Client could not be created.'));
+    done(null, userdata);
+  });
+};
 
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
+app.deserializeUser = function(userdata, done) {
+  app.models.UserIdentity.find({
+    where: {
+      provider: userdata.provider,
+      provider_id: userdata.userid
+    }
+  }, function(err, user) {
+    if(err) return done(err);
+    if(!user) return done(Error('Client [' + userdata.provider + '] : ' + userdata.id + 'not found.'));
+    console.log("Found user", user);
+    done(null, user);
+  });
+};
+
+passport.serializeUser(app.serializeUser);
+passport.deserializeUser(app.deserializeUser);
 
 // Execute all boot scripts in ./server/boot
 boot(app, __dirname);
