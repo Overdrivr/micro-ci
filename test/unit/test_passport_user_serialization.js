@@ -9,6 +9,11 @@ describe('user serialization', function(){
     },
     function(err, userdata){
       if(err) return done(err);
+      assert(userdata, 'userdata is empty.');
+      assert.lengthOf(Object.keys(userdata), 2);
+      assert.property(userdata, 'accessToken');
+      assert.property(userdata, 'userId');
+      assert.equal(userdata.userId, 1);
 
       app.models.Client.find(function(err, instances) {
         if (err) return done(err);
@@ -31,6 +36,12 @@ describe('user serialization', function(){
     function(err, userdata) {
       if(err) return done(err);
 
+      assert(userdata, 'userdata is empty.');
+      assert.lengthOf(Object.keys(userdata), 2);
+      assert.property(userdata, 'accessToken');
+      assert.property(userdata, 'userId');
+      assert.equal(userdata.userId, 1);
+
       app.models.Client.find(function(err, instances) {
         if (err) return done(err);
         assert.lengthOf(instances, 1);
@@ -40,7 +51,7 @@ describe('user serialization', function(){
         assert.equal(instances[0]['provider_id'], 12345)
         done();
       });
-      
+
     });
   });
 });
