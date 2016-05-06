@@ -13,9 +13,14 @@ describe('user serialization', function(){
       assert.lengthOf(Object.keys(userdata), 2);
       assert.property(userdata, 'accessToken');
       assert.property(userdata, 'userId');
-      assert.equal(userdata.userId, 1);
 
-      app.models.Client.find(function(err, instances) {
+      app.models.Client.find({
+          where: {
+            provider : 'github',
+            provider_id : 12345
+          }
+        },
+        function(err, instances) {
         if (err) return done(err);
         assert.lengthOf(instances, 1);
         assert.property(instances[0], 'provider');
@@ -40,9 +45,13 @@ describe('user serialization', function(){
       assert.lengthOf(Object.keys(userdata), 2);
       assert.property(userdata, 'accessToken');
       assert.property(userdata, 'userId');
-      assert.equal(userdata.userId, 1);
 
-      app.models.Client.find(function(err, instances) {
+      app.models.Client.find({
+          where: {
+            provider : 'github',
+            provider_id : 12345
+          }
+        }, function(err, instances) {
         if (err) return done(err);
         assert.lengthOf(instances, 1);
         assert.property(instances[0], 'provider');
