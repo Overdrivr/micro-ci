@@ -42,8 +42,8 @@ app.serializeUser = function(user, done) {
         }
       }, function(err, clients) {
         if (err) return callback(err);
-        // TODO: Provide token in the response instead of null ?
-        if (clients.length) return done();
+        if (clients.length > 1) return callback(Error('Multiple clients matching search pattern. Aborting'));
+        if (clients.length == 1) return callback('ok', clients[0]);
         callback();
       });
     },
@@ -68,19 +68,18 @@ app.serializeUser = function(user, done) {
         callback(null, client);
       });
     },
-    // Generate a token to return to the client to enable client-side session persistence
-    function(client, callback) {
+  ], function(err, client) {
+      if (err && err != 'ok') return done(err);
+
+      // Generate a token to return to the client to enable client-side session persistence
       app.models.Client.generateVerificationToken(client, function(err, token) {
-        if(err) return callback(err);
+        if(err) return done(err);
         var responsedata = {
           userId: client.id,
           accessToken: token
         };
         done(null, responsedata);
       });
-    }
-  ], function(err, results) {
-      done(err);
   });
 };
 
