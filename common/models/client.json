@@ -6,8 +6,12 @@
     "validateUpsert": true
   },
   "properties": {
-    "username": {
+    "provider": {
       "type": "string",
+      "required": true
+    },
+    "provider_id": {
+      "type": "number",
       "required": true
     }
   },
