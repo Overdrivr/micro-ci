@@ -8,14 +8,18 @@ describe('user serialization', function(){
       'id': 12345
     },
     function(err, userdata){
-      app.models.UserIdentity.find(function(err, instances) {
+      if(err) return done(err);
+
+      app.models.Client.find(function(err, instances) {
+        if (err) return done(err);
         assert.lengthOf(instances, 1);
         assert.property(instances[0], 'provider');
         assert.property(instances[0], 'provider_id');
         assert.equal(instances[0]['provider'], 'github');
         assert.equal(instances[0]['provider_id'], 12345)
-        done(err);
+        done();
       });
+
     });
   });
 
@@ -25,14 +29,18 @@ describe('user serialization', function(){
       'id': 12345
     },
     function(err, userdata) {
-      app.models.UserIdentity.find(function(err, instances) {
+      if(err) return done(err);
+
+      app.models.Client.find(function(err, instances) {
+        if (err) return done(err);
         assert.lengthOf(instances, 1);
         assert.property(instances[0], 'provider');
         assert.property(instances[0], 'provider_id');
         assert.equal(instances[0]['provider'], 'github');
         assert.equal(instances[0]['provider_id'], 12345)
-        done(err);
+        done();
       });
+      
     });
   });
 });
