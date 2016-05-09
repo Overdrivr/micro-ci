@@ -28,7 +28,7 @@ function initProvider(app, provider) {
   ));
 
   app.get('/auth/' + provider.name,
-    passport.authenticate(provider.name, { scope: [ 'user:email' ] }),
+    passport.authenticate(provider.name, { scope: provider.scope }),
     function(req, res){
       // The request will be redirected, this is not called.
     });
