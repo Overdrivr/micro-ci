@@ -52,9 +52,5 @@
   "Job": {
     "dataSource": "db",
     "public": true
-  },
-  "UserIdentity": {
-    "dataSource": "db",
-    "public": false
   }
 }
