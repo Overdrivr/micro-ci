@@ -14,17 +14,19 @@ module.exports = function slavesManager(app) {
       Slave.findOne({where:{status:"booting"}}, function(err, slave)
         if(err)
           return throw err;
-        jenkins.create_node("slave_"+slave.getId(), req.params.ip, function(err)
-        {
-          if(err)
-            throw err;
-        });
 
         slave.updateAttributes({status: "Building"}, function(err)
         {
           if(err)
-            throw err;
+            return throw err;
         });
+        jenkins.create_node("slave_"+slave.getId(), req.params.ip, function(err)
+        {
+          if(err)
+            return throw err;
+        });
+
+
       );
 
 
@@ -35,24 +37,34 @@ module.exports = function slavesManager(app) {
     {
       if(build.status == "created")
       {
-
         build.updateAttributes({status: "waiting"}, function(err)
         {
           if(err)
-            throw err;
+            return throw err;
+          //push the build to jenkins
+          jenkins.build(build.getId(), yaml, endpoint, function(err) //TODO who is yaml and endpoint?
+          {
+            if(err)
+              return throw err;
+
+            // if we have not reach the limit of slaves, power up one
+            Slaves.count( {}, function(err, cnt){
+              if(cnt < maxNbOfSlaves)
+              {
+                Slaves.create({status:"booting"}, function (err)
+                {
+                  if(err)
+                    return throw err;
+                    //TODO boot slave
+                });
+              }
+            });
+          });
+
+
+
         });
 
-        if(slaves.length < maxNbOfSlaves)
-        {
-          //Boot slave TODO
-          var slave = {status : "BOOTING", ip :"", jobId :req.params.id }
-          slaves.push(slave);
-        }
-
-        else { //Add to the queue list
-          var job = {id:req.params.id};
-          queuedJobs.push(job);
-        }
       }
       //Add the slave to jenkins and enable it
     });
