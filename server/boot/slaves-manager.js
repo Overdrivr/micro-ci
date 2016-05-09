@@ -1,4 +1,4 @@
-//var jenkins = require('../../lib/jenkins');
+var jenkins = require('../../lib/jenkins');
 
 
 
@@ -8,49 +8,66 @@ module.exports = function slavesManager(app) {
   console.log(app.get('nbOfSlaves'));
   console.log("Enabling slaves manager");
   app.get('/slaveManager/slave/:ip/boot',
-    function(req, res){//Slave complete is booting operation 
+    function(req, res){//Slave complete is booting operation
       console.log(req.params.ip);
       res.status(200).end();
+      Slave.findOne({where:{status:"booting"}}, function(err, slave)
+        if(err)
+          return throw err;
+        jenkins.create_node("slave_"+slave.getId(), req.params.ip, function(err)
+        {
+          if(err)
+            throw err;
+        });
+
+        slave.updateAttributes({status: "Building"}, function(err)
+        {
+          if(err)
+            throw err;
+        });
+      );
 
 
     });
 
-
-  //Ask for a new build
-  app.get('/slaveManager/build/:id/',
-    function(req, res){
-
-      if(slaves.length < maxNbOfSlaves)
+    //A build is created
+    Builds.on('changed', function (build)
+    {
+      if(build.status == "created")
       {
-        //Boot slave TODO
-        var slave = {status : "BOOTING", ip :"", jobId :req.params.id }
-        slaves.push(slave);
-      }
-      else { //Add to the queue list
-        var job = {id:req.params.id};
-        queuedJobs.push(job);
-      }
 
-      res.status(200).end();
+        build.updateAttributes({status: "waiting"}, function(err)
+        {
+          if(err)
+            throw err;
+        });
 
+        if(slaves.length < maxNbOfSlaves)
+        {
+          //Boot slave TODO
+          var slave = {status : "BOOTING", ip :"", jobId :req.params.id }
+          slaves.push(slave);
+        }
+
+        else { //Add to the queue list
+          var job = {id:req.params.id};
+          queuedJobs.push(job);
+        }
+      }
       //Add the slave to jenkins and enable it
     });
 
 
+    //A slave finished is job
     app.get('/slaveManager/slave/:ip/end',
       function(req, res){
         console.log(req.params.ip);
         //Find the slave and remove it TODO
-
         if(queuedJobs.length > 0)
         {
 
         }
-
         res.status(200).end();
-
         //Add the slave to jenkins and enable it TODO
       });
-
-
 }
