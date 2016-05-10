@@ -8,10 +8,21 @@ module.exports = function slavesManager(app) {
   console.log(app.get('nbOfSlaves'));
   console.log("Enabling slaves manager");
 
-  //This function check if we can powerup a slave and will power up if possible 
+  //This function check if we can powerup a slave and will power up if possible
   function check_and_boot_slave()
   {
-
+    // if we have not reach the limit of slaves, power up one
+    Slaves.count( {}, function(err, cnt){
+      if(cnt < maxNbOfSlaves)
+      {
+        Slaves.create({status:"booting"}, function (err)
+        {
+          if(err)
+            return throw err;
+          slave_api.boot_slave("http://127.0.0.1:3000");
+        });
+      }
+    });
   }
 
   app.get('/slaveManager/slave/:ip/boot',
@@ -58,18 +69,7 @@ module.exports = function slavesManager(app) {
               if(err)
                 return throw err;
 
-              // if we have not reach the limit of slaves, power up one
-              Slaves.count( {}, function(err, cnt){
-                if(cnt < maxNbOfSlaves)
-                {
-                  Slaves.create({status:"booting"}, function (err)
-                  {
-                    if(err)
-                      return throw err;
-                    slave_api.boot_slave("http://127.0.0.1:3000");
-                  });
-                }
-              });
+              check_and_boot_slave();
             });
           });
 
@@ -126,15 +126,10 @@ module.exports = function slavesManager(app) {
               if(err)
                 return throw err;
 
-
-
+              check_and_boot_slave();
             }
           )
-
           });
-
-
         });
 
-        });
 }
