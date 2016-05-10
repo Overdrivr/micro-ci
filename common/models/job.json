@@ -5,7 +5,11 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "yaml": {
+      "type": "string"
+    }
+  },
   "validations": [],
   "relations": {
     "commit": {
