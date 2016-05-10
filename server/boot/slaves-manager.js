@@ -7,6 +7,13 @@ module.exports = function slavesManager(app) {
 
   console.log(app.get('nbOfSlaves'));
   console.log("Enabling slaves manager");
+
+  //This function check if we can powerup a slave and will power up if possible 
+  function check_and_boot_slave()
+  {
+
+  }
+
   app.get('/slaveManager/slave/:ip/boot',
     function(req, res){//Slave complete is booting operation
       console.log(req.params.ip);
@@ -88,20 +95,46 @@ module.exports = function slavesManager(app) {
           {
             if(err)
               return throw err;
-
               build.updateAttributes({status: status}, function(err)
               {
                 if(err)
                   return throw err;
               });
-          };)
+          });
         }
 
-        if(queuedJobs.length > 0)
-        {
-
-        }
         res.status(200).end();
-        //Add the slave to jenkins and enable it TODO
+
       });
+
+      //A slave is powering down check if we have to start a new one
+      app.get('/slaveManager/slave/:ip/end',
+        function(req, res){
+
+          Slave.findOne({where:{ip:req.params.ip}}, function(err, slave)
+          if(err)
+            return throw err;
+
+          //Remove the slave node from jenkins
+          jenkins.remove_node("slave_" + slave.getId(), function(err) {
+            if(err)
+              return throw err;
+
+            //Remove the slave in the db
+            Slave.destroyById(slave.getId(), function(err)
+            {
+              if(err)
+                return throw err;
+
+
+
+            }
+          )
+
+          });
+
+
+        });
+
+        });
 }
