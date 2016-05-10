@@ -5,6 +5,7 @@ var session = require('express-session');
 var path = require('path');
 const crypto = require('crypto');
 var async = require('async');
+var secrets = require('./session-config.json').secrets;
 
 var app = module.exports = loopback();
 
@@ -15,11 +16,11 @@ app.set('view engine', 'jade');
 
 // Configure sessions and passport
 app.use(session({
-  secret: 'keyboard cat',
+  secret: secrets,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 1000 * 3600
+    maxAge: 1000 * 3600 * 24 * 30
   }
 }));
 app.use(passport.initialize());
