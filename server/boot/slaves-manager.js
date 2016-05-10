@@ -1,5 +1,5 @@
 var jenkins = require('../../lib/jenkins');
-
+var slave_api = require('../../lib/localhost_slave_api');
 
 
 
@@ -40,24 +40,29 @@ module.exports = function slavesManager(app) {
         build.updateAttributes({status: "waiting"}, function(err)
         {
           if(err)
-            return throw err;
-          //push the build to jenkins
-          jenkins.build(build.getId(), yaml, endpoint, function(err) //TODO who is yaml and endpoint?
-          {
-            if(err)
-              return throw err;
+          return throw err;
 
-            // if we have not reach the limit of slaves, power up one
-            Slaves.count( {}, function(err, cnt){
-              if(cnt < maxNbOfSlaves)
-              {
-                Slaves.create({status:"booting"}, function (err)
+          //Get yaml content
+          build.job(function(err, job))
+          {
+            //push the build to jenkins
+            jenkins.build(build.getId(), job.yaml, endpoint, function(err) //TODO where is the endpoint?
+            {
+              if(err)
+                return throw err;
+
+              // if we have not reach the limit of slaves, power up one
+              Slaves.count( {}, function(err, cnt){
+                if(cnt < maxNbOfSlaves)
                 {
-                  if(err)
-                    return throw err;
-                    //TODO boot slave
-                });
-              }
+                  Slaves.create({status:"booting"}, function (err)
+                  {
+                    if(err)
+                      return throw err;
+                    slave_api.boot_slave("http://127.0.0.1:3000");
+                  });
+                }
+              });
             });
           });
 
