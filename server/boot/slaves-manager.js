@@ -66,11 +66,10 @@ module.exports = function slavesManager(app) {
         });
 
       }
-      //Add the slave to jenkins and enable it
     });
 
 
-    //A slave finished is job
+    //A slave finished is job TODO maybe more a job is completed  ?
     app.get('/slaveManager/slave/:ip/end',
       function(req, res){
         console.log(req.params.ip);
