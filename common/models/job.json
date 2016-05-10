@@ -7,7 +7,8 @@
   },
   "properties": {
     "yaml": {
-      "type": "string"
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],
