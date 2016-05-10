@@ -74,11 +74,29 @@ module.exports = function slavesManager(app) {
     });
 
 
-    //A slave finished is job TODO maybe more a job is completed  ?
-    app.get('/slaveManager/slave/:ip/end',
+    //A build is complete
+    app.get('/build/:id/complete',
       function(req, res){
-        console.log(req.params.ip);
-        //Find the slave and remove it TODO
+        console.log(req.params.id);
+        //Update build status to complete:
+        Build.findOne({where:{id:req.params.id}}, function(err, build)
+        {
+          if(err)
+            return throw err;
+          //Get build status
+          jenkins.get_build_status(build.getId(), function(err, status)
+          {
+            if(err)
+              return throw err;
+
+              build.updateAttributes({status: status}, function(err)
+              {
+                if(err)
+                  return throw err;
+              });
+          };)
+        }
+
         if(queuedJobs.length > 0)
         {
 
