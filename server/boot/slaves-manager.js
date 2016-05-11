@@ -1,4 +1,4 @@
-var jenkins = require('../../lib/jenkins');
+var jenkins = require('../../lib/jenkins'); //TODO this should be available for anyone
 var slave_api = require('../../lib/localhost_slave_api');
 
 //TODO put site name (127.0.0.1/ micro-ci.com) in a variable
@@ -11,28 +11,6 @@ module.exports = function slavesManager(app) {
   console.log("Enabling slaves manager");
 
 
-
-  app.get('/slaveManager/slave/:ip/boot',
-  function(req, res){//Slave complete is booting operation
-    console.log(req.params.ip);
-    res.status(200).end();
-    Slave.findOne({where:{status:"booting"}}, function(err, slave)
-    {
-      if(err)
-      throw err;
-
-      slave.updateAttributes({status: "Building"}, function(err)
-      {
-        if(err)
-        throw err;
-      });
-      jenkins.create_node("slave_"+slave.getId(), req.params.ip, function(err)
-      {
-        if(err)
-        throw err;
-      });
-    });
-  });
 
   //A build is created
   app.models.Build.on('changed', function (build)
