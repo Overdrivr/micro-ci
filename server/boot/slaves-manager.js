@@ -4,28 +4,13 @@ var slave_api = require('../../lib/localhost_slave_api');
 //TODO put site name (127.0.0.1/ micro-ci.com) in a variable
 //TODO Move as much function as possible in each model
 //TODO manage the err and not throw them
-//TODO replace on method by operation hooks 
+//TODO replace on method by operation hooks
 module.exports = function slavesManager(app) {
 
   console.log(app.get('nbOfSlaves'));
   console.log("Enabling slaves manager");
 
-  //This function check if we can powerup a slave and will power up if possible
-  function check_and_boot_slave()
-  {
-    // if we have not reach the limit of slaves, power up one
-    Slaves.count( {}, function(err, cnt){
-      if(cnt < maxNbOfSlaves)
-      {
-        Slaves.create({status:"booting"}, function (err)
-        {
-          if(err)
-          throw err;
-          slave_api.boot_slave("http://127.0.0.1:3000");
-        });
-      }
-    });
-  }
+
 
   app.get('/slaveManager/slave/:ip/boot',
   function(req, res){//Slave complete is booting operation
@@ -68,7 +53,10 @@ module.exports = function slavesManager(app) {
             if(err)
             throw err;
 
-            check_and_boot_slave();
+            Slave.check_and_boot_slave(function(err) {
+              if(!err)//We can boot a slave
+                slave_api.boot_slave("http://127.0.0.1:3000");
+            });
           });
         });
       });
@@ -123,7 +111,10 @@ module.exports = function slavesManager(app) {
           if(err)
           throw err;
 
-          check_and_boot_slave();
+          Slave.check_and_boot_slave(function(err) {
+            if(!err)//We can boot a slave
+              slave_api.boot_slave("http://127.0.0.1:3000");
+          });
           res.status(200).end();
         });
       });
