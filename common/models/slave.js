@@ -33,7 +33,7 @@ module.exports = function(Slave) {
     return false
   }
 
-  Slave.boot = function(id, ip cb) {
+  Slave.boot = function(ip cb) {
 
     if(check_ip(ip))
     {
@@ -51,7 +51,7 @@ module.exports = function(Slave) {
             if(err)
             return cb(err)
 
-            return cb(null);
+            return cb(null, slave.getId());
           });
         });
 
@@ -65,7 +65,8 @@ module.exports = function(Slave) {
   Slave.remoteMethod(
     'boot',
     {
-      accepts: [{arg: 'id', type: 'number'}, {arg: 'ip', type: 'string'}]
+      accepts: [{arg: 'ip', type: 'string'}],
+      returns: {arg: 'id', type:'number'}
     }
   );
 };
