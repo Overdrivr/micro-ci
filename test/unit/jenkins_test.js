@@ -223,14 +223,15 @@ describe('jenkins', function() {
       describe('CreateNode', function() {
         it('Create a simple ssh node', function(done) {
           var ip = "92.128.12.7";
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(404)
           .post("/computer/doCreateItem?" + fixtures.nodeCreateQuery )
           .reply(302, '', { location: 'http://localhost:8080/computer/' });
 
-          jenkins.create_node(name, ip,
+          jenkins.create_node(id, ip,
             function(err, data)
             {
               should.not.exist(err);
@@ -243,14 +244,15 @@ describe('jenkins', function() {
       describe('NodeExist', function() {
         it('Create Node already exist', function(done) {
           var ip = "92.128.12.7";
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(200)
-          jenkins.create_node(name, ip,
+          jenkins.create_node(id, ip,
             function(err, data)
             {
-              assert.throws(function(){throw (err);},/Node Yellow already exist/);
+              assert.throws(function(){throw (err);},/Node slave_62 already exist/);
               should.not.exist(data);
               done();
             });
@@ -260,15 +262,16 @@ describe('jenkins', function() {
 
       describe('RemoveNodeDoesNotExist', function() {
         it('Remove a Node which does not exist', function(done) {
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(404)
 
-          jenkins.remove_node(name,
+          jenkins.remove_node(id,
             function(err)
             {
-              assert.throws(function(){throw (err);},/Node Yellow does not exist/);
+              assert.throws(function(){throw (err);},/Node slave_62 does not exist/);
               done();
             });
           });
@@ -276,13 +279,14 @@ describe('jenkins', function() {
 
       describe('RemoveNode', function() {
         it('Remove a node', function(done) {
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(200)
           .post('/computer/' + name + '/doDelete')
           .reply(302, '')
-          jenkins.remove_node(name,
+          jenkins.remove_node(id,
             function(err)
             {
               should.not.exist(err);
