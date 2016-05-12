@@ -1,5 +1,9 @@
-var jenkins = require('../../lib/jenkins');
 
+var jenkinsConf = require('../../server/jenkins.json');
+var Jenkins = require('../../lib/jenkins');
+
+
+var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 
 var isIp = require('is-ip');
 
@@ -25,7 +29,7 @@ module.exports = function(Slave) {
   }
 
 
-  Slave.boot = function(ip cb) {
+  Slave.boot = function(ip, cb) {
     if(isIp(ip))
     {
       Slave.findOne({where:{status:"booting"}}, function(err, slave) //At least one slave should be in boot mode
@@ -79,26 +83,24 @@ module.exports = function(Slave) {
             if(err)
               return cb(err);
 
-            Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager
+            Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager. Migrate it in the slave manger with a hook
               if(err)
                 return cb(err);
 
-              slave_api.boot_slave("http://127.0.0.1:3000");
-              cb(null);
+              slave_api.boot_slave("http://127.0.0.1:3000"); //Don't know if slave api should be there? TODO
+              cb(null, slave.getId());
               });
           });
         });
       });
-    else {
-      return cb(new Error("IP " + ip + "is not a valid IP"))
-    }
   }
 
   Slave.remoteMethod(
     'end',
     {
-      accepts: [{arg: 'id', type: 'string'}],
-      http: {path:'/:id/end'
+      accepts: [{arg: 'id', type: 'number'}],
+      returns: {arg: 'id', type: 'number'},
+      http: {path:'/:id/end'}
     }
   );
 
