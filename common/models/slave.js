@@ -1,5 +1,8 @@
 var jenkins = require('../../lib/jenkins');
 
+
+var isIp = require('is-ip');
+
 module.exports = function(Slave) {
 
   //This function check if we can powerup a slave and will power up if possible
@@ -21,17 +24,9 @@ module.exports = function(Slave) {
     });
   }
 
-  function check_ip(ip) //TODO check if a package is not already doing it
-  {
-    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip))
-    {
-      return true;
-    }
-    return false
-  }
 
   Slave.boot = function(ip cb) {
-    if(check_ip(ip))
+    if(isIp(ip))
     {
       Slave.findOne({where:{status:"booting"}}, function(err, slave) //At least one slave should be in boot mode
       {
@@ -66,12 +61,10 @@ module.exports = function(Slave) {
     }
   );
 
-  //Slave is powering down remove it from here 
-  Slave.end = function(ip, cb) //A slave finished is build
+  //Slave is powering down remove it from here
+  Slave.end = function(id, cb) //A slave finished is build
   {
-    if(check_ip(ip))
-    {
-      Slave.findOne({where:{IP:ip}}, function(err, slave)
+      Slave.findOne({where:{id:id}}, function(err, slave)
       {
         if(err)
           return cb(new Error("No slave with IP:" + ip));
@@ -96,7 +89,6 @@ module.exports = function(Slave) {
           });
         });
       });
-    }
     else {
       return cb(new Error("IP " + ip + "is not a valid IP"))
     }
@@ -105,7 +97,8 @@ module.exports = function(Slave) {
   Slave.remoteMethod(
     'end',
     {
-      accepts: [{arg: 'ip', type: 'string'}]
+      accepts: [{arg: 'id', type: 'string'}],
+      http: {path:'/:id/end'
     }
   );
 
