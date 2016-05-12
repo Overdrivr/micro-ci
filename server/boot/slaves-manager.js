@@ -2,7 +2,6 @@ var jenkins = require('../../lib/jenkins'); //TODO this should be available for 
 var slave_api = require('../../lib/localhost_slave_api');
 
 //TODO put site name (127.0.0.1/ micro-ci.com) in a variable
-//TODO Move as much function as possible in each model
 //TODO manage the err and not throw them
 //TODO replace on method by operation hooks
 module.exports = function slavesManager(app) {
@@ -12,32 +11,38 @@ module.exports = function slavesManager(app) {
 
 
   //A build is created
-  app.models.Build.on('changed', function (build)
+  Build.observe('after save', function (ctx, next())
   {
-    if(build.status == "created")
+    if(ctx.isNewInstance !== undefined)
     {
-      build.updateAttributes({status: "waiting"}, function(err)
+      var build = ctx.instance
+      if(build.status == "created")
       {
-        if(err)
-        throw err;
-
-        //Get yaml content
-        build.job(function(err, job)
+        build.updateAttributes({status: "waiting"}, function(err)
         {
-          //push the build to jenkins
-          jenkins.build(build.getId(), job.yaml, "http://127.0.0.1:3000/build/"+build.getId()+"/complete", function(err)
-          {
-            if(err)
+          if(err)
             throw err;
 
-            Slave.check_and_boot_slave(function(err) {
-              if(!err)//We can boot a slave
-                slave_api.boot_slave("http://127.0.0.1:3000");
+          //Get yaml content
+          build.job(function(err, job)
+          {
+            //push the build to jenkins
+            jenkins.build(build.getId(), job.yaml, "http://127.0.0.1:3000/build/"+build.getId()+"/complete", function(err)
+            {
+              if(err)
+                throw err;
+
+              Slave.check_and_boot_slave(function(err) {
+                if(!err)//We can boot a slave
+                  slave_api.boot_slave("http://127.0.0.1:3000");
+              });
             });
           });
         });
-      });
+      }
     }
-  });
+    next();
+  }
+);
 
 }
