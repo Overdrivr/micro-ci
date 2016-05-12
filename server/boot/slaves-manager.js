@@ -40,33 +40,4 @@ module.exports = function slavesManager(app) {
     }
   });
 
-  //A build is complete
-  app.get('/build/:id/complete',
-  function(req, res){
-    console.log(req.params.id);
-    //Update build status to complete:
-    Build.findOne({where:{id:req.params.id}}, function(err, build)
-    {
-      if(err)
-      throw err;
-      //Get build status
-      jenkins.get_build_status(build.getId(), function(err, status)
-      {
-        if(err)
-        throw err;
-        build.updateAttributes({status: status}, function(err)
-        {
-          if(err)
-          throw err;
-
-          res.status(200).end();
-        });
-      });
-    });
-
-
-
-  });
-
-  
 }
