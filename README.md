@@ -2,8 +2,8 @@
 > Continuous Integration service for embedded systems
 
 # Run
-1. Copy `providers.example.json` and rename to `providers.json`. Fill all the different fields for each third-party authentication provider.
-
+1. Copy `providers.example.json` and rename to `providers.json`.
+Fill all the different fields for each third-party authentication provider.
 2. Start the server
 
 ```
@@ -11,21 +11,18 @@ node .
 ```
 
 # Tests
-## unit tests
+## Unit
 
 ```
-mocha ./test/unit
+npm run unit
 ```
 
-## end to end
-### on Unix systems
-```
-webdriver-manager start &
-node . &
-protractor conf.js
-```
-### on Windows
-Open first console to start selenium server.
+## End to end
+Copy `test-credentials.example.json` and rename to `test-credentials.json`.
+Fill all the different fields for each third-party authentication provider with
+valid accounts from those platforms.
+
+Then, open a first console to start selenium server.
 ```
 webdriver-manager start
 ```
@@ -35,5 +32,5 @@ node .
 ```
 Finally, open third console and run the integration tests
 ```
-protractor conf.js
+npm run e2e
 ```
