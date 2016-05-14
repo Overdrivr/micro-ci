@@ -5,15 +5,14 @@ var loopback = require('loopback');
 
 var fakepayload = require('./fake-github-push-payload.json');
 
-before(function(done){
-    // Create a dummy repository
-    app.models.Repository.create({
-      platform: "github",
-      remoteId: fakepayload.repository.id
-    }, done);
-});
-
 describe('Fake github webhook', function(){
+  // Create a test repository
+  before(function(done){
+      app.models.Repository.create({
+        platform: "github",
+        remoteId: fakepayload.repository.id
+      }, done);
+  });
   // See https://developer.github.com/v3/activity/events/types/#events-api-payload-19
   // See example test payload https://gist.github.com/tschaub/2463cc33badbeb0dd047
   it('calls the endpoint properly',
