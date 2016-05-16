@@ -11,9 +11,21 @@ var repodata = {
 describe('Repositories endpoint', function() {
   // Create a test repository
   before(function(done) {
-      app.models.Repository.create(repodata, function(err, user) {
+      app.models.Repository.create(repodata, function(err, repo) {
         if (err) return done(err);
-        done();
+        if (!repo) return done(Error('Could not create repository.'));
+
+        // Related method not found, to investigate.
+        //app.models.Repository.__create__commits({
+        app.models.Commit.create({
+          commithash: 'fed92efegad289hd',
+          repositoryId: 1
+        }, function(err, commit) {
+          if (err) return done(err);
+          if (!commit) return done(Error('Could not create commit.'));
+
+          done();
+        });
       });
   });
 
@@ -146,7 +158,7 @@ describe('Repositories endpoint', function() {
       request(app)
         .post('/api/Repositories/1/commits')
         .send({
-          commmitHash: 'ead2ed923ud8hd289hd'
+          commmithash: 'ead2ed923ud8hd289hd'
         })
         .set('Accept', 'application/json')
         .expect(401, function(err, res) {
@@ -155,7 +167,48 @@ describe('Repositories endpoint', function() {
         });
     });
 
+    it('doesnt allow /DELETE repo commits by repo id', function(done) {
+      request(app)
+        .delete('/api/Repositories/1/commits')
+        .set('Accept', 'application/json')
+        .expect(401, function(err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
 
+    it('/GET repo commit by repo & commit id', function(done) {
+      request(app)
+        .get('/api/Repositories/1/commits/1')
+        .set('Accept', 'application/json')
+        .expect(200, function(err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('doesnt allow /PUT repo commit by repo & commit id', function(done) {
+      request(app)
+        .put('/api/Repositories/1/commits/1')
+        .send({
+          commithash: 'eade'
+        })
+        .set('Accept', 'application/json')
+        .expect(401, function(err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it('doesnt allow /DELETE repo commit by repo & commit id', function(done) {
+      request(app)
+        .delete('/api/Repositories/1/commits/1')
+        .set('Accept', 'application/json')
+        .expect(401, function(err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
 
   });
 
