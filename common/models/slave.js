@@ -7,6 +7,8 @@ var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 
 var isIp = require('is-ip');
 
+var maxNbOfSlaves = 3;// TODO to be migrate in a parameters
+
 module.exports = function(Slave) {
 
   //This function check if we can powerup a slave and will power up if possible
@@ -14,28 +16,31 @@ module.exports = function(Slave) {
   {
     // if we have not reach the limit of slaves, power up one
     Slave.count( {}, function(err, cnt){
+      if(err)
+        return cb(err);
       if(cnt < maxNbOfSlaves)
       {
         Slave.create({status:"booting"}, function (err)
         {
           if(err)
-          return cb(err);
+            return cb(err);
           cb();
         });
       }
       else
-      return cb(new Error('Max number of slave has been reached'));
+        return cb(new Error('Max number of slave has been reached'));
     });
   }
 
 
   Slave.boot = function(ip, cb) {
+    console.log("Hello3");
     if(isIp(ip))
     {
       Slave.findOne({where:{status:"booting"}}, function(err, slave) //At least one slave should be in boot mode
       {
-        if(err)
-          return cb(new Error("No slave in booting mode"));
+        if(err || !slave)
+          return cb(new Error("No slave in booting mode" + slave));
 
         slave.updateAttributes({status: "Building", IP:ip}, function(err)
         {
@@ -53,7 +58,7 @@ module.exports = function(Slave) {
       });
     }
     else {
-      return cb(new Error("IP " + ip + "is not a valid IP"))
+      return cb(new Error("IP " + ip + " is not a valid IP"))
     }
   }
 
@@ -61,7 +66,8 @@ module.exports = function(Slave) {
     'boot',
     {
       accepts: [{arg: 'ip', type: 'string'}],
-      returns: {arg: 'id', type:'number'}
+      returns: {arg: 'id', type:'number'},
+      http: {path:'/:ip/boot'}
     }
   );
 
@@ -70,8 +76,9 @@ module.exports = function(Slave) {
   {
       Slave.findOne({where:{id:id}}, function(err, slave)
       {
-        if(err)
+        if(err || !slave)
           return cb(new Error("No slave with IP:" + ip));
+
         //Remove the slave node from jenkins
         jenkins.remove_node(slave.getId(), function(err) {
           if(err)
@@ -87,7 +94,7 @@ module.exports = function(Slave) {
               if(err)
                 return cb(err);
 
-              slave_api.boot_slave("http://127.0.0.1:3000"); //Don't know if slave api should be there? TODO
+              slave_api.boot_slave("127.0.0.1:3000"); //Don't know if slave api should be there? TODO
               cb(null, slave.getId());
               });
           });
