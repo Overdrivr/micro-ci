@@ -3,6 +3,15 @@ var async = require('async');
 
 module.exports = function(Repository) {
 
+  Repository.disableRemoteMethod('create', true);
+  Repository.disableRemoteMethod('upsert', true);
+  Repository.disableRemoteMethod('updateAttributes', false);
+  Repository.disableRemoteMethod('deleteById', true);
+
+  Repository.disableRemoteMethod('createChangeStream', true);
+  Repository.disableRemoteMethod('count', true);
+  Repository.disableRemoteMethod('findOne', true);
+
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
       // Identify repository
@@ -44,7 +53,7 @@ module.exports = function(Repository) {
 
       // Webhook processing done successfully
       function(repositoryInstance, commitInstance, callback) {
-        //TODO: Trigger a job creation ? 
+        //TODO: Trigger a job creation ?
         cb();
       }
     ],
