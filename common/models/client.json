@@ -6,8 +6,12 @@
     "validateUpsert": true
   },
   "properties": {
-    "username": {
+    "provider": {
       "type": "string",
+      "required": true
+    },
+    "provider_id": {
+      "type": "number",
       "required": true
     }
   },
@@ -16,11 +20,6 @@
     "repositories": {
       "type": "hasMany",
       "model": "Repository",
-      "foreignKey": ""
-    },
-    "accounts": {
-      "type": "hasMany",
-      "model": "Account",
       "foreignKey": ""
     }
   },

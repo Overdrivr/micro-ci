@@ -7,29 +7,28 @@ module.exports = function initRoutes(app) {
   //   the request will proceed.  Otherwise, the user will be redirected to the
   //   login page.
   function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) { return next(); }
-    console.log("not authenticated, redirecting.")
+    if (req.isAuthenticated()) return next();
     res.redirect('/login');
   }
 
   /// ROUTING
   app.get('/', function (req, res, next) {
-    res.render('pages/index', {user:
-      req.user,
+    res.render('pages/index', {
+      user: req.user,
       url: req.url
     });
   });
 
   app.get('/login', function (req, res, next) {
-    res.render('pages/login', {user:
-      req.user,
+    res.render('pages/login', {
+      user: req.user,
       url: req.url
     });
   });
 
   app.get('/signup', function (req, res, next) {
-    res.render('pages/signup', {user:
-      req.user,
+    res.render('pages/signup', {
+      user: req.user,
       url: req.url
     });
   });
@@ -37,7 +36,6 @@ module.exports = function initRoutes(app) {
   app.get('/account', ensureAuthenticated, function(req, res){
     res.render('pages/loginProfiles', {
        user: req.user,
-
      });
   });
 };
