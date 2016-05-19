@@ -3,7 +3,6 @@ var Jenkins = require('../../lib/jenkins');
 var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 
 
-var slave_api = require('../../lib/localhost_slave_api');
 //TODO put site name (127.0.0.1/ micro-ci.com) in a variable
 //TODO manage the err and not throw them
 module.exports = function slavesManager(app) {
@@ -44,8 +43,7 @@ module.exports = function slavesManager(app) {
 
               app.models.Slave.check_and_boot_slave(function(err) {
                 if(err)
-                  return next(err);                
-                slave_api.boot_slave("127.0.0.1");
+                  return next(err);
                 return next();
               });
             });
