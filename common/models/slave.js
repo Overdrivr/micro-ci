@@ -9,6 +9,8 @@ var isIp = require('is-ip');
 
 var maxNbOfSlaves = 3;// TODO to be migrate in a parameters
 
+var slave_api = require('../../lib/localhost_slave_api');
+
 module.exports = function(Slave) {
 
   //This function check if we can powerup a slave and will power up if possible
@@ -24,7 +26,13 @@ module.exports = function(Slave) {
         {
           if(err)
             return cb(err);
-          cb();
+
+            slave_api.boot_slave("127.0.0.1", function(err)
+            {
+              if(err)
+                return next(err);
+              return cb();
+            });
         });
       }
       else
@@ -34,22 +42,22 @@ module.exports = function(Slave) {
 
 
   Slave.boot = function(ip, cb) {
-    console.log("Hello3");
     if(isIp(ip))
     {
+
       Slave.findOne({where:{status:"booting"}}, function(err, slave) //At least one slave should be in boot mode
       {
         if(err || !slave)
           return cb(new Error("No slave in booting mode" + slave));
-
-        slave.updateAttributes({status: "Building", IP:ip}, function(err)
+        slave.updateAttributes({status: "building", IP:ip}, function(err)
         {
           if(err)
-          return cb(err)
+            return cb(err)
+
           jenkins.create_node(slave.getId(), ip, function(err)
           {
             if(err)
-            return cb(err)
+              return cb(err)
 
             return cb(null, slave.getId());
           });
@@ -67,7 +75,7 @@ module.exports = function(Slave) {
     {
       accepts: [{arg: 'ip', type: 'string'}],
       returns: {arg: 'id', type:'number'},
-      http: {path:'/:ip/boot'}
+      http: {path:'/:ip/boot', verb: 'post'}
     }
   );
 
@@ -93,8 +101,6 @@ module.exports = function(Slave) {
             Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager. Migrate it in the slave manger with a hook
               if(err)
                 return cb(err);
-
-              slave_api.boot_slave("127.0.0.1:3000"); //Don't know if slave api should be there? TODO
               cb(null, slave.getId());
               });
           });
@@ -107,7 +113,7 @@ module.exports = function(Slave) {
     {
       accepts: [{arg: 'id', type: 'number'}],
       returns: {arg: 'id', type: 'number'},
-      http: {path:'/:id/end'}
+      http: {path:'/:id/end', verb: 'post'}
     }
   );
 

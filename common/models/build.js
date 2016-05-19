@@ -8,8 +8,9 @@ module.exports = function(Build) {
 
   Build.complete = function(id, cb)
   {
+
     //Update build status to complete:
-    Build.findOne({where:{id:req.params.id}}, function(err, build)
+    Build.findOne({where:{id:id}}, function(err, build)
     {
       if(err)
         return cb(err);
@@ -17,7 +18,7 @@ module.exports = function(Build) {
       jenkins.get_build_status(build.getId(), function(err, status)
       {
         if(err)
-          throw err;
+          return cb(err);
         build.updateAttributes({status: status}, function(err)
         {
           if(err)
@@ -29,12 +30,10 @@ module.exports = function(Build) {
     });
   }
   Build.remoteMethod(
-    'boot',
+    'complete',
     {
       accepts: [{arg: 'id', type: 'number'}],
-      http: {path:'/:id/complete'}
+      http: {path:'/:id/complete', verb: 'post'}
     }
   );
-
-
 };
