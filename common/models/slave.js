@@ -16,6 +16,8 @@ module.exports = function(Slave) {
   //This function check if we can powerup a slave and will power up if possible
   Slave.check_and_boot_slave = function(cb)//Callback is used to inform that you can reate a slave
   {
+    console.log("TTTT", Slave.app.models.Build);
+
     // if we have not reach the limit of slaves, power up one
     Slave.count( {}, function(err, cnt){
       if(err)
@@ -80,7 +82,7 @@ module.exports = function(Slave) {
   );
 
   //Slave is powering down remove it from here
-  Slave.end = function(id, cb) //A slave finished is build
+  Slave.end = function(id, cb) //A slave finished is powering down
   {
       Slave.findOne({where:{id:id}}, function(err, slave)
       {
