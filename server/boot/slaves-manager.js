@@ -13,7 +13,6 @@ module.exports = function slavesManager(app) {
 
   app.models.Build.observe('after save', function (ctx, next)
   {
-
     if(ctx.isNewInstance !== undefined)
     {
       var build = ctx.instance
