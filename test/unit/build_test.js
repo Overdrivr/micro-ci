@@ -149,7 +149,6 @@ describe('Build_test', function() {
         .post('/computer/'+slaveName+'/doDelete')
         .reply(302, '');
 
-
         app.models.Job.create({
           yaml:{build: ["sleep 3", "echo 'End of Build'"]}
         },
@@ -159,12 +158,10 @@ describe('Build_test', function() {
             status:"created",
             builddate:new Date(),
             jobId:job.getId()
-          }, function(err, build)
-          {
+          }, function(err, build){
+
             app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
               if(err) return done(err);
-
-              console.log(slave);
               assert.equal(slave.status, "booting");
               //Simulate booted slave:
               request(app)
@@ -232,7 +229,6 @@ describe('Build_test', function() {
         .reply(200)
         .post('/computer/'+slaveName+'/doDelete')
         .reply(302, '');
-
 
         app.models.Job.create({
           yaml:{build: ["sleep 3", "echo 'End of Build'"]}
@@ -314,8 +310,8 @@ describe('Build_test', function() {
                                   app.models.Slave.find({},function(err, cnt)
                                   {
                                     if(err) return done(err);
-                                    console.log("A",cnt, err);
-                                    assert.equal(cnt, 0); //All slave should be removed
+
+                                    assert.equal(cnt, 0); //All slaves should be removed
                                     done();
                                   });
                                 });

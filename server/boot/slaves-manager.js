@@ -7,10 +7,8 @@ var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 //TODO manage the err and not throw them
 module.exports = function slavesManager(app) {
 
-
   //TODO this function is here because I need to have access to slave model. What do you think Remi?
   //A build is created
-
   app.models.Build.observe('after save', function (ctx, next)
   {
     if(ctx.isNewInstance !== undefined)
@@ -40,9 +38,10 @@ module.exports = function slavesManager(app) {
               if(err)
                 return next(err);
 
+              app.models.Build.inc_nbPendingBuild();
               app.models.Slave.check_and_boot_slave(function(err) {
                 if(err)
-                  return next(err);
+                  return next(err);                  
                 return next();
               });
             });

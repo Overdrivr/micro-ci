@@ -4,6 +4,30 @@ var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 
 
 module.exports = function(Build) {
+  var pendingBuild=0;
+
+  Build.get_nbPendingBuild = function()
+  {
+    return pendingBuild;
+  }
+
+  Build.inc_nbPendingBuild = function()
+  {
+    pendingBuild++;
+  }
+
+  Build.dec_nbPendingBuild = function()
+  {
+    if(pendingBuild > 0)
+    {
+      pendingBuild--;
+      return null;
+    }
+    else {
+      return new Error("There is no pendingBuild. Cannot decrease the counter.");
+
+    }
+  }
 
 
   Build.complete = function(id, cb)

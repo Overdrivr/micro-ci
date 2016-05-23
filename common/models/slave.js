@@ -16,30 +16,37 @@ module.exports = function(Slave) {
   //This function check if we can powerup a slave and will power up if possible
   Slave.check_and_boot_slave = function(cb)//Callback is used to inform that you can reate a slave
   {
-    console.log("TTTT", Slave.app.models.Build);
-
-    // if we have not reach the limit of slaves, power up one
-    Slave.count( {}, function(err, cnt){
-      if(err)
-        return cb(err);
-      if(cnt < maxNbOfSlaves)
-      {
-        Slave.create({status:"booting"}, function (err)
+    if(Slave.app.models.Build.get_nbPendingBuild() > 0) // There are pendings build
+    {
+      // if we have not reach the limit of slaves, power up one
+      Slave.count( {}, function(err, cnt){
+        if(err)
+          return cb(err);
+        if(cnt < maxNbOfSlaves)
         {
-          if(err)
-            return cb(err);
+          Slave.create({status:"booting"}, function (err)
+          {
+            if(err)
+              return cb(err);
 
             slave_api.boot_slave("127.0.0.1", function(err)
             {
               if(err)
-                return next(err);
+                return cb(err);
+              if(err = Slave.app.models.Build.dec_nbPendingBuild())
+                return cb(err)
+              
               return cb();
+
             });
-        });
-      }
-      else
-        return cb(new Error('Max number of slave has been reached'));
-    });
+          });
+        }
+        else
+          return cb(new Error('Max number of slave has been reached'));
+      });
+    }
+    else
+      return cb();
   }
 
 
