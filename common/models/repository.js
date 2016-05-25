@@ -11,6 +11,7 @@ module.exports = function(Repository) {
   Repository.disableRemoteMethod('createChangeStream', true);
   Repository.disableRemoteMethod('count', true);
   Repository.disableRemoteMethod('findOne', true);
+  Repository.disableRemoteMethod('updateAll', true);
 
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
