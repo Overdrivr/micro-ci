@@ -77,6 +77,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "__get__owner"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "webhookGithub"
     }
   ],
   "methods": {}
