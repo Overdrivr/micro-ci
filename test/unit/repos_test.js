@@ -288,7 +288,7 @@ describe('Repositories endpoint', function() {
           platform: 'github',
           remoteId: 123,
         })
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
@@ -296,27 +296,13 @@ describe('Repositories endpoint', function() {
 
     it('doesnt allow to /POST a new repo', function(done) {
       request(app)
-        .post('/api/Repositories' + '?access_token=' + validtoken)
+        .post('/api/Repositories/' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .send({
           platform: 'github',
           remoteId: 123,
         })
-        .expect(401, function(err, res) {
-          if (err) return done(err);
-          done();
-        });
-    });
-
-    it('doesnt allow to /POST a new repo', function(done) {
-      request(app)
-        .post('/api/Repositories' + '?access_token=' + validtoken)
-        .set('Accept', 'application/json')
-        .send({
-          platform: 'bitbucket',
-          remoteId: 123,
-        })
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
