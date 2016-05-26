@@ -1,14 +1,9 @@
-var request = require('supertest'),
-    assert  = require('chai').assert,
-    app     = require('../../server/server');
-
-require('./test-setup');
+var request  = require('supertest'),
+    assert   = require('chai').assert,
+    app      = require('../../server/server');
+    repodata = require('./test-setup');
 
 var validtoken = '';
-var repodata = {
-  platform: "github",
-  remoteId: 12345
-};
 
 describe('Repositories endpoint', function() {
   describe('with authenticated user', function() {

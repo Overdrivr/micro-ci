@@ -1,5 +1,10 @@
 var app = require('../../server/server');
 
+var repodata = {
+  platform: "github",
+  remoteId: 12345
+};
+
 before(function(done) {
     app.models.Repository.create(repodata, function(err, repo) {
       if (err) return done(err);
@@ -18,3 +23,5 @@ before(function(done) {
       });
     });
 });
+
+module.exports = repodata;
