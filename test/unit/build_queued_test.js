@@ -2,7 +2,6 @@ var fixtures = require("fixturefiles")
 
 var assert = require('assert');
 
-var app = require('../../server/server');
 var request = require('supertest');
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
@@ -12,6 +11,15 @@ var async = require('async')
 
 
 describe('QueuedBUild', function() {
+  var app;
+  beforeEach(function () {
+   delete require.cache[require.resolve('../../server/server')];
+   app = require('../../server/server');
+ });
+ afterEach(function (done) {
+   //app.delete('/', function(a,b) {done()})
+   done();
+ });
   it('Create  multiple builds and check queue is working', function(done) {
 
     var maxNbOfSlaves = 3; //TODO should be commng from a global var

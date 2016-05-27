@@ -2,7 +2,6 @@ var fixtures = require("fixturefiles")
 
 var assert = require('assert');
 
-var app = require('../../server/server');
 var request = require('supertest');
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
@@ -14,6 +13,16 @@ var async = require('async')
 //TODO BUILD status is waiting or created but no other status availabe !
 
   describe('SimpleBuild', function() {
+
+    var app;
+    beforeEach(function () {
+     app = require('../../server/server');
+     app.models.Job.destroyAll();
+     app.models.Build.destroyAll();
+     app.models.Slave.destroyAll();
+     app.models.destroyAll();
+   });
+
     it('Create a build and lunch it on a slave', function(done) {
       var build_id = 1;
       var jobName = 'build_' + build_id;
