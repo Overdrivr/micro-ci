@@ -35,7 +35,7 @@ module.exports = function(Slave) {
                 return cb(err);
               if(err = Slave.app.models.Build.dec_nbPendingBuild())
                 return cb(err)
-              
+
               return cb();
 
             });
@@ -87,43 +87,4 @@ module.exports = function(Slave) {
       http: {path:'/:ip/boot', verb: 'post'}
     }
   );
-
-  //Slave is powering down remove it from here
-  Slave.end = function(id, cb) //A slave finished is powering down
-  {
-      Slave.findOne({where:{id:id}}, function(err, slave)
-      {
-        if(err || !slave)
-          return cb(new Error("No slave with IP:" + ip));
-
-        //Remove the slave node from jenkins
-        jenkins.remove_node(slave.getId(), function(err) {
-          if(err)
-            return cb(err);
-
-          //Remove the slave in the db
-          Slave.destroyById(slave.getId(), function(err)
-          {
-            if(err)
-              return cb(err);
-
-            Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager. Migrate it in the slave manger with a hook
-              if(err)
-                return cb(err);
-              cb(null, slave.getId());
-              });
-          });
-        });
-      });
-  }
-
-  Slave.remoteMethod(
-    'end',
-    {
-      accepts: [{arg: 'id', type: 'number'}],
-      returns: {arg: 'id', type: 'number'},
-      http: {path:'/:id/end', verb: 'post'}
-    }
-  );
-
 };
