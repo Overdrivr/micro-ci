@@ -8,37 +8,36 @@
     "e2e": "protractor ./test/e2e/conf.js"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "debug": "^2.2.0",
     "express-flash": "0.0.2",
     "express-session": "^1.13.0",
+    "fixturefiles": "~0.3.0",
     "in-array": "~0.1.2",
+    "jenkins": "~0.17.0",
     "loopback": "^2.22.0",
     "loopback-boot": "^2.6.5",
     "loopback-component-explorer": "^2.1.0",
     "loopback-datasource-juggler": "^2.39.0",
+    "mocha": "~2.4.5",
+    "nock": "~8.0.0",
     "passport": "^0.3.2",
     "passport-github2": "^0.1.10",
     "passport-google-oauth20": "^1.0.0",
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.0.1",
-    "yaml": "~0.3.0",
-    "mocha": "~2.4.5",
-    "xml": "~1.0.1",
     "should": "~8.3.1",
-    "nock": "~8.0.0",
-    "fixturefiles": "~0.3.0",
-    "jenkins": "~0.17.0"
+    "xml": "~1.0.1",
+    "yaml": "~0.3.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "jshint": "^2.5.6",
     "mocha": "~2.4.5",
     "supertest": "^1.2.0",
-    "jshint": "^2.5.6",
-    "url-parse": "^1.1.1",
-    "mocha": "~2.4.5"
+    "url-parse": "^1.1.1"
   },
   "repository": {
     "type": "",
