@@ -20,7 +20,7 @@ describe('jenkins', function() {
         nock
         .head('/job/' + jobName + '/api/json')
         .reply(404)
-        .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost//api/Build/3/complete</url><event>all</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost//api/Slave/{slave_id}/end</url><event>all</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
+        .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost//api/Builds/3/complete</url><event>all</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
         .reply(200)
         .post('/job/' + jobName + '/build')
         .reply(201, '', { location: url + '/queue/item/1/' })
@@ -178,6 +178,28 @@ describe('jenkins', function() {
       });
     });
 
+describe('builtOn', function() {
+    describe('builtOn', function() {
+      it('Get on which slave built has been done ', function(done) {
+        var build_id = 3;
+        var jobName = 'build_' + build_id;
+        nock
+        .head('/job/' + jobName + '/api/json')
+        .reply(200)
+        .get('/job/'+jobName+'/1/api/json')
+        .reply(201, fixtures.jobSuccess);
+
+        jenkins.get_slave(build_id,
+          function(err, data)
+          {
+            assert.equal(err, null);
+            assert.equal(data, "slave_12");
+          });
+          done();
+        });
+      });
+    });
+
   describe('log', function() {
     describe('GetLog', function() {
       it('Return build log', function(done) {
@@ -233,7 +255,7 @@ describe('jenkins', function() {
 
           jenkins.create_node(id, ip,
             function(err, data)
-            {
+            {              
               should.not.exist(err);
               should.not.exist(data);
               done();
