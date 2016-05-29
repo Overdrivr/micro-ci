@@ -37,18 +37,43 @@ module.exports = function(Build) {
     Build.findOne({where:{id:id}}, function(err, build)
     {
       if(err)
-        return cb(err);
+      return cb(err);
       //Get build status
       jenkins.get_build_status(build.getId(), function(err, status)
       {
         if(err)
-          return cb(err);
+        return cb(err);
         build.updateAttributes({status: status}, function(err)
         {
-          if(err)
-            return cb(err);
+          if(err) return cb(err);
 
-          cb(null);
+          //Remove the slave
+          jenkins.get_slave(build.getId(), function(err, slaveName)
+          {
+            if(err) return cb(err);
+            var Slave = Build.app.models.Slave;
+            var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
+            Slave.findOne({where:{id:slave_id}}, function(err, slave)
+            {
+              if(err) return cb(err);
+              if(!slave) return cb(new Error("No slave with ID:" + slave_id));
+
+              //Remove the slave node from jenkins
+              jenkins.remove_node(slave.getId(), function(err) {
+                if(err) return cb(err);
+
+                //Remove the slave in the db
+                Slave.destroyById(slave.getId(), function(err)
+                {
+                  if(err) return cb(err);
+                  Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager. Migrate it in the slave manger with
+                    if(err) return cb(err);
+                    cb(null, slave.getId());
+                  });
+                });
+              });
+            });
+          });
         });
       });
     });

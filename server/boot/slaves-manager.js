@@ -33,7 +33,7 @@ module.exports = function slavesManager(app) {
 
 
             //push the build to jenkins
-            jenkins.build(build.getId(), job.yaml, "http://127.0.0.1:3000/build/"+build.getId()+"/complete", function(err)
+            jenkins.build(build.getId(), job.yaml, "http://127.0.0.1:3000", function(err)
             {
               if(err)
                 return next(err);
@@ -41,7 +41,7 @@ module.exports = function slavesManager(app) {
               app.models.Build.inc_nbPendingBuild();
               app.models.Slave.check_and_boot_slave(function(err) {
                 if(err)
-                  return next(err);                  
+                  return next(err);
                 return next();
               });
             });
