@@ -7,7 +7,7 @@
   },
   "properties": {
     "yaml": {
-      "type": "string",
+      "type": "object",
       "required": true
     }
   },
