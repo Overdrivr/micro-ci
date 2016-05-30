@@ -32,7 +32,6 @@ module.exports = function(Build) {
 
   Build.complete = function(id, cb)
   {
-
     //Update build status to complete:
     Build.findOne({where:{id:id}}, function(err, build)
     {
@@ -66,9 +65,9 @@ module.exports = function(Build) {
                 Slave.destroyById(slave.getId(), function(err)
                 {
                   if(err) return cb(err);
-                  Slave.check_and_boot_slave(function(err) { //TODO to boot a slave we should have at least one build in the queue. Maybe I have to create an hook in slaves-manager. Migrate it in the slave manger with
-                    if(err) return cb(err);
-                    cb(null, slave.getId());
+                    Slave.check_and_boot_slave(function(err) {
+                      if(err) return cb(err);
+                      cb(null, slave.getId());
                   });
                 });
               });

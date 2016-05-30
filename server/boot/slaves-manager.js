@@ -5,6 +5,7 @@ var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
 
 //TODO put site name (127.0.0.1/ micro-ci.com) in a variable
 //TODO manage the err and not throw them
+//TODO migrate this function inside Build 
 module.exports = function slavesManager(app) {
 
   //TODO this function is here because I need to have access to slave model. What do you think Remi?
@@ -40,8 +41,7 @@ module.exports = function slavesManager(app) {
 
               app.models.Build.inc_nbPendingBuild();
               app.models.Slave.check_and_boot_slave(function(err) {
-                if(err)
-                  return next(err);
+                if(err) return next(err);
                 return next();
               });
             });

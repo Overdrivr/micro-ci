@@ -29,13 +29,12 @@ module.exports = function(Slave) {
             if(err)
               return cb(err);
 
-            slave_api.boot_slave("127.0.0.1", function(err)
+            slave_api.boot_slave("http://127.0.0.1", function(err)
             {
               if(err)
                 return cb(err);
               if(err = Slave.app.models.Build.dec_nbPendingBuild())
-                return cb(err)
-
+                return cb(err)              
               return cb();
 
             });
@@ -84,7 +83,7 @@ module.exports = function(Slave) {
     {
       accepts: [{arg: 'ip', type: 'string'}],
       returns: {arg: 'id', type:'number'},
-      http: {path:'/:ip/boot', verb: 'post'}
+      http: {path:'/:ip/boot'}
     }
   );
 };
