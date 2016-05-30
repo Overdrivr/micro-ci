@@ -15,11 +15,11 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('hides /GET all commits', function(done) {
+  it('/GET all commits', function(done) {
     request(app)
       .get('/api/Commits')
       .set('Accept', 'application/json')
-      .expect(401, function(err, res) {
+      .expect(200, function(err, res) {
         if (err) return done(err);
         done();
       });
