@@ -9,9 +9,16 @@ var commit = {
 
 describe('Commits endpoint', function() {
   before(function(done){
-    app.models.Commit.create(commit, function (err, res) {
+    app.models.Commit.create(commit, function (err, instance) {
       if (err) return done(err);
-      done();
+
+      instance.jobs.create({
+        commitId: "f2ea2dcadf"
+      }, function (err, job) {
+        if (err) return done(err);
+        console.log(job);
+        done();
+      });
     });
   });
 
@@ -33,7 +40,7 @@ describe('Commits endpoint', function() {
         commithash: 'eadeb3f4gg038se',
         repositoryId: 12345
       })
-      .expect(401, function(err, res) {
+      .expect(404, function(err, res) {
         if (err) return done(err);
         done();
       });
@@ -47,7 +54,7 @@ describe('Commits endpoint', function() {
       commithash: 'eadeb3f4gg038se',
       repositoryId: 12345
     })
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -81,9 +88,9 @@ describe('Commits endpoint', function() {
     .set('Accept', 'application/json')
     .send({
       commithash: 'eadeb3f4gg038se',
-      repositoryId: 12345
+      repositoryId: 1245
     })
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -93,7 +100,7 @@ describe('Commits endpoint', function() {
     request(app)
     .delete('/api/Commits/1')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -113,8 +120,9 @@ describe('Commits endpoint', function() {
     request(app)
     .get('/api/Commits/12345/exists')
     .set('Accept', 'application/json')
-    .expect(404, function(err, res) {
+    .expect(200, function(err, res) {
       if (err) return done(err);
+      assert.isNotOk(res.body.exists);
       done();
     });
   });
@@ -136,7 +144,7 @@ describe('Commits endpoint', function() {
     .send({
       commitId: "efd24e2a"
     })
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -146,7 +154,7 @@ describe('Commits endpoint', function() {
     request(app)
     .delete('/api/Commits/1/jobs')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -169,7 +177,7 @@ describe('Commits endpoint', function() {
       commitId: 'ffeaf324f78d'
     })
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -179,7 +187,7 @@ describe('Commits endpoint', function() {
     request(app)
     .delete('/api/Commits/1/jobs/1')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -209,17 +217,17 @@ describe('Commits endpoint', function() {
     request(app)
     .get('/api/Commits/change-stream')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
   });
 
-  it('hides /POST Commits/1/jobs/count', function(done) {
+  it('hides /POST Commits/change-stream', function(done) {
     request(app)
     .post('/api/Commits/change-stream')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -229,7 +237,7 @@ describe('Commits endpoint', function() {
     request(app)
     .get('/api/Commits/count')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -239,7 +247,7 @@ describe('Commits endpoint', function() {
     request(app)
     .get('/api/Commits/findOne')
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
@@ -252,7 +260,7 @@ describe('Commits endpoint', function() {
       id: 1
     })
     .set('Accept', 'application/json')
-    .expect(401, function(err, res) {
+    .expect(404, function(err, res) {
       if (err) return done(err);
       done();
     });
