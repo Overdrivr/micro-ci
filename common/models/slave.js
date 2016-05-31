@@ -59,7 +59,7 @@ module.exports = function(Slave) {
             return cb(err)
 
           jenkins.create_node(slave.getId(), ip, function(err)
-          {                        
+          {                     
             if(err)
               return cb(err)
 
