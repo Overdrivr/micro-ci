@@ -178,27 +178,6 @@ describe('jenkins', function() {
       });
     });
 
-describe('builtOn', function() {
-    describe('builtOn', function() {
-      it('Get on which slave built has been done ', function(done) {
-        var build_id = 3;
-        var jobName = 'build_' + build_id;
-        nock
-        .head('/job/' + jobName + '/api/json')
-        .reply(200)
-        .get('/job/'+jobName+'/1/api/json')
-        .reply(201, fixtures.jobSuccess);
-
-        jenkins.get_slave(build_id,
-          function(err, data)
-          {
-            assert.equal(err, null);
-            assert.equal(data, "slave_12");
-          });
-          done();
-        });
-      });
-    });
 
   describe('log', function() {
     describe('GetLog', function() {
@@ -316,5 +295,46 @@ describe('builtOn', function() {
             });
           });
         });
+
+        describe('GetSlave', function() {
+          it('Get on which slave built has been done ', function(done) {
+            var build_id = 3;
+            var jobName = 'build_' + build_id;
+            nock
+            .head('/job/' + jobName + '/api/json')
+            .reply(200)
+            .get('/job/'+jobName+'/1/api/json')
+            .reply(201, fixtures.jobSuccess);
+
+            jenkins.get_slave(build_id,
+              function(err, data)
+              {
+                assert.equal(err, null);
+                assert.equal(data, "slave_12");
+              });
+              done();
+            });
+          });
+
+
+          describe('GetSlaveNotExist', function() {
+            it('Get slave of an not existing built', function(done) {
+              var build_id = 3;
+              var jobName = 'build_' + build_id;
+              nock
+              .head('/job/' + jobName + '/api/json')
+              .reply(404)
+
+              jenkins.get_slave(build_id,
+                function(err, data)
+                {
+                  assert.throws(function(){throw (err);},/Job build_3 does not exist/);
+                  assert.equal(data, null);
+                });
+                done();
+              });
+            });
+
+
     });
 });
