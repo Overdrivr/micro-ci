@@ -1,9 +1,7 @@
-var jenkinsConf = require('../../server/jenkins.json');
-var Jenkins = require('../../lib/jenkins');
-var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
+var jenkins = require('../../server/jenkinsInstance').jenkinsInstance;
 
-//TODO put site name (127.0.0.1/ micro-ci.com) in a variable
-//TODO manage the err and not throw them
+var config = require('../../server/config.json');
+
 
 module.exports = function(Build) {
   var pendingBuild=0;
@@ -57,7 +55,7 @@ module.exports = function(Build) {
 
 
             //push the build to jenkins
-            jenkins.build(build.getId(), job.yaml, "http://127.0.0.1:3000", function(err)
+            jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port, function(err)
             {
               if(err)
                 return next(err);

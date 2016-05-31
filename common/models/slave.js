@@ -1,13 +1,10 @@
 
-var jenkinsConf = require('../../server/jenkins.json');
-var Jenkins = require('../../lib/jenkins');
+var jenkins = require('../../server/jenkinsInstance').jenkinsInstance;
 
-
-var jenkins =  new Jenkins(jenkinsConf.host, jenkinsConf.credential);
+var config = require('../../server/config');
+var maxNbOfSlaves = config.nbOfSlaves;
 
 var isIp = require('is-ip');
-
-var maxNbOfSlaves = 3;// TODO to be migrate in a parameters
 
 var slave_api = require('../../lib/localhost_slave_api');
 
@@ -34,7 +31,7 @@ module.exports = function(Slave) {
               if(err)
                 return cb(err);
               if(err = Slave.app.models.Build.dec_nbPendingBuild())
-                return cb(err)              
+                return cb(err)
               return cb();
 
             });
