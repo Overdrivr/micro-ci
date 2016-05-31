@@ -26,7 +26,7 @@ module.exports = function(Slave) {
             if(err)
               return cb(err);
 
-            slave_api.boot_slave("http://127.0.0.1", function(err)
+            slave_api.boot_slave("http://"+config.host+":"+config.port, function(err)
             {
               if(err)
                 return cb(err);
@@ -49,7 +49,6 @@ module.exports = function(Slave) {
   Slave.boot = function(ip, cb) {
     if(isIp(ip))
     {
-
       Slave.findOne({where:{status:"booting"}}, function(err, slave) //At least one slave should be in boot mode
       {
         if(err || !slave)
@@ -60,7 +59,7 @@ module.exports = function(Slave) {
             return cb(err)
 
           jenkins.create_node(slave.getId(), ip, function(err)
-          {
+          {                        
             if(err)
               return cb(err)
 

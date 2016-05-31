@@ -33,6 +33,7 @@ module.exports = function(Build) {
   //A build is created
   Build.observe('after save', function (ctx, next)
   {
+
     if(ctx.isNewInstance !== undefined)
     {
       var build = ctx.instance
@@ -40,8 +41,7 @@ module.exports = function(Build) {
       {
         build.updateAttributes({status: "waiting"}, function(err)
         {
-          if(err)
-            return next(err);
+          if(err) return next(err);
 
 
           //Get yaml content
@@ -57,9 +57,7 @@ module.exports = function(Build) {
             //push the build to jenkins
             jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port, function(err)
             {
-              if(err)
-                return next(err);
-
+              if(err) return next(err);
               Build.inc_nbPendingBuild();
               Build.app.models.Slave.check_and_boot_slave(function(err) {
                 if(err) return next(err);
@@ -99,7 +97,7 @@ module.exports = function(Build) {
             var Slave = Build.app.models.Slave;
             var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
             Slave.findOne({where:{id:slave_id}}, function(err, slave)
-            {
+            {              
               if(err) return cb(err);
               if(!slave) return cb(new Error("No slave with ID:" + slave_id));
 
