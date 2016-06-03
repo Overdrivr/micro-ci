@@ -1,103 +1,71 @@
 var jenkins = require('../../server/jenkinsInstance').jenkinsInstance;
-
-var config = require('../../server/config.json');
+var config  = require('../../server/config.json');
 
 
 module.exports = function(Build) {
-  var pendingBuild=0;
+  var pendingBuild = 0;
 
-  Build.get_nbPendingBuild = function()
-  {
+  Build.get_nbPendingBuild = function() {
     return pendingBuild;
   }
 
-  Build.inc_nbPendingBuild = function()
-  {
+  Build.inc_nbPendingBuild = function() {
     pendingBuild++;
   }
 
-  Build.dec_nbPendingBuild = function()
-  {
-    if(pendingBuild > 0)
-    {
+  Build.dec_nbPendingBuild = function() {
+    if(pendingBuild > 0) {
       pendingBuild--;
-      return null;
-    }
-    else {
+    } else {
       return new Error("There is no pendingBuild. Cannot decrease the counter.");
-
     }
   }
 
-
   //A build is created
-  Build.observe('after save', function (ctx, next)
-  {
+  Build.observe('after save', function (ctx, next) {
+    if(!ctx.isNewInstance) return  next();
+    var build = ctx.instance;
+    if(build.status !== "created") return  next();
 
-    if(ctx.isNewInstance !== undefined)
-    {
-      var build = ctx.instance
-      if(build.status == "created")
-      {
-        build.updateAttributes({status: "waiting"}, function(err)
-        {
+    build.updateAttributes({ status: "waiting" }, function(err) {
+      if(err) return next(err);
+
+      //Get yaml content
+      build.job(function(err, job) {
+        if(err) return next(err);
+        if(job === undefined) return next(new Error("Build should be link to a job"));
+
+        //push the build to jenkins
+        jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port,
+        function(err) {
           if(err) return next(err);
-
-
-          //Get yaml content
-          build.job(function(err, job)
-          {
-
-            if(err)
-              return next(err);
-            if(job === undefined)
-              return next(new Error("Build should be link to a job"));
-
-
-            //push the build to jenkins
-            jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port, function(err)
-            {
-              if(err) return next(err);
-              Build.inc_nbPendingBuild();
-              Build.app.models.Slave.check_and_boot_slave(function(err) {
-                if(err) return next(err);
-                return next();
-              });
-            });
+          Build.inc_nbPendingBuild();
+          Build.app.models.Slave.check_and_boot_slave(function(err) {
+            if(err) return next(err);
+            next();
           });
         });
-      }
-      else
-        return  next();
-    }
-    else
-      return  next();
+      });
+    });
+
   });
 
-  Build.complete = function(id, cb)
-  {
+  Build.complete = function(id, cb) {
     //Update build status to complete:
-    Build.findOne({where:{id:id}}, function(err, build)
-    {
-      if(err)
-      return cb(err);
+    Build.findOne({where:{id:id}}, function(err, build) {
+      if(err) return cb(err);
       //Get build status
-      jenkins.get_build_status(build.getId(), function(err, status)
-      {
-        if(err)
-        return cb(err);
-        build.updateAttributes({status: status}, function(err)
-        {
+      jenkins.get_build_status(build.getId(), function(err, status) {
+        if(err) return cb(err);
+        build.updateAttributes({status: status}, function(err) {
           if(err) return cb(err);
 
           //Remove the slave
-          jenkins.get_slave(build.getId(), function(err, slaveName)
-          {
+          jenkins.get_slave(build.getId(), function(err, slaveName) {
             if(err) return cb(err);
             var Slave = Build.app.models.Slave;
             var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
-            Slave.findOne({where:{id:slave_id}}, function(err, slave)
-            {              
+            Slave.findOne({where:{id:slave_id}}, function(err, slave) {
               if(err) return cb(err);
               if(!slave) return cb(new Error("No slave with ID:" + slave_id));
 
@@ -106,8 +74,7 @@ module.exports = function(Build) {
                 if(err) return cb(err);
 
                 //Remove the slave in the db
-                Slave.destroyById(slave.getId(), function(err)
-                {
+                Slave.destroyById(slave.getId(), function(err) {
                   if(err) return cb(err);
                     Slave.check_and_boot_slave(function(err) {
                       if(err) return cb(err);
