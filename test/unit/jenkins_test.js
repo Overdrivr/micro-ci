@@ -20,7 +20,7 @@ describe('jenkins', function() {
         nock
         .head('/job/' + jobName + '/api/json')
         .reply(404)
-        .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost/</url><event>all</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
+        .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost//api/Builds/3/complete</url><event>completed</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
         .reply(200)
         .post('/job/' + jobName + '/build')
         .reply(201, '', { location: url + '/queue/item/1/' })
@@ -178,6 +178,7 @@ describe('jenkins', function() {
       });
     });
 
+
   describe('log', function() {
     describe('GetLog', function() {
       it('Return build log', function(done) {
@@ -223,14 +224,15 @@ describe('jenkins', function() {
       describe('CreateNode', function() {
         it('Create a simple ssh node', function(done) {
           var ip = "92.128.12.7";
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(404)
           .post("/computer/doCreateItem?" + fixtures.nodeCreateQuery )
           .reply(302, '', { location: 'http://localhost:8080/computer/' });
 
-          jenkins.create_node(name, ip,
+          jenkins.create_node(id, ip,
             function(err, data)
             {
               should.not.exist(err);
@@ -243,14 +245,15 @@ describe('jenkins', function() {
       describe('NodeExist', function() {
         it('Create Node already exist', function(done) {
           var ip = "92.128.12.7";
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(200)
-          jenkins.create_node(name, ip,
+          jenkins.create_node(id, ip,
             function(err, data)
             {
-              assert.throws(function(){throw (err);},/Node Yellow already exist/);
+              assert.throws(function(){throw (err);},/Node slave_62 already exist/);
               should.not.exist(data);
               done();
             });
@@ -260,15 +263,16 @@ describe('jenkins', function() {
 
       describe('RemoveNodeDoesNotExist', function() {
         it('Remove a Node which does not exist', function(done) {
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(404)
 
-          jenkins.remove_node(name,
+          jenkins.remove_node(id,
             function(err)
             {
-              assert.throws(function(){throw (err);},/Node Yellow does not exist/);
+              assert.throws(function(){throw (err);},/Node slave_62 does not exist/);
               done();
             });
           });
@@ -276,13 +280,14 @@ describe('jenkins', function() {
 
       describe('RemoveNode', function() {
         it('Remove a node', function(done) {
-          var name = "Yellow"
+          var id = 62;
+          var name = "slave_" + id;
           nock
           .head('/computer/' + name + '/api/json')
           .reply(200)
           .post('/computer/' + name + '/doDelete')
           .reply(302, '')
-          jenkins.remove_node(name,
+          jenkins.remove_node(id,
             function(err)
             {
               should.not.exist(err);
@@ -290,5 +295,46 @@ describe('jenkins', function() {
             });
           });
         });
+
+        describe('GetSlave', function() {
+          it('Get on which slave built has been done ', function(done) {
+            var build_id = 3;
+            var jobName = 'build_' + build_id;
+            nock
+            .head('/job/' + jobName + '/api/json')
+            .reply(200)
+            .get('/job/'+jobName+'/1/api/json')
+            .reply(201, fixtures.jobSuccess);
+
+            jenkins.get_slave(build_id,
+              function(err, data)
+              {
+                assert.equal(err, null);
+                assert.equal(data, "slave_12");
+              });
+              done();
+            });
+          });
+
+
+          describe('GetSlaveNotExist', function() {
+            it('Get slave of an not existing built', function(done) {
+              var build_id = 3;
+              var jobName = 'build_' + build_id;
+              nock
+              .head('/job/' + jobName + '/api/json')
+              .reply(404)
+
+              jenkins.get_slave(build_id,
+                function(err, data)
+                {
+                  assert.throws(function(){throw (err);},/Job build_3 does not exist/);
+                  assert.equal(data, null);
+                });
+                done();
+              });
+            });
+
+
     });
 });
