@@ -15,17 +15,19 @@ describe('Repositories endpoint', function() {
           password: "bar"
         }, function(err, user) {
           if (err) return done(err);
+          if (!user) return done(new Error('User could not be created'));
 
           app.models.Client.generateVerificationToken(user,
             function(err, token) {
-              if(err) return done(err);
+              if (err) return done(err);
+              if (!token) return done(new Error('token could not be created'));
               validtoken = token;
               done();
           });
         });
     });
 
-    it('doesnt allow to /PUT a new repo', function(done) {
+    it('hides /PUT a new repo', function(done) {
       request(app)
         .put('/api/Repositories' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
@@ -39,7 +41,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow to /POST a new repo', function(done) {
+    it('hides /POST a new repo', function(done) {
       request(app)
         .post('/api/Repositories/' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
@@ -53,7 +55,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('allows /GET a repo by id', function(done) {
+    it('/GET a repo by id', function(done) {
       request(app)
         .get('/api/Repositories/1' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
@@ -88,7 +90,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /PUT repo by id with id=1', function(done) {
+    it('hides /PUT repo by id with id=1', function(done) {
       request(app)
         .put('/api/Repositories/1' + '?access_token=' + validtoken)
         .send({
@@ -103,7 +105,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /DELETE repo by id with id=1', function(done) {
+    it('hides /DELETE repo by id with id=1', function(done) {
       request(app)
         .delete('/api/Repositories/1' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
@@ -113,7 +115,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('allow /GET repo commits by repo id', function(done) {
+    it('/GET repo commits by repo id', function(done) {
       request(app)
         .get('/api/Repositories/1/commits' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
@@ -124,24 +126,24 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /POST repo commits by repo id', function(done) {
+    it('hides /POST repo commits by repo id', function(done) {
       request(app)
         .post('/api/Repositories/1/commits' + '?access_token=' + validtoken)
         .send({
           commmithash: 'ead2ed923ud8hd289hd'
         })
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
     });
 
-    it('doesnt allow /DELETE repo commits by repo id', function(done) {
+    it('hides /DELETE repo commits by repo id', function(done) {
       request(app)
         .delete('/api/Repositories/1/commits' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
@@ -157,24 +159,24 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /PUT repo commit by repo & commit id', function(done) {
+    it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
         .put('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
         .send({
           commithash: 'eade'
         })
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
     });
 
-    it('doesnt allow /DELETE repo commit by repo & commit id', function(done) {
+    it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
         .delete('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
@@ -230,7 +232,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt find /POST repo in chunks', function(done) {
+    it('hides /POST repo in chunks', function(done) {
       request(app)
         .post('/api/Repositories/update' + '?access_token=' + validtoken)
         .send({

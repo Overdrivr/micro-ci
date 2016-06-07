@@ -6,18 +6,18 @@ var request  = require('supertest'),
 describe('Repositories endpoint', function() {
 
   describe('with unauthenticated user', function (){
-    it('doesnt allow to /GET all repos', function(done) {
+    it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         })
         ;
     });
 
-    it('doesnt allow to /PUT a new repo', function(done) {
+    it('hides /PUT a new repo', function(done) {
       request(app)
         .put('/api/Repositories')
         .set('Accept', 'application/json')
@@ -31,7 +31,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow to /POST a new repo', function(done) {
+    it('hides /POST a new repo', function(done) {
       request(app)
         .post('/api/Repositories')
         .set('Accept', 'application/json')
@@ -45,7 +45,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('allows /GET a repo by id', function(done) {
+    it('/GET a repo by id', function(done) {
       request(app)
         .get('/api/Repositories/1')
         .set('Accept', 'application/json')
@@ -80,7 +80,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /PUT repo by id with id=1', function(done) {
+    it('hides /PUT repo by id with id=1', function(done) {
       request(app)
         .put('/api/Repositories/1')
         .send({
@@ -95,7 +95,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /DELETE repo by id with id=1', function(done) {
+    it('hides /DELETE repo by id with id=1', function(done) {
       request(app)
         .delete('/api/Repositories/1')
         .set('Accept', 'application/json')
@@ -105,7 +105,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('allow /GET repo commits by repo id', function(done) {
+    it('/GET repo commits by repo id', function(done) {
       request(app)
         .get('/api/Repositories/1/commits')
         .set('Accept', 'application/json')
@@ -116,24 +116,24 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /POST repo commits by repo id', function(done) {
+    it('hides /POST repo commits by repo id', function(done) {
       request(app)
         .post('/api/Repositories/1/commits')
         .send({
           commmithash: 'ead2ed923ud8hd289hd'
         })
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
     });
 
-    it('doesnt allow /DELETE repo commits by repo id', function(done) {
+    it('hides /DELETE repo commits by repo id', function(done) {
       request(app)
         .delete('/api/Repositories/1/commits')
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
@@ -149,24 +149,24 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt allow /PUT repo commit by repo & commit id', function(done) {
+    it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
         .put('/api/Repositories/1/commits/1')
         .send({
           commithash: 'eade'
         })
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
     });
 
-    it('doesnt allow /DELETE repo commit by repo & commit id', function(done) {
+    it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
         .delete('/api/Repositories/1/commits/1')
         .set('Accept', 'application/json')
-        .expect(401, function(err, res) {
+        .expect(404, function(err, res) {
           if (err) return done(err);
           done();
         });
@@ -212,7 +212,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('/GET repo owner if repo doesnt exist', function(done) {
+    it('doesnt /GET repo owner if repo doesnt exist', function(done) {
       request(app)
         .get('/api/Repositories/3543/owner')
         .set('Accept', 'application/json')
@@ -222,7 +222,7 @@ describe('Repositories endpoint', function() {
         });
     });
 
-    it('doesnt find /POST repo in chunks', function(done) {
+    it('hides /POST repo in chunks', function(done) {
       request(app)
         .post('/api/Repositories/update')
         .send({
