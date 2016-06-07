@@ -16,7 +16,7 @@ describe('Commits endpoint', function() {
         commitId: "f2ea2dcadf"
       }, function (err, job) {
         if (err) return done(err);
-        console.log(job);
+        if (!job) return done(new Error('job was not created'));
         done();
       });
     });
