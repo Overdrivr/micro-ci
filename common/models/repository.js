@@ -3,6 +3,7 @@ var async = require('async');
 
 module.exports = function(Repository) {
 
+  Repository.disableRemoteMethod('find', true);
   Repository.disableRemoteMethod('create', true);
   Repository.disableRemoteMethod('upsert', true);
   Repository.disableRemoteMethod('updateAttributes', false);
@@ -12,6 +13,11 @@ module.exports = function(Repository) {
   Repository.disableRemoteMethod('count', true);
   Repository.disableRemoteMethod('findOne', true);
   Repository.disableRemoteMethod('updateAll', true);
+
+  Repository.disableRemoteMethod('__create__commits', false);
+  Repository.disableRemoteMethod('__delete__commits', false);
+  Repository.disableRemoteMethod('__destroyById__commits', false);
+  Repository.disableRemoteMethod('__updateById__commits', false);
 
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
