@@ -11,8 +11,10 @@ describe('Repositories endpoint', function() {
     before(function(done) {
         app.models.Client.create({
           username: "foo",
-          email: "foo@foo.com",
-          password: "bar"
+          email: "foo@bar.com",
+          password: "bar",
+          provider: 'github',
+          provider_id: 12348566
         }, function(err, user) {
           if (err) return done(err);
           if (!user) return done(new Error('User could not be created'));
