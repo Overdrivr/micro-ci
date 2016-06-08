@@ -36,6 +36,12 @@ app.serializeUser = function(user, done) {
   async.waterfall([
     // Check user doesn't exist
     function(callback) {
+      // Data validation
+      if(!user.hasOwnProperty('provider')) return callback(Error('Incomplete user informations. Missing provider.'));
+      if(!user.hasOwnProperty('id')) return callback(Error('Incomplete user informations. Missing id.'));
+      if(!user.provider) return callback(Error('Incomplete user informations. Undefined provider.'));
+      if(!user.id) return callback(Error('Incomplete user informations. Undefined id.'));
+
       app.models.Client.find({
         where: {
           provider: user.provider,
