@@ -39,7 +39,7 @@ app.serializeUser = function(user, done) {
       app.models.Client.find({
         where: {
           provider: user.provider,
-          provider_id: user.provider_id
+          provider_id: user.id
         }
       }, function(err, clients) {
         if (err) return callback(err);
@@ -85,18 +85,27 @@ app.serializeUser = function(user, done) {
 };
 
 app.deserializeUser = function(userdata, done) {
+  // Data validation
+  if(!userdata.hasOwnProperty('provider')) return done(Error('Incomplete user informations. Missing provider.'));
+  if(!userdata.hasOwnProperty('provider_id')) return done(Error('Incomplete user informations. Missing provider_id.'));
+  if(!userdata.provider) return done(Error('Incomplete user informations. Undefined provider.'));
+  if(!userdata.provider_id) return done(Error('Incomplete user informations. Undefined provider_id.'));
+
   app.models.Client.find({
-    where: {
-      provider: userdata.provider,
-      provider_id: userdata.userid
-    }
-  }, function(err, user) {
-    if(err) return done(err);
-    if(!user) return done(Error('Client [' + userdata.provider + '] : ' + userdata.id + 'not found.'));
-    done(null, {
-      provider_id: user[0].provider_id,
-      provider: user[0].provider
-    });
+      where: {
+        provider: userdata.provider,
+        provider_id: userdata.provider_id
+      }
+    },
+    function(err, users) {
+      if (err) return done(err);
+      if (!users) return done(Error('Client [' + userdata.provider + '] : ' + userdata.id + 'not found.'));
+      if (users.length > 1) return done(Error('Found more than 1 client matching pattern: ' + userdata.provider + '|' + userdata.provider_id));
+      if (users.length == 0) return done(Error('NO client found: ' + userdata.provider + '|' + userdata.provider_id));
+      done(null, {
+        provider: users[0].provider,
+        provider_id: users[0].provider_id
+      });
   });
 };
 
