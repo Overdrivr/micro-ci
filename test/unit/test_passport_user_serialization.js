@@ -2,9 +2,14 @@ var app = require('../../server/server');
 var assert = require('chai').assert;
 
 var user = {
-  provider: 'github',
+  provider: 'gitlabfoobaryo',
   id: 9683543 // Using id instead of provider_id because Passport will call this function and provide a remote id
 };
+
+var user2 = {
+  provider: 'gitbob',
+  id: 96232424032
+}
 
 //TODO: Test serialization and deserialization with undefined data and make sure nothing happens
 
@@ -75,7 +80,51 @@ describe('user serialization', function(){
     });
   });
 
-  it('doesnt find a user with undefined provider', function(done) {
+  it('doesnt serialize a user with non-valid id', function(done) {
+    app.serializeUser({
+        provider: user2.provider,
+        provider_id: undefined
+      }, function(err, userdata) {
+        assert.isNotOk(userdata);
+        if (err) return done();
+        done(Error('Expected error was not returned.'));
+    });
+  });
+
+  it('doesnt serialize a user with non-valid provider', function(done) {
+    app.serializeUser({
+        provider: undefined,
+        provider_id: user2.id
+      }, function(err, userdata) {
+        assert.isNotOk(userdata);
+        if (err) return done();
+        done(Error('Expected error was not returned.'));
+    });
+  });
+
+  it('doesnt serialize a user with non-valid id but same provider than another user', function(done) {
+    app.serializeUser({
+        provider: user.provider,
+        provider_id: undefined
+      }, function(err, userdata) {
+        assert.isNotOk(userdata);
+        if (err) return done();
+        done(Error('Expected error was not returned.'));
+    });
+  });
+
+  it('doesnt serialize a user with non-valid provider but same id than another user', function(done) {
+    app.serializeUser({
+        provider: undefined,
+        provider_id: user.id
+      }, function(err, userdata) {
+        assert.isNotOk(userdata);
+        if (err) return done();
+        done(Error('Expected error was not returned.'));
+    });
+  });
+
+  it('doesnt deserialize a user with undefined provider', function(done) {
     app.deserializeUser({
         provider: undefined,
         provider_id: user.id
@@ -86,7 +135,7 @@ describe('user serialization', function(){
     });
   });
 
-  it('doesnt find a user with undefined id', function(done) {
+  it('doesnt deserialize a user with undefined id', function(done) {
     app.deserializeUser({
         provider: user.provider,
         provider_id: undefined
@@ -97,7 +146,7 @@ describe('user serialization', function(){
     });
   });
 
-  it('doesnt find a user with non-exisiting provider but valid id', function(done) {
+  it('doesnt deserialize a user with non-exisiting provider but valid id', function(done) {
     app.deserializeUser({
         provider: 'hithub',
         provider_id: user.id
