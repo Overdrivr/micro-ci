@@ -13,17 +13,9 @@ var nockNode = require('nock')(url);
 
 var async = require('async')
 
-
+var app = require('../../server/server');
 describe('QueuedBUild', function() {
-  var app;
-  beforeEach(function () {
-    delete require.cache[require.resolve('../../server/server')];
-    app = require('../../server/server');
-  });
-  afterEach(function (done) {
-    //app.delete('/', function(a,b) {done()})
-    done();
-  });
+
   it('Create  multiple builds and check queue is working', function(done) {
 
     var maxNbOfSlaves = 3; //TODO should be commng from a global var
