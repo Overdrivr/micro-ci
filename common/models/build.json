@@ -7,31 +7,27 @@
   },
   "properties": {
     "status": {
-      "type": "string"
-    },
-    "log": {
       "type": "string",
       "required": true
+    },
+    "log": {
+      "type": "string"
     },
     "builddate": {
       "type": "date",
       "required": true
     },
     "buildtime": {
-      "type": "date",
-      "required": true
+      "type": "date"
     },
     "text": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "data": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "bss": {
-      "type": "number",
-      "required": true
+      "type": "number"
     }
   },
   "validations": [],

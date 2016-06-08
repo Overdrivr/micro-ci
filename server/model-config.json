@@ -52,5 +52,9 @@
   "Job": {
     "dataSource": "db",
     "public": true
+  },
+  "Slave": {
+    "dataSource": "db",
+    "public": true
   }
 }
