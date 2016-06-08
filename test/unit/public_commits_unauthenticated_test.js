@@ -1,27 +1,9 @@
 var request  = require('supertest'),
     assert   = require('chai').assert,
-    app      = require('../../server/server');
-
-var commit = {
-  commithash: 'al234',
-  repositoryId: 222
-};
+    app      = require('../../server/server'),
+    commit   = require('./test-setup').commit;
 
 describe('Commits endpoint', function() {
-  before(function(done){
-    app.models.Commit.create(commit, function (err, instance) {
-      if (err) return done(err);
-
-      instance.jobs.create({
-        commitId: "f2ea2dcadf"
-      }, function (err, job) {
-        if (err) return done(err);
-        if (!job) return done(new Error('job was not created'));
-        done();
-      });
-    });
-  });
-
   it('/GET all commits', function(done) {
     request(app)
       .get('/api/Commits')
@@ -62,7 +44,7 @@ describe('Commits endpoint', function() {
 
   it('/GET Commit by id = 1', function(done) {
     request(app)
-    .get('/api/Commits/1')
+    .get('/api/Commits/' + commit.id)
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
@@ -74,7 +56,7 @@ describe('Commits endpoint', function() {
 
   it('/HEAD Commit by id = 1', function(done) {
     request(app)
-    .head('/api/Commits/1')
+    .head('/api/Commits/' + commit.id)
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
@@ -84,7 +66,7 @@ describe('Commits endpoint', function() {
 
   it('hides /PUT Commit by id', function(done) {
     request(app)
-    .put('/api/Commits/1')
+    .put('/api/Commits/' + commit.id)
     .set('Accept', 'application/json')
     .send({
       commithash: 'eadeb3f4gg038se',
@@ -98,7 +80,7 @@ describe('Commits endpoint', function() {
 
   it('hides /DELETE Commit by id', function(done) {
     request(app)
-    .delete('/api/Commits/1')
+    .delete('/api/Commits/' + commit.id)
     .set('Accept', 'application/json')
     .expect(404, function(err, res) {
       if (err) return done(err);
@@ -106,12 +88,13 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('/GET Commit with id = 1 exists', function(done) {
+  it('/GET Commit with id exists', function(done) {
     request(app)
-    .get('/api/Commits/1/exists')
+    .get('/api/Commits/' + commit.id + '/exists')
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
+      assert(res.body.exists);
       done();
     });
   });
@@ -127,9 +110,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('/GET Commit with id = 1 jobs', function(done) {
+  it('/GET Commit jobs from id', function(done) {
     request(app)
-    .get('/api/Commits/1/jobs')
+    .get('/api/Commits/' + commit.id + '/jobs')
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
@@ -139,7 +122,7 @@ describe('Commits endpoint', function() {
 
   it('hides /POST Commit/jobs with id = 1', function(done) {
     request(app)
-    .post('/api/Commits/1/jobs')
+    .post('/api/Commits/' + commit.id + '/jobs')
     .set('Accept', 'application/json')
     .send({
       commitId: "efd24e2a"
@@ -152,7 +135,7 @@ describe('Commits endpoint', function() {
 
   it('hides /DELETE Commit/jobs with id = 1', function(done) {
     request(app)
-    .delete('/api/Commits/1/jobs')
+    .delete('/api/Commits/' + commit.id + '/jobs')
     .set('Accept', 'application/json')
     .expect(404, function(err, res) {
       if (err) return done(err);
@@ -160,9 +143,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('/GET Commits/1/jobs/1', function(done) {
+  it('/GET Commits/' + commit.id + '/jobs/1', function(done) {
     request(app)
-    .get('/api/Commits/1/jobs/1')
+    .get('/api/Commits/' + commit.id + '/jobs/1')
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
@@ -170,9 +153,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('hides /PUT Commits/1/jobs/1', function(done) {
+  it('hides /PUT Commits/' + commit.id + '/jobs/1', function(done) {
     request(app)
-    .put('/api/Commits/1/jobs/1')
+    .put('/api/Commits/' + commit.id + '/jobs/1')
     .send({
       commitId: 'ffeaf324f78d'
     })
@@ -183,9 +166,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('hides /DELETE Commits/1/jobs/1', function(done) {
+  it('hides /DELETE Commits/' + commit.id + '/jobs/1', function(done) {
     request(app)
-    .delete('/api/Commits/1/jobs/1')
+    .delete('/api/Commits/' + commit.id + '/jobs/1')
     .set('Accept', 'application/json')
     .expect(404, function(err, res) {
       if (err) return done(err);
@@ -193,9 +176,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('/GET Commits/1/jobs/count', function(done) {
+  it('/GET Commits/' + commit.id + '/jobs/count', function(done) {
     request(app)
-    .get('/api/Commits/1/jobs/count')
+    .get('/api/Commits/' + commit.id + '/jobs/count')
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
@@ -203,9 +186,9 @@ describe('Commits endpoint', function() {
     });
   });
 
-  it('/GET Commits/1/repository', function(done) {
+  it('/GET Commits/' + commit.id + '/repository', function(done) {
     request(app)
-    .get('/api/Commits/1/repository')
+    .get('/api/Commits/' + commit.id + '/repository')
     .set('Accept', 'application/json')
     .expect(200, function(err, res) {
       if (err) return done(err);
