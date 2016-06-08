@@ -1,5 +1,6 @@
 # Micro-ci
 > Continuous Integration service for embedded systems
+[ ![Codeship Status for Overdrivr/micro-ci](https://codeship.com/projects/48e15dc0-0f71-0134-8b30-3a660a5bed18/status?branch=master)](https://codeship.com/projects/156640)
 
 # Run
 1. Copy `providers.example.json` and rename to `providers.json`.
