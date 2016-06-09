@@ -1,7 +1,7 @@
 var request  = require('supertest'),
     assert   = require('chai').assert,
     app      = require('../../server/server');
-    repodata = require('./test-setup');
+    repodata = require('./test-setup').repo;
 
 var validtoken = '';
 
@@ -11,10 +11,10 @@ describe('Repositories endpoint', function() {
     before(function(done) {
         app.models.Client.create({
           username: "foo",
-          email: "foo@bar.com",
+          email: "foo@foo123112eae1.com",
           password: "bar",
-          provider: 'github',
-          provider_id: 12348566
+          provider: 'foobarprovider',
+          provider_id: 87334702902
         }, function(err, user) {
           if (err) return done(err);
           if (!user) return done(new Error('User could not be created'));
