@@ -92,25 +92,15 @@ app.serializeUser = function(user, done) {
 
 app.deserializeUser = function(userdata, done) {
   // Data validation
-  if(!userdata.hasOwnProperty('provider')) return done(Error('Incomplete user informations. Missing provider.'));
-  if(!userdata.hasOwnProperty('provider_id')) return done(Error('Incomplete user informations. Missing provider_id.'));
-  if(!userdata.provider) return done(Error('Incomplete user informations. Undefined provider.'));
-  if(!userdata.provider_id) return done(Error('Incomplete user informations. Undefined provider_id.'));
+  if(!userdata.hasOwnProperty('userId')) return done(Error('Incomplete user informations. Missing id.'));
+  if(!userdata.userId) return done(Error('Incomplete user informations. Undefined id.'));
 
-  app.models.Client.find({
-      where: {
-        provider: userdata.provider,
-        provider_id: userdata.provider_id
-      }
-    },
-    function(err, users) {
+  app.models.Client.findById(userdata.userId, function(err, user) {
       if (err) return done(err);
-      if (!users) return done(Error('Client [' + userdata.provider + '] : ' + userdata.id + 'not found.'));
-      if (users.length > 1) return done(Error('Found more than 1 client matching pattern: ' + userdata.provider + '|' + userdata.provider_id));
-      if (users.length == 0) return done(Error('NO client found: ' + userdata.provider + '|' + userdata.provider_id));
+      if (!user) return done(Error('Client [' + userdata.userId + '] not found.'));
       done(null, {
-        provider: users[0].provider,
-        provider_id: users[0].provider_id
+        provider: user.provider,
+        provider_id: user.provider_id
       });
   });
 };
