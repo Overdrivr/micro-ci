@@ -72,7 +72,7 @@ describe('SimpleBuild', function() {
         if(err) return done(err);
 
         if(err) return done(err);
-        app.models.Slave.findOne({},function(err, slave) {
+        app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
           if(err) return done(err);
 
           assert.equal(slave.status, "booting");

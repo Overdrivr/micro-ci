@@ -12,7 +12,8 @@ describe('CreateJob', function() {
 
   it('Create a job and check a builds are created', function(done) {
 
-    build_id=1;
+
+    var build_id=1;
     var jobName = 'build_' + build_id;
     var slaveName = 'slave_' + build_id;
     var slave_id = build_id;

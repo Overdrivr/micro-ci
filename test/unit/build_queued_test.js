@@ -22,7 +22,14 @@ describe('QueuedBUild', function() {
 
     function create_job(i, cb)
     {
-      var build_id = i;
+      app.models.Build.findOne({order: 'id DESC'},function(err, build) {
+        if(build != null)
+        {
+          var build_id = build.id +1;
+        }
+        else {
+          var build_id = 1;
+        }      
       var jobName = 'build_' + build_id;
       var slaveName = 'slave_' + build_id;
       nock
@@ -84,7 +91,8 @@ describe('QueuedBUild', function() {
           });
         });
       });
-    }
+    });
+  }
 
     function loopFunction(j, cb)
     {
