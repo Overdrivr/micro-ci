@@ -16,7 +16,6 @@ describe('Fake github webhook', function(){
         if (!repo) return done(Error("Repository instance not created."));
 
         repoId = repo.id;
-        console.log(repo.id);
         app.models.Commit.deleteAll({
           id: {neq: 0}
         }, function(err, res) {

@@ -36,10 +36,16 @@ app.serializeUser = function(user, done) {
   async.waterfall([
     // Check user doesn't exist
     function(callback) {
+      // Data validation
+      if(!user.hasOwnProperty('provider')) return callback(Error('Incomplete user informations. Missing provider.'));
+      if(!user.hasOwnProperty('id')) return callback(Error('Incomplete user informations. Missing id.'));
+      if(!user.provider) return callback(Error('Incomplete user informations. Undefined provider.'));
+      if(!user.id) return callback(Error('Incomplete user informations. Undefined id.'));
+
       app.models.Client.find({
         where: {
           provider: user.provider,
-          provider_id: user.provider_id
+          provider_id: user.id
         }
       }, function(err, clients) {
         if (err) return callback(err);
@@ -85,18 +91,17 @@ app.serializeUser = function(user, done) {
 };
 
 app.deserializeUser = function(userdata, done) {
-  app.models.Client.find({
-    where: {
-      provider: userdata.provider,
-      provider_id: userdata.userid
-    }
-  }, function(err, user) {
-    if(err) return done(err);
-    if(!user) return done(Error('Client [' + userdata.provider + '] : ' + userdata.id + 'not found.'));
-    done(null, {
-      provider_id: user[0].provider_id,
-      provider: user[0].provider
-    });
+  // Data validation
+  if(!userdata.hasOwnProperty('userId')) return done(Error('Incomplete user informations. Missing id.'));
+  if(!userdata.userId) return done(Error('Incomplete user informations. Undefined id.'));
+
+  app.models.Client.findById(userdata.userId, function(err, user) {
+      if (err) return done(err);
+      if (!user) return done(Error('Client [' + userdata.userId + '] not found.'));
+      done(null, {
+        provider: user.provider,
+        provider_id: user.provider_id
+      });
   });
 };
 
