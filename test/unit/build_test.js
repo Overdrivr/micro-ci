@@ -43,7 +43,7 @@ describe('SimpleBuild', function() {
       .head('/computer/'+slaveName+'/api/json')// Slave creation
       .reply(404)
       .post("/computer/doCreateItem?name="+slaveName+"&type=hudson.slaves.DumbSlave%24DescriptorImpl&json=%7B%22name%22%3A%22"+slaveName+"%22%2C%22nodeDescription%22%3A%22%22%2C%22numExecutors%22%3A1%2C%22remoteFS%22%3A%22~%2F%22%2C%22labelString%22%3A%22%22%2C%22mode%22%3A%22NORMAL%22%2C%22type%22%3A%22hudson.slaves.DumbSlave%24DescriptorImpl%22%2C%22retentionStrategy%22%3A%7B%22stapler-class%22%3A%22hudson.slaves.RetentionStrategy%24Always%22%7D%2C%22nodeProperties%22%3A%7B%22stapler-class-bag%22%3A%22true%22%2C%22hudson-slaves-EnvironmentVariablesNodeProperty%22%3A%7B%22env%22%3A%7B%22key%22%3A%22slave_id%22%2C%22value%22%3A"+slave_id+"%7D%7D%7D%2C%22launcher%22%3A%7B%22stapler-class%22%3A%22hudson.plugins.sshslaves.SSHLauncher%22%2C%22credentialsId%22%3A%22099c7823-795b-41b8-81b0-ad92f79492e0%22%2C%22host%22%3A%22127.0.0.1%22%2C%22port%22%3A22%7D%7D")
-      
+
       .reply(302, '', { location: 'http://localhost:8080/computer/' })
       .head('/job/' + jobName + '/api/json') //Job status
       .reply(200)
@@ -70,56 +70,45 @@ describe('SimpleBuild', function() {
       function(err, job)
       {
         if(err) return done(err);
-        app.models.Build.create({
-          status:"created",
-          builddate:new Date(),
-          jobId:job.getId()
-        }, function(err, build)
-        {
 
+        if(err) return done(err);
+        app.models.Slave.findOne({},function(err, slave) {
           if(err) return done(err);
-          app.models.Slave.findOne({},function(err, slave) {
+
+          assert.equal(slave.status, "booting");
+          //Simulate booted slave:
+
+          request(app)
+          .get('/api/Slaves/127.0.0.1/boot')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200, function(err, res){
             if(err) return done(err);
+            assert.equal(res.body.id, slave_id);
 
-            assert.equal(slave.status, "booting");
-            //Simulate booted slave:
-
-            request(app)
-            .get('/api/Slaves/127.0.0.1/boot')
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect(200, function(err, res){
+            app.models.Slave.findOne({},function(err, slave) {
               if(err) return done(err);
-              assert.equal(res.body.id, slave_id);
+              assert.equal(slave.status, "building");
 
-              app.models.Slave.findOne({},function(err, slave) {
+
+              //Simulate build end
+              request(app)
+              .post('/api/Builds/'+build_id+'/complete')
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(204, function(err, res){
                 if(err) return done(err);
-                assert.equal(slave.status, "building");
+                app.models.Build.findOne({},function(err, build) {
+                  assert.equal(build.status, "success");
+                  app.models.Slave.exists(1, function(err, exist) {
 
-
-                //Simulate build end
-                request(app)
-                .post('/api/Builds/'+build_id+'/complete')
-                .set('Accept', 'application/json')
-                .expect('Content-Type', /json/)
-                .expect(204, function(err, res){
-                  if(err) return done(err);
-                  app.models.Build.findOne({},function(err, build) {
-                    assert.equal(build.status, "success");
-                    app.models.Slave.exists(1, function(err, exist) {
-
-                      if(exist)
-                      return done(new Error("Slave should be removed because it has been used"))
-                      done();
-                    });
+                    if(exist)
+                    return done(new Error("Slave should be removed because it has been used"))
+                    done();
                   });
                 });
-
               });
-
-
             });
-
           });
         });
       });
