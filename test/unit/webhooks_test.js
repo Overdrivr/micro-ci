@@ -38,15 +38,18 @@ describe('Fake github webhook', function(){
       });
   });
 
-  it('can find the new Commit and it contains the received data',
+  it('can find the new Commit, and its belonging job',
   function(done){
       app.models.Commit.findOne({
         where: {
           commithash: fakepayload.after
-        }
+        },
+        include: 'jobs'
       }, function(err, instance) {
+        var commitdata = instance.toJSON();
         if (err) return done(err);
-        if (!instance) return done(new Error("Commit not found."));
+        if (!commitdata) return done(new Error("Commit not found."));
+        assert.strictEqual(commitdata.jobs.length, 1);
         done();
     });
   });
