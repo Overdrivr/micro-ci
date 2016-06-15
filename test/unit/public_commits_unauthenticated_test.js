@@ -1,9 +1,19 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    app      = require('../../server/server'),
-    commit   = require('./test-setup').commit;
+
+
+describe('Unauthenticated commits', function (){
+
+
 
 describe('Commits endpoint', function() {
+  var request  = require('supertest'),
+      assert   = require('chai').assert;
+
+  var commit = require('./test-setup').commit;
+  var app  = require('../../server/server');
+
+ require('./test-setup');
+
+
   it('/GET all commits', function(done) {
     request(app)
       .get('/api/Commits')
@@ -248,4 +258,5 @@ describe('Commits endpoint', function() {
       done();
     });
   });
+});
 });

@@ -1,19 +1,26 @@
-var app = require('../../server/server');
-var assert = require('chai').assert;
-
-var user = {
-  provider: 'gitlabfoobaryo',
-  id: 9683543
-};
-
-var user2 = {
-  provider: 'gitbob',
-  id: 96232424032
-}
-
-var serializedUserId;
-
 describe('user serialization', function(){
+
+  var app = require('../../server/server');
+  var assert = require('chai').assert;
+
+  var user = {
+    provider: 'gitlabfoobaryo',
+    id: 9683543
+  };
+
+  var user2 = {
+    provider: 'gitbob',
+    id: 96232424032
+  }
+
+  var serializedUserId;
+
+  before(function()
+  {
+    delete require.cache[require.resolve('../../server/server')]
+    app  = require('../../server/server');
+  });
+
   before(function(done) {
     app.models.Client.create({
       provider: 'github',

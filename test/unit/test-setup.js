@@ -1,4 +1,4 @@
-var app = require('../../server/server');
+var app;
 
 var repodata = {
   platform: "github",
@@ -10,7 +10,13 @@ var commit = {
   repositoryId: 222
 };
 
+
 before(function(done) {
+
+  delete require.cache[require.resolve('../../server/server')]
+  app  = require('../../server/server');
+
+
     app.models.Repository.create(repodata, function(err, repo) {
       if (err) return done(err);
       if (!repo) return done(Error('Could not create repository.'));
@@ -30,7 +36,7 @@ before(function(done) {
 
           instance.jobs.create({
             commitId: "f2ea2dcadf",
-            yaml: "foo: bar"
+            yaml:{build: ["sleep 3", "echo 'End of Build'"]}
           }, function (err, job) {
             if (err) return done(err);
             if (!job) return done(new Error('job was not created'));
@@ -39,7 +45,8 @@ before(function(done) {
         });
       });
     });
-});
+  });
 
 module.exports.repo = repodata;
 module.exports.commit = commit;
+module.exports.app = app;

@@ -1,11 +1,14 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    app      = require('../../server/server');
-    repodata = require('./test-setup').repo;
-
-var validtoken = '';
 
 describe('Repositories endpoint', function() {
+
+  var request  = require('supertest'),
+      assert   = require('chai').assert,
+      app      = require('../../server/server');
+      repodata = require('./test-setup').repo;
+
+  var validtoken = '';
+
+
   describe('with authenticated user', function() {
     // Create a test user for authenticated requests
     before(function(done) {
