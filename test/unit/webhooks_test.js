@@ -67,20 +67,9 @@ describe('Fake github webhook', function(){
       assert.strictEqual(commitData.commits.length, 1);
       assert.strictEqual(commitData[0].commithash, fakepayload.after);
       done();
-    })
-  })
-  //TODO: Test with tampered data (a wrong secret key)
-  /*
-  it('calls the endpoint with tampered data using a not-existing commit',
-  function(done){
-    fakepayload.after = "eades4hd83jsswd340ddee"
-    request(app)
-    .post('/api/Repositories/webhook/github')
-    .set('Accept', 'application/json')
-    .send(fakepayload)
-    .expect(204, function(err, res){
-      if(err) return done(err);
-      done();
     });
-  });*/
+  });
+
+  //TODO: Test with multiple calls to webhook
+  //TODO: Test with tampered data (a wrong secret key)
 });
