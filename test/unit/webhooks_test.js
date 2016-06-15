@@ -65,11 +65,12 @@ describe('Fake github webhook', function(){
       if (err) return done(err);
       commitData = repo.toJSON();
       assert.strictEqual(commitData.commits.length, 1);
-      assert.strictEqual(commitData[0].commithash, fakepayload.after);
+      assert.strictEqual(commitData.commits[0].commithash, fakepayload.after);
       done();
     });
   });
 
   //TODO: Test with multiple calls to webhook
   //TODO: Test with tampered data (a wrong secret key)
+  //TODO: Test POST a commit with same hash but from different platform
 });
