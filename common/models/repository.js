@@ -49,9 +49,8 @@ module.exports = function(Repository) {
           if(commits.length > 1) return callback(new Error('Found multiple Commits under hash ',after));
           if(commits.length == 1) return callback(null, commits[0])
 
-          app.models.Commit.create({
-            "commithash": after
-          }, function(err, createdCommit){
+          repositoryInstance.__create__commits({ commithash: after },
+          function(err, createdCommit) {
             if(err) return callback(err);
             callback(null, repositoryInstance, createdCommit);
           });
