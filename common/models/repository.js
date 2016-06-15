@@ -51,17 +51,21 @@ module.exports = function(Repository) {
 
           app.models.Commit.create({
             "commithash": after
-          }, function(err, models){
+          }, function(err, createdCommit){
             if(err) return callback(err);
-            callback(null, repositoryInstance, models[0]);
+            callback(null, repositoryInstance, createdCommit);
           });
         });
       },
 
-      // Webhook processing done successfully
+      // Create a job for this commit
       function(repositoryInstance, commitInstance, callback) {
-        //TODO: Trigger a job creation ?
-        cb();
+        commitInstance.__create__jobs({
+          yaml: {}
+        }, function (err, createdJobs) {
+          if (err) return cb(err);
+          cb();
+        });
       }
     ],
     // Webhook processing failed somewhere
