@@ -53,6 +53,22 @@ describe('Fake github webhook', function(){
         done();
     });
   });
+
+  it('can find the new Commit from the repository', function (done) {
+    app.models.Repository.findOne({
+      where: {
+        platform: "github",
+        remoteId: fakepayload.repository.id
+      },
+      include: 'commits'
+    }, function (err, repo) {
+      if (err) return done(err);
+      commitData = repo.toJSON();
+      assert.strictEqual(commitData.commits.length, 1);
+      assert.strictEqual(commitData[0].commithash, fakepayload.after);
+      done();
+    })
+  })
   //TODO: Test with tampered data (a wrong secret key)
   /*
   it('calls the endpoint with tampered data using a not-existing commit',
