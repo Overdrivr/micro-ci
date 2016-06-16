@@ -1,4 +1,5 @@
 var app;
+var clearRequire = require('clear-require');
 
 var repodata = {
   platform: "github",
@@ -13,7 +14,7 @@ var commit = {
 
 before(function(done) {
 
-  delete require.cache[require.resolve('../../server/server')]
+  clearRequire('../../server/server');
   app  = require('../../server/server');
 
 

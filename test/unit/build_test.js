@@ -15,11 +15,12 @@ describe('SimpleBuild', function() {
   var nockNode = nock(url);
 
   var request = require('supertest');
-  var async = require('async')
+  var async = require('async');
+  var clearRequire = require('clear-require');
   var app;
   beforeEach(function()
   {
-    delete require.cache[require.resolve('../../server/server')]
+    clearRequire('../../server/server');
     app  = require('../../server/server');
   });
 
@@ -71,7 +72,7 @@ describe('SimpleBuild', function() {
       .head('/computer/'+slaveName+'/api/json')
       .reply(200)
       .post('/computer/'+slaveName+'/doDelete')
-      .reply(302, '')      
+      .reply(302, '')
       .get('/job/'+jobName+'/1/api/json')
       .reply(201, {"actions":[{"causes":[{"shortDescription":"Started by user anonymous","userId":null,"userName":"anonymous"}]}],"artifacts":[],"building":true,"description":null,"displayName":"#1","duration":0,"estimatedDuration":-1,"executor":{},"fullDisplayName":"Test3 #1","id":"1","keepLog":false,"number":1,"queueId":9,"result":"SUCCESS","timestamp":1461214209569,"url":"http://127.0.0.1:8080/job/Test3/1/","builtOn":slaveName,"changeSet":{"items":[],"kind":null},"culprits":[]});
 

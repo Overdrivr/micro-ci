@@ -8,11 +8,12 @@ describe('Fake github webhook', function(){
   var app;
   var loopback = require('loopback');
   var fakepayload = require('./fake-github-push-payload.json');
+  var clearRequire = require('clear-require');
   var repoId = null;
 
   before(function()
   {
-    delete require.cache[require.resolve('../../server/server')]
+    clearRequire('../../server/server');
     app  = require('../../server/server');
   });
 

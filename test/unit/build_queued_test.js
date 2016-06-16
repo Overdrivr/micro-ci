@@ -6,6 +6,7 @@ describe('QueuedBuild', function() {
   var request = require('supertest');
   var async = require('async')
   var app;
+  var clearRequire = require('clear-require');
 
 
   var nock = require('nock');
@@ -18,7 +19,7 @@ describe('QueuedBuild', function() {
 
   beforeEach(function()
   {
-    delete require.cache[require.resolve('../../server/server')]
+    clearRequire('../../server/server');
     app  = require('../../server/server');
   });
 
