@@ -70,7 +70,17 @@ describe('Fake github webhook', function(){
     });
   });
 
-  //TODO: Test with multiple calls to webhook
+  it('can be called several time with the same data without effect', function (done) {
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send(fakepayload)
+      .expect(204, function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+  });
+  
   //TODO: Test with tampered data (a wrong secret key)
   //TODO: Test POST a commit with same hash but from different platform
 });
