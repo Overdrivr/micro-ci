@@ -1,27 +1,19 @@
+var fixtures = require("fixturefiles"),
+    assert   = require('assert'),
+    request  = require('supertest'),
+    async    = require('async'),
+    clear    = require('clear-require');
+               clear('../../server/server');
+var app      = require('../../server/server'),
+    nock     = require('nock');
+
+var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
+var nockJenkins = nock(url);
+
+var url =  'http://0.0.0.0:3000';
+var nockNode = nock(url);
 
 describe('QueuedBuild', function() {
-
-  var fixtures = require("fixturefiles")
-  var assert = require('assert');
-  var request = require('supertest');
-  var async = require('async')
-  var app;
-  var clearRequire = require('clear-require');
-
-
-  var nock = require('nock');
-  var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-  var nockJenkins = nock(url);
-
-  var url =  'http://0.0.0.0:3000';
-  var nockNode = nock(url);
-
-
-  beforeEach(function()
-  {
-    clearRequire('../../server/server');
-    app  = require('../../server/server');
-  });
 
   afterEach(function(done)
   {

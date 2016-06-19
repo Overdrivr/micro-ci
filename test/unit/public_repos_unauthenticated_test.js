@@ -1,13 +1,9 @@
+var request  = require('supertest'),
+    assert   = require('chai').assert,
+    app      = require('../../server/server');
+    repodata = require('./test-setup').repo;
 
-describe('Repositories endpoint', function() {
-
-  var request  = require('supertest'),
-      assert   = require('chai').assert,
-      app      = require('../../server/server');
-      repodata = require('./test-setup').repo;
-
-
-  describe('with unauthenticated user', function (){
+describe('Repositories endpoint with Unauthenticated client', function() {
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
@@ -236,6 +232,4 @@ describe('Repositories endpoint', function() {
           done();
         });
     });
-
-  });
 });

@@ -1,15 +1,13 @@
+var request  = require('supertest'),
+    assert   = require('chai').assert,
+    clear    = require('clear-require'),
+    app      = require('../../server/server'),
+    repodata = require('./test-setup').repo;
 
-describe('Repositories endpoint', function() {
+var validtoken = '';
 
-  var request  = require('supertest'),
-      assert   = require('chai').assert,
-      app      = require('../../server/server');
-      repodata = require('./test-setup').repo;
+describe('Repositories endpoint with authenticated client', function() {
 
-  var validtoken = '';
-
-
-  describe('with authenticated user', function() {
     // Create a test user for authenticated requests
     before(function(done) {
         app.models.Client.create({
@@ -249,5 +247,4 @@ describe('Repositories endpoint', function() {
           done();
         });
     });
-  });
 });

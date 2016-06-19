@@ -1,21 +1,14 @@
+var request     = require('supertest'),
+    clear       = require('clear-require'),
+    assert      = require('chai').assert;
+                  clear('../../server/server');
+var app         = require('../../server/server'),
+    loopback    = require('loopback'),
+    fakepayload = require('./fake-github-push-payload.json');
 
+var repoId = null;
 
 describe('Fake github webhook', function(){
-
-
-  var request = require('supertest');
-  var assert = require('chai').assert;
-  var app;
-  var loopback = require('loopback');
-  var fakepayload = require('./fake-github-push-payload.json');
-  var clearRequire = require('clear-require');
-  var repoId = null;
-
-  before(function()
-  {
-    clearRequire('../../server/server');
-    app  = require('../../server/server');
-  });
 
   // Create a test repository
   before(function(done){

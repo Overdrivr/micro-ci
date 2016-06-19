@@ -1,28 +1,20 @@
+var fixtures = require("fixturefiles"),
+    assert   = require('assert'),
+    nock     = require('nock'),
+    request  = require('supertest'),
+    async    = require('async'),
+    clear    = require('clear-require');
+               clear('../../server/server');
+var app      = require('../../server/server');
+
+var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
+var nockJenkins = nock(url);
+
+var url =  'http://0.0.0.0:3000';
+var nockNode = nock(url);
 
 
 describe('SimpleBuild', function() {
-
-  var fixtures = require("fixturefiles")
-
-  var assert = require('assert');
-
-  var nock = require('nock');
-  var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-  var nockJenkins = nock(url);
-
-
-  var url =  'http://0.0.0.0:3000';
-  var nockNode = nock(url);
-
-  var request = require('supertest');
-  var async = require('async');
-  var clearRequire = require('clear-require');
-  var app;
-  beforeEach(function()
-  {
-    clearRequire('../../server/server');
-    app  = require('../../server/server');
-  });
 
   afterEach(function(done)
   {
@@ -32,10 +24,7 @@ describe('SimpleBuild', function() {
     done();
   });
 
-
-
-
-  it('Create a build and lunch it on a slave', function(done) {
+  it('Creates a build and launches it on a slave', function(done) {
     //Get next id
     app.models.Build.findOne({order: 'id DESC'},function(err, build) {
       if(build != null)

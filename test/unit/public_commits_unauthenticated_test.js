@@ -1,18 +1,11 @@
+var request = require('supertest'),
+    assert  = require('chai').assert,
+    commit  = require('./test-setup').commit,
+    clear   = require('clear-require'),
+    app     = require('../../server/server');
 
 
-describe('Unauthenticated commits', function (){
-
-
-
-describe('Commits endpoint', function() {
-  var request  = require('supertest'),
-      assert   = require('chai').assert;
-
-  var commit = require('./test-setup').commit;
-  var app  = require('../../server/server');
-
- require('./test-setup');
-
+describe('Commits endpoint with Unauthenticated client', function() {
 
   it('/GET all commits', function(done) {
     request(app)
@@ -258,5 +251,4 @@ describe('Commits endpoint', function() {
       done();
     });
   });
-});
 });
