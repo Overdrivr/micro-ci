@@ -1,5 +1,6 @@
-var clear  = require('clear-require'),
-    app    = require('../../server/server'),
+var clear  = require('clear-require');
+             clear('../../server/server');
+var app    = require('../../server/server'),
     assert = require('chai').assert;
 
 var user = {
@@ -15,12 +16,6 @@ var user2 = {
 var serializedUserId;
 
 describe('user serialization', function(){
-
-  before(function()
-  {
-    delete require.cache[require.resolve('../../server/server')]
-    app  = require('../../server/server');
-  });
 
   before(function(done) {
     app.models.Client.create({
