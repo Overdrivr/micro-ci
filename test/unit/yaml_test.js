@@ -1,6 +1,9 @@
-var inArray = require("in-array"),
-    yaml    = require("../../lib/yaml-parser"),
-    assert  = require('assert');
+
+var inArray = require("in-array");
+
+var yaml = require("../../lib/yaml-parser")
+
+var assert = require('assert');
 
 describe('emptyYaml', function(){
   it('Empty yaml file', function(){

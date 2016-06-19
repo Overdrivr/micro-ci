@@ -1,7 +1,5 @@
-var clear  = require('clear-require');
-             clear('../../server/server');
-var app    = require('../../server/server'),
-    assert = require('chai').assert;
+var app = require('../../server/server');
+var assert = require('chai').assert;
 
 var user = {
   provider: 'gitlabfoobaryo',
@@ -16,7 +14,6 @@ var user2 = {
 var serializedUserId;
 
 describe('user serialization', function(){
-
   before(function(done) {
     app.models.Client.create({
       provider: 'github',
