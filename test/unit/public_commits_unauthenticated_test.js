@@ -1,9 +1,12 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    app      = require('../../server/server'),
-    commit   = require('./test-setup').commit;
+var request = require('supertest'),
+    assert  = require('chai').assert,
+    commit  = require('./test-setup').commit,
+    clear   = require('clear-require'),
+    app     = require('../../server/server');
 
-describe('Commits endpoint', function() {
+
+describe('Commits endpoint with Unauthenticated client', function() {
+
   it('/GET all commits', function(done) {
     request(app)
       .get('/api/Commits')
