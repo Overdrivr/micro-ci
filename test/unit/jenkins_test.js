@@ -1,25 +1,14 @@
+var assert   = require('assert'),
+    Jenkins  = require('../../lib/jenkins'),
+    nock =  require('nock'),
+    fixtures = require("fixturefiles"),
+    should = require('should');
+
+var url = process.env.JENKINS_TEST_URL || 'http://localhost:8080';
+var nockJenkins = nock(url);
+var jenkins =  new Jenkins(url, "099c7823-795b-41b8-81b0-ad92f79492e0");
 
 describe('jenkins', function() {
-
-  var url = process.env.JENKINS_TEST_URL || 'http://localhost:8080';
-
-  var assert = require('assert');
-
-  var Jenkins = require('../../lib/jenkins');
-  var jenkins =  new Jenkins(url, "099c7823-795b-41b8-81b0-ad92f79492e0");
-
-  var nock =  require('nock');
-  var nockJenkins = nock(url);
-
-
-  var should = require('should');
-
-
-
-
-  var assert = require('assert')
-  var fixtures = require("fixturefiles")
-
 
   afterEach(function(done)
   {
@@ -28,7 +17,6 @@ describe('jenkins', function() {
     nock.cleanAll();
     done();
   });
-
 
   describe('build', function() {
     describe('runBuild', function() {
@@ -179,7 +167,7 @@ describe('jenkins', function() {
         .reply(200)
         .get('/queue/api/json')
         .reply(201, fixtures.jobQueue)
-        
+
         jenkins.get_build_status(build_id,
           function(err, data)
           {
