@@ -1,13 +1,12 @@
 var request  = require('supertest'),
     assert   = require('chai').assert,
-    clear    = require('clear-require'),
-    app      = require('../../server/server'),
+    app      = require('../../server/server');
     repodata = require('./test-setup').repo;
 
 var validtoken = '';
 
-describe('Repositories endpoint with authenticated client', function() {
-
+describe('Repositories endpoint', function() {
+  describe('with authenticated user', function() {
     // Create a test user for authenticated requests
     before(function(done) {
         app.models.Client.create({
@@ -247,4 +246,5 @@ describe('Repositories endpoint with authenticated client', function() {
           done();
         });
     });
+  });
 });
