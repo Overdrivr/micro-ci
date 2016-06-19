@@ -46,12 +46,13 @@ module.exports = function(Repository) {
         },
         function(err, commits) {
           if(err) return callback(err);
-          if(commits.length > 1) return callback(new Error('Found multiple Commits under hash ',after));
-          if(commits.length == 1) return callback(null, commits[0])
+          if(commits.length > 1) return callback(Error('Found multiple Commits under hash ',after));
+          if(commits.length == 1) return callback(null, repositoryInstance, commits[0])
 
           repositoryInstance.__create__commits({ commithash: after },
           function(err, createdCommit) {
-            if(err) return callback(err);
+            if (err) return callback(err);
+            if (!createdCommit) return callback(Error('Commit could not be created'));
             callback(null, repositoryInstance, createdCommit);
           });
         });
