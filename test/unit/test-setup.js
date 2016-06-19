@@ -1,5 +1,4 @@
-var app;
-var clearRequire = require('clear-require');
+var app = require('../../server/server');
 
 var repodata = {
   platform: "github",
@@ -13,10 +12,6 @@ var commit = {
 
 
 before(function(done) {
-
-  clearRequire('../../server/server');
-  app  = require('../../server/server');
-
 
     app.models.Repository.create(repodata, function(err, repo) {
       if (err) return done(err);
