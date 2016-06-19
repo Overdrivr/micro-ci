@@ -3,8 +3,7 @@ var request  = require('supertest'),
     app      = require('../../server/server');
     repodata = require('./test-setup').repo;
 
-describe('Repositories endpoint', function() {
-  describe('with unauthenticated user', function (){
+describe('Repositories endpoint with Unauthenticated client', function() {
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
@@ -233,6 +232,4 @@ describe('Repositories endpoint', function() {
           done();
         });
     });
-
-  });
 });
