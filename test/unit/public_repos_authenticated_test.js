@@ -1,10 +1,9 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    clear    = require('clear-require'),
-    app      = require('../../server/server'),
-    repodata = require('./test-setup').repo;
-
-var validtoken = '';
+var request    = require('supertest'),
+    assert     = require('chai').assert,
+    clear      = require('clear-require'),
+    app        = require('../../server/server'),
+    repodata   = require('./test-setup').repo,
+    validtoken = {};
 
 describe('Repositories endpoint with authenticated client', function() {
 
