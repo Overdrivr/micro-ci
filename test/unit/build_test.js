@@ -3,9 +3,8 @@ var fixtures = require("fixturefiles"),
     nock     = require('nock'),
     request  = require('supertest'),
     async    = require('async'),
-    clear    = require('clear-require');
-               clear('../../server/server');
-var app      = require('../../server/server');
+    clear    = require('clear-require'),
+    app      = {};
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
@@ -15,6 +14,11 @@ var nockNode = nock(url);
 
 
 describe('SimpleBuild', function() {
+
+  before(function(){
+    clear('../../server/server');
+    app = require('../../server/server');
+  });
 
   afterEach(function(done)
   {

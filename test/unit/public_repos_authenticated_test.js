@@ -1,33 +1,74 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    clear    = require('clear-require'),
-    app      = require('../../server/server'),
-    repodata = require('./test-setup').repo;
-
-var validtoken = '';
+var request    = require('supertest'),
+    assert     = require('chai').assert,
+    async      = require('async'),
+    clear      = require('clear-require'),
+    repodata   = require('./test-setup').repo,
+    commit     = require('./test-setup').commit,
+    app        = {},
+    validtoken = {};
 
 describe('Repositories endpoint with authenticated client', function() {
 
     // Create a test user for authenticated requests
     before(function(done) {
-        app.models.Client.create({
-          username: "foo",
-          email: "foo@foo123112eae1.com",
-          password: "bar",
-          provider: 'foobarprovider',
-          provider_id: 87334702902
-        }, function(err, user) {
-          if (err) return done(err);
-          if (!user) return done(new Error('User could not be created'));
+      clear('../../server/server');
+      app = require('../../server/server');
 
-          app.models.Client.generateVerificationToken(user,
-            function(err, token) {
-              if (err) return done(err);
-              if (!token) return done(new Error('token could not be created'));
-              validtoken = token;
-              done();
+      async.waterfall([
+        function(callback) {
+          app.models.Client.create({
+            username: "foo",
+            email: "foo@foo123112eae1.com",
+            password: "bar",
+            provider: 'foobarprovider',
+            provider_id: 87334702902
+          }, function(err, user) {
+            if (err) return callback(err);
+            if (!user) return callback(new Error('User could not be created'));
+            callback(null, user);
           });
-        });
+        },
+        function(user, callback) {
+          app.models.Client.generateVerificationToken(user,
+          function(err, token) {
+            if (err) return callback(err);
+            if (!token) return callback(new Error('token could not be created'));
+            validtoken = token;
+            callback();
+          });
+        },
+        function(callback) {
+          app.models.Repository.create(repodata, function(err, repo) {
+            if (err) return callback(err);
+            if (!repo) return callback(Error('Could not create repository.'));
+            callback(null, repo);
+          });
+        },
+        function(repository, callback) {
+          repository.commits.create(commit, function(err, inst) {
+            if (err) return done(err);
+            if (!inst) return done(Error('Could not create commit.'));
+            console.log(repository);
+            console.log(commit);
+            commit.id = inst.id;
+            callback(null, inst);
+          });
+        },
+        function(commit, callback) {
+          commit.jobs.create({
+              commitId: "f2ea2dcadf",
+              yaml:{build: ["sleep 3", "echo 'End of Build'"]}
+            },
+            function (err, job) {
+              if (err) return callback(err);
+              if (!job) return callback(new Error('job was not created'));
+              callback();
+          });
+        }
+      ], function(err, result) {
+        if (err) return done(err);
+        done();
+      });
     });
 
     it('hides /PUT a new repo', function(done) {
@@ -154,7 +195,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('/GET repo commit by repo & commit id', function(done) {
       request(app)
-        .get('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
+        .get('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);
@@ -164,7 +205,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
-        .put('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
+        .put('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
         .send({
           commithash: 'eade'
         })
@@ -177,7 +218,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
-        .delete('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
+        .delete('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);

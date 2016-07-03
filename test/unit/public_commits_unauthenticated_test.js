@@ -7,6 +7,31 @@ var request = require('supertest'),
 
 describe('Commits endpoint with Unauthenticated client', function() {
 
+  before(function(done) {
+    clear('../../server/server');
+    app = require('../../server/server');
+
+    app.models.Repository.create(repodata, function(err, repo) {
+      if (err) return done(err);
+      if (!repo) return done(Error('Could not create repository.'));
+
+      app.models.Commit.create(commit, function(err, inst) {
+        if (err) return done(err);
+        if (!inst) return done(Error('Could not create commit.'));
+        commit.id = inst.id;
+        inst.jobs.create({
+            commitId: "f2ea2dcadf",
+            yaml:{build: ["sleep 3", "echo 'End of Build'"]}
+          },
+          function (err, job) {
+            if (err) return done(err);
+            if (!job) return done(new Error('job was not created'));
+            done();
+        });
+      });
+    });
+  });
+
   it('/GET all commits', function(done) {
     request(app)
       .get('/api/Commits')
