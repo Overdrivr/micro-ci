@@ -2,10 +2,9 @@ var fixtures = require("fixturefiles"),
     assert   = require('assert'),
     request  = require('supertest'),
     async    = require('async'),
-    clear    = require('clear-require');
-               clear('../../server/server');
-var app      = require('../../server/server'),
-    nock     = require('nock');
+    clear    = require('clear-require')
+    nock     = require('nock'),
+    app      = {};
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
@@ -14,6 +13,11 @@ var url =  'http://0.0.0.0:3000';
 var nockNode = nock(url);
 
 describe('QueuedBuild', function() {
+
+  before(function(){
+    clear('../../server/server');
+    app = require('../../server/server');
+  });
 
   afterEach(function(done)
   {

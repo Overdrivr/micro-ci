@@ -139,7 +139,7 @@ describe('Repositories endpoint with Unauthenticated client', function() {
 
     it('/GET repo commit by repo & commit id', function(done) {
       request(app)
-        .get('/api/Repositories/1/commits/1')
+        .get('/api/Repositories/1/commits/2')
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);
@@ -149,7 +149,7 @@ describe('Repositories endpoint with Unauthenticated client', function() {
 
     it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
-        .put('/api/Repositories/1/commits/1')
+        .put('/api/Repositories/1/commits/2')
         .send({
           commithash: 'eade'
         })
@@ -162,7 +162,7 @@ describe('Repositories endpoint with Unauthenticated client', function() {
 
     it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
-        .delete('/api/Repositories/1/commits/1')
+        .delete('/api/Repositories/1/commits/2')
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);
