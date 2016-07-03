@@ -6,8 +6,7 @@ var repodata = {
 };
 
 var commit = {
-  commithash: 'al234',
-  repositoryId: 222
+  commithash: 'al234'
 };
 
 
