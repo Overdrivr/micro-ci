@@ -2,6 +2,7 @@ var request = require('supertest'),
     assert  = require('chai').assert,
     commit  = require('./test-setup').commit,
     clear   = require('clear-require'),
+    repodata= require('./test-setup').repo;
     app     = require('../../server/server');
 
 
