@@ -1,6 +1,7 @@
 var fixtures = require("fixturefiles")
 var app = require('../../server/server');
 var assert = require('assert');
+var clear    = require('clear-require');
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nock = require('nock')(url);
@@ -9,6 +10,18 @@ var url =  'http://0.0.0.0:3000';
 var nockNode = require('nock')(url);
 
 describe('CreateJob', function() {
+  before(function(){
+    clear('../../server/server');
+    app = require('../../server/server');
+  });
+
+  afterEach(function(done)
+  {
+    if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
+      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+    nock.cleanAll();
+    done();
+  });
 
   it('Create a job and check a builds are created', function(done) {
 
