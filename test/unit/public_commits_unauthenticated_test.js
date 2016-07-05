@@ -1,13 +1,14 @@
-var request = require('supertest'),
-    assert  = require('chai').assert,
-    commit  = require('./test-setup').commit,
-    clear   = require('clear-require'),
-    repodata= require('./test-setup').repo;
-    app     = require('../../server/server');
+
 
 
 describe('Commits endpoint with Unauthenticated client', function() {
-
+  var request = require('supertest'),
+      assert  = require('chai').assert,
+      commit  = require('./test-setup').commit,
+      clear   = require('clear-require'),
+      repodata= require('./test-setup').repo;
+      app     = require('../../server/server');
+      
   before(function(done) {
     clear('../../server/server');
     app = require('../../server/server');
