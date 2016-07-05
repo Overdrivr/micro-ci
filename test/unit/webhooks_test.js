@@ -44,30 +44,49 @@ describe('Fake github webhook', function(){
       });
   });
 
-  it('can find the new Commit and it contains the received data',
+  it('can find the new Commit, and its belonging job',
   function(done){
       app.models.Commit.findOne({
         where: {
           commithash: fakepayload.after
-        }
+        },
+        include: 'jobs'
       }, function(err, instance) {
+        var commitdata = instance.toJSON();
         if (err) return done(err);
-        if (!instance) return done(new Error("Commit not found."));
+        if (!commitdata) return done(new Error("Commit not found."));
+        assert.strictEqual(commitdata.jobs.length, 1);
         done();
     });
   });
-  //TODO: Test with tampered data (a wrong secret key)
-  /*
-  it('calls the endpoint with tampered data using a not-existing commit',
-  function(done){
-    fakepayload.after = "eades4hd83jsswd340ddee"
-    request(app)
-    .post('/api/Repositories/webhook/github')
-    .set('Accept', 'application/json')
-    .send(fakepayload)
-    .expect(204, function(err, res){
-      if(err) return done(err);
+
+  it('can find the new Commit from the repository', function (done) {
+    app.models.Repository.findOne({
+      where: {
+        platform: "github",
+        remoteId: fakepayload.repository.id
+      },
+      include: 'commits'
+    }, function (err, repo) {
+      if (err) return done(err);
+      commitData = repo.toJSON();
+      assert.strictEqual(commitData.commits.length, 1);
+      assert.strictEqual(commitData.commits[0].commithash, fakepayload.after);
       done();
     });
-  });*/
+  });
+
+  it('can be called several time with the same data without effect', function (done) {
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send(fakepayload)
+      .expect(204, function(err, res) {
+        if (err) return done(err);
+        done();
+      });
+  });
+  
+  //TODO: Test with tampered data (a wrong secret key)
+  //TODO: Test POST a commit with same hash but from different platform
 });
