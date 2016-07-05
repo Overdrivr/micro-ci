@@ -1,10 +1,14 @@
-var app = require('../../server/server');
-var request = require('supertest');
-var assert = require('chai').assert;
-var token = '';
+var clear   = require('clear-require'),
+    request = require('supertest'),
+    assert  = require('chai').assert,
+    app     = {},
+    token   = {};
 
 describe('Client endpoint', function() {
+
   before(function(done) {
+    clear('../../server/server');
+    app = require('../../server/server');
     // Create a dummy user to ensure endpoints won't return 404 because model is not found
     // Rather than endpoint does not exist
     app.models.Client.create({

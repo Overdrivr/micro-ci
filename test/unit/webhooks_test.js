@@ -1,28 +1,34 @@
-var request = require('supertest');
-var assert = require('chai').assert;
-var app = require('../../server/server');
-var loopback = require('loopback');
-var fakepayload = require('./fake-github-push-payload.json');
+var request     = require('supertest'),
+    clear       = require('clear-require'),
+    assert      = require('chai').assert
+    loopback    = require('loopback'),
+    fakepayload = require('./fake-github-push-payload.json'),
+    app         = {};
+
 var repoId = null;
 
 describe('Fake github webhook', function(){
+
   // Create a test repository
   before(function(done){
-      app.models.Repository.create({
-        platform: "github",
-        remoteId: fakepayload.repository.id
-      }, function(err, repo) {
-        if (err) return done(err);
-        if (!repo) return done(Error("Repository instance not created."));
+    clear('../../server/server');
+    app = require('../../server/server');
 
-        repoId = repo.id;
-        app.models.Commit.deleteAll({
-          id: {neq: 0}
-        }, function(err, res) {
-          if (err) return done(err);
-          done();
-        });
+    app.models.Repository.create({
+      platform: "github",
+      remoteId: fakepayload.repository.id
+    }, function(err, repo) {
+      if (err) return done(err);
+      if (!repo) return done(Error("Repository instance not created."));
+
+      repoId = repo.id;
+      app.models.Commit.deleteAll({
+        id: {neq: 0}
+      }, function(err, res) {
+        if (err) return done(err);
+        done();
       });
+    });
   });
   // See https://developer.github.com/v3/activity/events/types/#events-api-payload-19
   // See example test payload https://gist.github.com/tschaub/2463cc33badbeb0dd047

@@ -2,9 +2,9 @@ var request  = require('supertest'),
     assert   = require('chai').assert,
     app      = require('../../server/server');
 
-describe('Repositories endpoint', function() {
-  var repodata = require('./test-setup').repo;
-  describe('with unauthenticated user', function (){
+
+describe('Repositories endpoint with Unauthenticated client', function() {
+    var repodata = require('./test-setup').repo;
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
@@ -140,7 +140,7 @@ describe('Repositories endpoint', function() {
 
     it('/GET repo commit by repo & commit id', function(done) {
       request(app)
-        .get('/api/Repositories/1/commits/1')
+        .get('/api/Repositories/1/commits/2')
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);
@@ -150,7 +150,7 @@ describe('Repositories endpoint', function() {
 
     it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
-        .put('/api/Repositories/1/commits/1')
+        .put('/api/Repositories/1/commits/2')
         .send({
           commithash: 'eade'
         })
@@ -163,7 +163,7 @@ describe('Repositories endpoint', function() {
 
     it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
-        .delete('/api/Repositories/1/commits/1')
+        .delete('/api/Repositories/1/commits/2')
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);
@@ -233,6 +233,4 @@ describe('Repositories endpoint', function() {
           done();
         });
     });
-
-  });
 });

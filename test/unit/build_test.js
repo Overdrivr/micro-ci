@@ -1,23 +1,34 @@
-var fixtures = require("fixturefiles")
+var fixtures = require("fixturefiles"),
+    assert   = require('assert'),
+    nock     = require('nock'),
+    request  = require('supertest'),
+    async    = require('async'),
+    clear    = require('clear-require'),
+    app      = {};
 
-var assert = require('assert');
-
-var request = require('supertest');
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-var nock = require('nock')(url);
+var nockJenkins = nock(url);
 
 var url =  'http://0.0.0.0:3000';
-var nockNode = require('nock')(url);
+var nockNode = nock(url);
 
-var async = require('async')
-var app = require('../../server/server.js');
-
-//TODO BUILD status is waiting or created but no other status availabe !
 
 describe('SimpleBuild', function() {
 
+  before(function(){
+    clear('../../server/server');
+    app = require('../../server/server');
+  });
 
-  it('Create a build and lunch it on a slave', function(done) {
+  afterEach(function(done)
+  {
+    if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
+      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+    nock.cleanAll();
+    done();
+  });
+
+  it('Creates a build and launches it on a slave', function(done) {
     //Get next id
     app.models.Build.findOne({order: 'id DESC'},function(err, build) {
       if(build != null)
@@ -27,11 +38,10 @@ describe('SimpleBuild', function() {
       else {
         var build_id = 1;
       }
-
       var jobName = 'build_' + build_id;
       var slaveName = 'slave_' + build_id;
       var slave_id = build_id;
-      nock
+      nockJenkins
       .head('/job/' + jobName + '/api/json') //Job creation
       .reply(404)
       .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://0.0.0.0:3000/api/Builds/'+build_id+'/complete</url><event>completed</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>sleep 3\necho &apos;End of Build&apos;\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
@@ -55,8 +65,6 @@ describe('SimpleBuild', function() {
       .reply(200)
       .post('/computer/'+slaveName+'/doDelete')
       .reply(302, '')
-      .head('/job/'+jobName+'/api/json')
-      .reply(200)
       .get('/job/'+jobName+'/1/api/json')
       .reply(201, {"actions":[{"causes":[{"shortDescription":"Started by user anonymous","userId":null,"userName":"anonymous"}]}],"artifacts":[],"building":true,"description":null,"displayName":"#1","duration":0,"estimatedDuration":-1,"executor":{},"fullDisplayName":"Test3 #1","id":"1","keepLog":false,"number":1,"queueId":9,"result":"SUCCESS","timestamp":1461214209569,"url":"http://127.0.0.1:8080/job/Test3/1/","builtOn":slaveName,"changeSet":{"items":[],"kind":null},"culprits":[]});
 
@@ -69,8 +77,6 @@ describe('SimpleBuild', function() {
       },
       function(err, job)
       {
-        if(err) return done(err);
-
         if(err) return done(err);
         app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
           if(err) return done(err);
