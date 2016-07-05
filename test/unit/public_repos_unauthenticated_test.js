@@ -5,6 +5,7 @@ var request  = require('supertest'),
 
 describe('Repositories endpoint with Unauthenticated client', function() {
     var repodata = require('./test-setup').repo;
+    
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
