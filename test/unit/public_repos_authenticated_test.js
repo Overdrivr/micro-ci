@@ -82,8 +82,6 @@ describe('Repositories endpoint with authenticated client', function() {
           repository.commits.create(commit, function(err, inst) {
             if (err) return done(err);
             if (!inst) return done(Error('Could not create commit.'));
-            console.log(repository);
-            console.log(commit);
             commit.id = inst.id;
             callback(null, inst);
           });
