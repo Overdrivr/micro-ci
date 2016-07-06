@@ -1,21 +1,19 @@
+var request = require('supertest'),
+    assert  = require('chai').assert,
+    clear   = require('clear-require'),
+    nock    = require('nock');
+    app     = {};
 
-
+var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
+var serverURL =  'http://0.0.0.0:3000';
 
 describe('Commits endpoint with Unauthenticated client', function() {
-  var request = require('supertest'),
-      assert  = require('chai').assert,
-      commit  = require('./test-setup').commit,
-      clear   = require('clear-require'),
-      repodata= require('./test-setup').repo;
-      app     = require('../../server/server');
 
-  var nock = require('nock');
-  var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-  var nockJenkins = nock(url);
+  var commit   = require('./test-setup').commit,
+      repodata = require('./test-setup').repo;
 
-  var url =  'http://0.0.0.0:3000';
-  var nockNode = nock(url);
-
+  var nockJenkins = nock(jenkinsURL);
+  var nockNode = nock(serverURL);
 
   after(function(done)
   {
@@ -41,7 +39,7 @@ describe('Commits endpoint with Unauthenticated client', function() {
     .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://0.0.0.0:3000/api/Builds/'+build_id+'/complete</url><event>completed</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>sleep 3\necho &apos;End of Build&apos;\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
     .reply(200)
     .post('/job/' + jobName + '/build')
-    .reply(201, '', { location: url + '/queue/item/1/' })
+    .reply(201, '', { location: serverURL + '/queue/item/1/' })
 
     nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
     .reply(200);
