@@ -33,7 +33,14 @@ describe('QueuedBuild', function() {
 
     function create_job(i, cb)
     {
-      var build_id = i;
+      app.models.Build.findOne({order: 'id DESC'},function(err, build) {
+        if(build != null)
+        {
+          var build_id = build.id +1;
+        }
+        else {
+          var build_id = 1;
+        }
       var jobName = 'build_' + build_id;
       var slaveName = 'slave_' + build_id;
 
@@ -72,36 +79,30 @@ describe('QueuedBuild', function() {
       },
       function(err, job)
       {
-        app.models.Build.create({
-          status:"created",
-          builddate:new Date(),
-          jobId:job.getId()
-        }, function(err, build){
-
+        if(err) return done(err);
+        app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
           if(err) return done(err);
-          app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
+          assert.equal(slave.status, "booting");
+          //Simulate booted slave:
+          request(app)
+          .post('/api/Slaves/127.0.0.1/boot')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200, function(err, res){
             if(err) return done(err);
-            assert.equal(slave.status, "booting");
-            //Simulate booted slave:
-            request(app)
-            .post('/api/Slaves/127.0.0.1/boot')
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect(200, function(err, res){
+            assert.equal(res.body.id, build_id);
+
+            app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
               if(err) return done(err);
-              assert.equal(res.body.id, build_id);
-
-              app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
-                if(err) return done(err);
-                assert.equal(slave.status, "building");
-                cb();
-              });
-
+              assert.equal(slave.status, "building");
+              cb();
             });
+
           });
         });
       });
-    }
+    });
+  }
 
     function loopFunction(j, cb)
     {
@@ -159,82 +160,73 @@ describe('QueuedBuild', function() {
       },
       function(err, job)
       {
-        app.models.Build.create({
-          status:"created",
-          builddate:new Date(),
-          jobId:job.getId()
-        }, function(err, build)
-        {
+        app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
+          if(err) return done(err);
+          assert.equal(slave, null); //No slave is created
 
-          app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
+
+
+          //End a build and release a slave
+          request(app)
+          .post('/api/Builds/1/complete')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(204, function(err, res){
             if(err) return done(err);
-            assert.equal(slave, null); //No slave is created
+            app.models.Build.findOne({where:{id:1}},function(err, build) {
+              assert.equal(build.status, "success");
 
+              //Check build is now running and slave on
+              app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
+                if(err) return done(err);
 
-            //End a build and release a slave
-            request(app)
-            .post('/api/Builds/1/complete')
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect(204, function(err, res){
-              if(err) return done(err);
-              app.models.Build.findOne({where:{id:1}},function(err, build) {
-                assert.equal(build.status, "success");
-
-                //Check build is now running and slave on
-                app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
+                assert.equal(slave.status, 'booting');
+                //Simulate booted slave:
+                request(app)
+                .post('/api/Slaves/127.0.0.1/boot')
+                .set('Accept', 'application/json')
+                .expect('Content-Type', /json/)
+                .expect(200, function(err, res){
                   if(err) return done(err);
+                  assert.equal(res.body.id, build_id);
 
-                  assert.equal(slave.status, 'booting');
-                  //Simulate booted slave:
-                  request(app)
-                  .post('/api/Slaves/127.0.0.1/boot')
-                  .set('Accept', 'application/json')
-                  .expect('Content-Type', /json/)
-                  .expect(200, function(err, res){
+                  app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
                     if(err) return done(err);
-                    assert.equal(res.body.id, build_id);
+                    assert.equal(slave.status, "building");
 
-                    app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
-                      if(err) return done(err);
-                      assert.equal(slave.status, "building");
+                    //Now complete all the build and kill all the slave
 
-                      //Now complete all the build and kill all the slave
+                    function create_func(path) { return function(cb) { request(app).post(path).set('Accept', 'application/json').expect('Content-Type', /json/).expect(204, cb)}}
+                    var funcArray = [];
+                    for(var p=2; p <= maxNbOfSlaves+1; p++ )
+                    {
+                      var path ='/api/Builds/'+p+'/complete';
+                      funcArray.push(create_func(path))
+                    }
 
-                      function create_func(path) { return function(cb) { request(app).post(path).set('Accept', 'application/json').expect('Content-Type', /json/).expect(204, cb)}}
-                      var funcArray = [];
-                      for(var p=2; p <= maxNbOfSlaves+1; p++ )
+                    async.series(funcArray, function(err)
+                    {
+                      app.models.Build.count({status:'success'},function(err, cnt)
                       {
-                        var path ='/api/Builds/'+p+'/complete';
-                        funcArray.push(create_func(path))
-                      }
-
-                      async.series(funcArray, function(err)
-                      {
-                        app.models.Build.count({status:'success'},function(err, cnt)
+                        assert.equal(cnt, maxNbOfSlaves+1); //All job should be success
+                        app.models.Slave.find({},function(err, cnt)
                         {
-                          assert.equal(cnt, maxNbOfSlaves+1); //All job should be success
-                          app.models.Slave.find({},function(err, cnt)
-                          {
-                            if(err) return done(err);
+                          if(err) return done(err);
 
-                            assert.equal(cnt, 0); //All slaves should be removed
-                            done();
-                          });
-
+                          assert.equal(cnt, 0); //All slaves should be removed
+                          done();
                         });
 
-                      }
-                    );
+                      });
 
-                  });
+                    }
+                  );
 
                 });
+
               });
             });
           });
-
-
         });
       });
     });

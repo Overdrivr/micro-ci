@@ -4,7 +4,7 @@
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
-    "unit": "mocha ./test/unit",
+    "unit": "mocha ./test/unit --timeout 5000",
     "e2e": "protractor ./test/e2e/conf.js"
   },
   "dependencies": {

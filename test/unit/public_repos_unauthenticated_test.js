@@ -1,9 +1,11 @@
 var request  = require('supertest'),
     assert   = require('chai').assert,
     app      = require('../../server/server');
-    repodata = require('./test-setup').repo;
+
 
 describe('Repositories endpoint with Unauthenticated client', function() {
+    var repodata = require('./test-setup').repo;
+    
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
