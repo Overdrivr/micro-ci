@@ -1,6 +1,7 @@
 var Jenkins = require('../lib/jenkins');
 
 var host = "http://127.0.0.1:8080";
-var credential = "099c7823-795b-41b8-81b0-ad92f79492e0";
+//This key is the one used in the docker image 
+var credential = "41bc3d31-9703-40dc-887f-f16561a4d3a6";
 
 exports.jenkinsInstance = new Jenkins(host, credential);
