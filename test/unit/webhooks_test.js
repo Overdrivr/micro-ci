@@ -3,10 +3,11 @@ var request     = require('supertest'),
     assert      = require('chai').assert
     fakepayload = require('./fake-github-push-payload.json'),
     repoId      = null,
+    config    = require('../../server/config'),
     app         = {};
 
 var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-var serverURL =  'http://0.0.0.0:3000';
+var serverURL = 'http://'+config.host+':'+config.port;
 
 describe('Fake github webhook', function() {
   var nock = require('nock');

@@ -21,7 +21,7 @@ module.exports = function(Slave) {
       Slave.create({status:"booting"}, function (err) {
         if(err) return cb(err);
 
-        if(err = Slave.app.models.Build.dec_nbPendingBuild()) return cb(err); 
+        if(err = Slave.app.models.Build.dec_nbPendingBuild()) return cb(err);
         slave_api.boot_slave("http://"+config.host+":"+config.port,
         function(err) {
           if(err) return cb(err);

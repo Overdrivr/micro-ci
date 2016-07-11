@@ -10,11 +10,13 @@ var commit = {
   repositoryId: 222
 };
 
+
+var config    = require('../../server/config');
 var nock = require('nock');
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
 
-var url =  'http://0.0.0.0:3000';
+var url =  'http://'+config.host+':'+config.port;
 var nockNode = nock(url);
 
 
@@ -42,7 +44,7 @@ before(function(done) {
     nockJenkins
     .head('/job/' + jobName + '/api/json') //Job creation
     .reply(404)
-    .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://0.0.0.0:3000/api/Builds/'+build_id+'/complete</url><event>completed</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>sleep 3\necho &apos;End of Build&apos;\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
+    .post('/createItem?name=' + jobName)
     .reply(200)
     .post('/job/' + jobName + '/build')
     .reply(201, '', { location: url + '/queue/item/1/' })

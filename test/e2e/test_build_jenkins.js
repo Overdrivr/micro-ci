@@ -2,14 +2,15 @@ var assert = require('assert');
 var request = require('request');
 var nb_of_build = 5;
 var async = require('async');
+var config  = require('../../server/config.json');
 
 describe('e2eBuild', function() {
   it('Test e2e build on jenkins', function(done) {
     this.timeout(0);
-    request.post('http://127.0.0.1:3000/api/Jobs', {form:{"yaml": {"build": ["sleep 0", "echo 'End of Build'"]}}},  function(err,httpResponse,body){
+    request.post('http://'+config.host+':'+config.port+'/api/Jobs', {form:{"yaml": {"build": ["sleep 0", "echo 'End of Build'"]}}},  function(err,httpResponse,body){
       if(err) return done(err);
 
-      function create_func() { return function(cb) {request.post('http://127.0.0.1:3000/api/Builds', {form:{ "status":"created",  "builddate":"2016",  "jobId":1}},  cb)}}
+      function create_func() { return function(cb) {request.post('http://'+config.host+':'+config.port+'/api/Builds', {form:{ "status":"created",  "builddate":"2016",  "jobId":1}},  cb)}}
 
       var func_array = [];
       for(var i =0; i < nb_of_build; i++)
@@ -24,7 +25,7 @@ describe('e2eBuild', function() {
         {
           if(waitingBuilds)
           {
-            request.get('http://127.0.0.1:3000/api/Builds',  function(err, httpResponse, body)
+            request.get('http://'+config.host+':'+config.port+'/api/Builds',  function(err, httpResponse, body)
             {
               builds = JSON.parse(body);
               waitingBuilds = 0;
@@ -43,7 +44,7 @@ describe('e2eBuild', function() {
         }
         else {
           //Check all the slave has been removed
-          request.get('http://127.0.0.1:3000/api/Slaves',  function(err, httpResponse, body)
+          request.get('http://'+config.host+':'+config.port+'/api/Slaves',  function(err, httpResponse, body)
           {
             if(JSON.parse(body).length > 0)
             {
