@@ -1,14 +1,15 @@
 var request     = require('supertest'),
     clear       = require('clear-require'),
     assert      = require('chai').assert
-    fakepayload = require('./fake-github-push-payload.json'),
+    pushPayload = require('./github-webhook-push-payload-repo1.json'),
+    pingPayload = require('./github-webhook-ping-payload-repo2.json'),
     repoId      = null,
     app         = {};
 
 var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var serverURL =  'http://0.0.0.0:3000';
 
-describe('Fake github webhook', function() {
+describe('Github webhook', function() {
   var nock = require('nock');
   var nockJenkins = nock(jenkinsURL);
   var nockNode = nock(serverURL);
@@ -59,7 +60,7 @@ describe('Fake github webhook', function() {
 
     app.models.Repository.create({
       platform: "github",
-      remoteId: fakepayload.repository.id
+      remoteId: pushPayload.repository.id
     }, function(err, repo) {
       if (err) return done(err);
       if (!repo) return done(Error("Repository instance not created."));
@@ -80,7 +81,7 @@ describe('Fake github webhook', function() {
     request(app)
       .post('/api/Repositories/webhook/github')
       .set('Accept', 'application/json')
-      .send(fakepayload)
+      .send(pushPayload)
       .expect(204, function(err, res){
         if (err) return done(err);
         done();
@@ -91,7 +92,7 @@ describe('Fake github webhook', function() {
   function(done){
       app.models.Commit.findOne({
         where: {
-          commithash: fakepayload.after
+          commithash: pushPayload.after
         },
         include: 'jobs'
       }, function(err, instance) {
@@ -107,14 +108,14 @@ describe('Fake github webhook', function() {
     app.models.Repository.findOne({
       where: {
         platform: "github",
-        remoteId: fakepayload.repository.id
+        remoteId: pushPayload.repository.id
       },
       include: 'commits'
     }, function (err, repo) {
       if (err) return done(err);
       commitData = repo.toJSON();
       assert.strictEqual(commitData.commits.length, 1);
-      assert.strictEqual(commitData.commits[0].commithash, fakepayload.after);
+      assert.strictEqual(commitData.commits[0].commithash, pushPayload.after);
       done();
     });
   });
@@ -123,18 +124,30 @@ describe('Fake github webhook', function() {
     request(app)
       .post('/api/Repositories/webhook/github')
       .set('Accept', 'application/json')
-      .send(fakepayload)
+      .send(pushPayload)
       .expect(204, function(err, res) {
         if (err) return done(err);
         app.models.Commit.find({
           'where': {
-            'commithash': fakepayload.after
+            'commithash': pushPayload.after
           }
         }, function(err, commits) {
           if (err) return done(err);
           assert.strictEqual(commits.length, 1);
           done();
         });
+      });
+  });
+
+  it('can be called with ping payload on a non-existing repo and return repo not found',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send(pingPayload)
+      .expect(404, function(err, res){
+        if (err) return done(err);
+        done();
       });
   });
 
