@@ -30,7 +30,7 @@ module.exports = function(Repository) {
           }
         }, function(err, repositories) {
             if(err) return callback(err)
-            if(!repositories) return callback(new Error('Github repository with id '+ repository.id + ' not found.'));
+            if(repositories.length == 0) return callback(new Error('Github repository with id '+ repository.id + ' not found.'));
             if(repositories.length > 1) return callback(new Error('Found multiple Github repositories with id ' + repository.id));
             callback(null, repositories[0]);
           });
@@ -61,21 +61,27 @@ module.exports = function(Repository) {
         commitInstance.__create__jobs({
           yaml: {}
         }, function (err, createdJobs) {
-          if (err) return cb(err);
-          cb();
+          if (err) return callback(err);
+          callback();
         });
       }
     ],
     // Webhook processing failed somewhere
     function(err, results) {
-      cb(err);
+      if (err) return cb(err);
+      cb();
     });
   };
 
   Repository.remoteMethod(
       'webhookGithub',
       {
-          http: {path: '/webhook/github', verb: 'post'},
+          http: {
+            path: '/webhook/github',
+            verb: 'post',
+            status: 204,
+            errorStatus: 404
+          },
           accepts: [
             { arg: 'repository', type: 'Object' },
             { arg: 'after', type: 'string'}
