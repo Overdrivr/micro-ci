@@ -3,6 +3,8 @@ var jenkins   = require('../../server/jenkinsInstance').jenkinsInstance,
     isIp      = require('is-ip'),
     slave_api = require('../../lib/localhost_slave_api');
 
+var utils = require('../../lib/utils');
+
 var maxNbOfSlaves = config.nbOfSlaves;
 
 module.exports = function(Slave) {
@@ -10,25 +12,50 @@ module.exports = function(Slave) {
   // This function check if we can powerup a slave and will power up if possible
   // Callback is used to inform that you can reate a slave
   Slave.check_and_boot_slave = function(cb) {
+
+    cb = cb || utils.createPromiseCallback();
+
     // There are no pendings build
-    if(Slave.app.models.Build.get_nbPendingBuild() <= 0) return cb();
+    if(Slave.app.models.Build.get_nbPendingBuild() <= 0){
+      cb();
+      return ;
+    }
 
     // if we have not reach the limit of slaves, power up one
     Slave.count({}, function(err, cnt) {
-      if(err) return cb(err);
-      if(cnt >= maxNbOfSlaves) return cb(new Error('Max number of slave has been reached'));
+      if(err){
+        cb(err);
+        return ;
+      }
+      if(cnt >= maxNbOfSlaves){
+        cb(new Error('Max number of slave has been reached'));
+        return ;
+      }
 
       Slave.create({status:"booting"}, function (err) {
-        if(err) return cb(err);
 
-        if(err = Slave.app.models.Build.dec_nbPendingBuild()) return cb(err);
+        if(err){
+         cb(err);
+         return ;
+       }
+
+        if(err = Slave.app.models.Build.dec_nbPendingBuild()){
+           cb(err);
+           return ;
+        }
         slave_api.boot_slave("http://"+config.host+":"+config.port,
         function(err) {
-          if(err) return cb(err);
+
+          if(err) {
+            cb(err);
+            return ;
+          }
           cb();
+          return ;
         });
       });
     });
+    return cb.promise;
   }
 
 

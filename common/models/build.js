@@ -51,43 +51,30 @@ module.exports = function(Build) {
   });
 
   Build.complete = function(id, cb) {
+    var build;
+    var slave;
+    var Slave = Build.app.models.Slave;
     //Update build status to complete:
-    Build.findOne({where:{id:id}}, function(err, build) {
-      if(err) return cb(err);
-      //Get build status
-      jenkins.get_build_status(build.getId(), function(err, status) {
-        if(err) return cb(err);
-        build.updateAttributes({status: status}, function(err) {
-          if(err) return cb(err);
+    Build.findOne({where:{id:id}})
+    .then(function(pbuild) {build = pbuild; return jenkins.get_build_status(build.getId())})
+    .then(function(status) {return build.updateAttributes({status: status})})
+    .then(function() {return jenkins.get_slave(build.getId())})
+    .then(function(slaveName) {
+        var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
+        return Slave.findOne({where:{id:slave_id}});
+    })
+    .then(function(pslave) {
 
-          //Remove the slave
-          jenkins.get_slave(build.getId(), function(err, slaveName) {
-            if(err) return cb(err);
-            var Slave = Build.app.models.Slave;
-            var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
-            Slave.findOne({where:{id:slave_id}}, function(err, slave) {
-              if(err) return cb(err);
-              if(!slave) return cb(new Error("No slave with ID:" + slave_id));
+        if(!pslave)  throw new Error("No slave with ID:" + slave_id);
+        slave = pslave;
+        return jenkins.remove_node(slave.getId());
+      })
+    .then(function() { return Slave.destroyById(slave.getId())})
+    .then(function() { return Slave.check_and_boot_slave()})
+    .then(function() { cb(null, slave.getId());})
 
-              //Remove the slave node from jenkins
-              jenkins.remove_node(slave.getId(), function(err) {
-                if(err) return cb(err);
-
-                //Remove the slave in the db
-                Slave.destroyById(slave.getId(), function(err) {
-                  if(err) return cb(err);
-                    Slave.check_and_boot_slave(function(err) {
-                      if(err) return cb(err);
-                      cb(null, slave.getId());
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
   }
+
   Build.remoteMethod(
     'complete',
     {

@@ -39,6 +39,8 @@ describe('SimpleBuild', function() {
       else {
         var build_id = 1;
       }
+
+
       var jobName = 'build_' + build_id;
       var slaveName = 'slave_' + build_id;
       var slave_id = build_id;
@@ -72,6 +74,7 @@ describe('SimpleBuild', function() {
       nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
       .reply(200);
 
+      console.log("SlaveName", slaveName);
 
       app.models.Job.create({
         yaml:{build: ["sleep 3", "echo 'End of Build'"]}
