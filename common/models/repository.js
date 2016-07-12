@@ -30,9 +30,8 @@ module.exports = function(Repository) {
           }
         }, function(err, repositories) {
             if(err) return callback(err)
-            if(!repositories) return callback(new Error('Github repository with id ',repository.id,' not found.'));
-            if(repositories.length > 1) return callback(new Error('Found multiple Github repositories with id ', repository.id));
-
+            if(!repositories) return callback(new Error('Github repository with id '+ repository.id + ' not found.'));
+            if(repositories.length > 1) return callback(new Error('Found multiple Github repositories with id ' + repository.id));
             callback(null, repositories[0]);
           });
       },
@@ -46,9 +45,8 @@ module.exports = function(Repository) {
         },
         function(err, commits) {
           if(err) return callback(err);
-          if(commits.length > 1) return callback(Error('Found multiple Commits under hash ',after));
-          if(commits.length == 1) return callback(null, repositoryInstance, commits[0])
-
+          if(commits.length > 1) return callback(Error('Found multiple Commits under hash ' + after));
+          if(commits.length == 1) return callback(null, repositoryInstance, commits[0]);
           repositoryInstance.__create__commits({ commithash: after },
           function(err, createdCommit) {
             if (err) return callback(err);
