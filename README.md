@@ -1,4 +1,6 @@
 [ ![Codeship Status for Overdrivr/micro-ci](https://codeship.com/projects/48e15dc0-0f71-0134-8b30-3a660a5bed18/status?branch=master)](https://codeship.com/projects/156640)
+[![codecov](https://codecov.io/gh/Overdrivr/micro-ci/branch/master/graph/badge.svg?token=u9QO851ER5)](https://codecov.io/gh/Overdrivr/micro-ci)
+
 # Micro-ci
 > Continuous Integration service for embedded systems
 
