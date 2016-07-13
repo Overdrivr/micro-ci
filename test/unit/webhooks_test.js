@@ -77,7 +77,16 @@ describe('Github webhook', function() {
         }, function(err, commit) {
           if (err) return done(err);
           if (!commit) return done(Error("Commit not created."));
-          done();
+
+          // Create a dummy github repo to highlight 2+ instances side-effects
+          app.models.Repository.create({
+            platform: "github",
+            remoteId: 1234
+          }, function(err, repo) {
+            if (err) return done(err);
+            if (!repo) return done(Error("Repository instance not created."));
+            done();
+          });
         });
       });
     });
@@ -154,7 +163,25 @@ describe('Github webhook', function() {
       .set('Accept', 'application/json')
       .send(pingPayload)
       .expect(404, function(err, res){
-        console.log(res.body);
+        if (err) return done(err);
+        assert.strictEqual(res.body.error.message, 'Github repository with id '+ pingPayload.repository.id + ' not found.');
+        done();
+      });
+  });
+
+  it('can be called with undefined payload without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({
+        after: "",
+        repository: {
+          id: undefined
+        }
+      })
+      .expect(404, function(err, res){
+        assert.strictEqual(res.body.error.message, 'Repository id is undefined.');
         if (err) return done(err);
         done();
       });
