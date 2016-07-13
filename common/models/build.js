@@ -27,26 +27,22 @@ module.exports = function(Build) {
     var build = ctx.instance;
     if(build.status !== "created") return  next();
 
-    build.updateAttributes({ status: "waiting" }, function(err) {
-      if(err) return next(err);
-
-      //Get yaml content
-      build.job(function(err, job) {
-        if(err) return next(err);
-        if(job === undefined) return next(new Error("Build should be link to a job"));
-
-        //push the build to jenkins
-        jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port,
-        function(err) {
-          if(err) return next(err);
-          Build.inc_nbPendingBuild();
-          Build.app.models.Slave.check_and_boot_slave(function(err) {
-            if(err) return next(err);
-            next();
-          });
-        });
-      });
-    });
+    build.updateAttributes({ status: "waiting" })
+    .then(function() {
+      build.job(function(err, job)
+      {
+        if(err) throw err;
+        if(job === undefined) throw new Error("Build should be link to a job");
+        return  jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port);
+      })
+    })
+    .then(function()
+    {
+      Build.inc_nbPendingBuild();
+      return Build.app.models.Slave.check_and_boot_slave();
+    })
+    .then(function() {next()})
+    .catch(function(err) {console.log(err);cb(err);})
 
   });
 
