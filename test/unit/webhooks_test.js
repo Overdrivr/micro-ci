@@ -70,7 +70,15 @@ describe('Github webhook', function() {
         id: {neq: 0}
       }, function(err, res) {
         if (err) return done(err);
-        done();
+
+        // Create a dummy commit to highlight 2+ instances side-effects
+        app.models.Commit.create({
+          commithash: 'eadebf2e36'
+        }, function(err, commit) {
+          if (err) return done(err);
+          if (!commit) return done(Error("Commit not created."));
+          done();
+        });
       });
     });
   });
@@ -146,6 +154,7 @@ describe('Github webhook', function() {
       .set('Accept', 'application/json')
       .send(pingPayload)
       .expect(404, function(err, res){
+        console.log(res.body);
         if (err) return done(err);
         done();
       });
