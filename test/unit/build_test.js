@@ -39,6 +39,8 @@ describe('SimpleBuild', function() {
       else {
         var build_id = 1;
       }
+
+
       var jobName = 'build_' + build_id;
       var slaveName = 'slave_' + build_id;
       var slave_id = build_id;

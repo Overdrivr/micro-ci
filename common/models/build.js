@@ -27,67 +27,53 @@ module.exports = function(Build) {
     var build = ctx.instance;
     if(build.status !== "created") return  next();
 
-    build.updateAttributes({ status: "waiting" }, function(err) {
-      if(err) return next(err);
-
-      //Get yaml content
-      build.job(function(err, job) {
-        if(err) return next(err);
-        if(job === undefined) return next(new Error("Build should be link to a job"));
-
-        //push the build to jenkins
-        jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port,
-        function(err) {
-          if(err) return next(err);
-          Build.inc_nbPendingBuild();
-          Build.app.models.Slave.check_and_boot_slave(function(err) {
-            if(err) return next(err);
-            next();
-          });
-        });
-      });
-    });
+    build.updateAttributes({ status: "waiting" })
+    .then(function() {
+      build.job(function(err, job)
+      {
+        if(err) throw err;
+        if(job === undefined) throw new Error("Build should be link to a job");
+        return  jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port);
+      })
+    })
+    .then(function()
+    {
+      Build.inc_nbPendingBuild();
+      return Build.app.models.Slave.check_and_boot_slave();
+    })
+    .then(function() {next()})
+    .catch(function(err) {cb(err);})
 
   });
 
   Build.complete = function(id, cb) {
+    var build;
+    var slave;
+    var Slave = Build.app.models.Slave;
     //Update build status to complete:
-    Build.findOne({where:{id:id}}, function(err, build) {
-      if(err) return cb(err);
-      //Get build status
-      jenkins.get_build_status(build.getId(), function(err, status) {
-        if(err) return cb(err);
-        build.updateAttributes({status: status}, function(err) {
-          if(err) return cb(err);
+    Build.findOne({where:{id:id}})
+    .then(function(pbuild) {
+      build = pbuild;
+      return jenkins.get_build_status(build.getId())
+    })
+    .then(function(status) {return build.updateAttributes({status: status})})
+    .then(function() {return jenkins.get_slave(build.getId())})
+    .then(function(slaveName) {
+        var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
+        return Slave.findOne({where:{id:slave_id}});
+    })
+    .then(function(pslave) {
+        if(!pslave)  throw new Error("No slave with ID:" + slave_id);
+        slave = pslave;
+        return jenkins.remove_node(slave.getId());
+      })
+    .then(function() { return Slave.destroyById(slave.getId())})
+    .then(function() { return Slave.check_and_boot_slave()})
+    .then(function() { cb(null, slave.getId());})
+    .catch(function(err) { cb(err);})
 
-          //Remove the slave
-          jenkins.get_slave(build.getId(), function(err, slaveName) {
-            if(err) return cb(err);
-            var Slave = Build.app.models.Slave;
-            var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
-            Slave.findOne({where:{id:slave_id}}, function(err, slave) {
-              if(err) return cb(err);
-              if(!slave) return cb(new Error("No slave with ID:" + slave_id));
-
-              //Remove the slave node from jenkins
-              jenkins.remove_node(slave.getId(), function(err) {
-                if(err) return cb(err);
-
-                //Remove the slave in the db
-                Slave.destroyById(slave.getId(), function(err) {
-                  if(err) return cb(err);
-                    Slave.check_and_boot_slave(function(err) {
-                      if(err) return cb(err);
-                      cb(null, slave.getId());
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
   }
+
   Build.remoteMethod(
     'complete',
     {
