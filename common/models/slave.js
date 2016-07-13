@@ -22,39 +22,33 @@ module.exports = function(Slave) {
     }
 
     // if we have not reach the limit of slaves, power up one
-    Slave.count({}, function(err, cnt) {
-      if(err){
-        cb(err);
+    Slave.count({})
+    .then(function (cnt) {
+      if(cnt >= maxNbOfSlaves){
+        throw new RangeError("Max number of slave has been reached");
         return ;
       }
-      if(cnt >= maxNbOfSlaves){ //Max number of slave has been reached
-        cb();
-        return ;
-      }
-
-      Slave.create({status:"booting"}, function (err) {
-
-        if(err){
-         cb(err);
+      return Slave.create({status:"booting"});
+    })
+    .then(function()
+    {
+      if(err = Slave.app.models.Build.dec_nbPendingBuild()){
+         throw err;
          return ;
-       }
+      }
+      return   slave_api.boot_slave("http://"+config.host+":"+config.port);
+    })
+    .then(function(){
+      cb();
+      return ;
+    })
+    .catch(function(err) {
+      if(err instanceof RangeError) //No error should be issued to the calling fonction if we have reach the max number of slave
+        return cb();
+      else
+        return cb(err);
+    })
 
-        if(err = Slave.app.models.Build.dec_nbPendingBuild()){
-           cb(err);
-           return ;
-        }
-        slave_api.boot_slave("http://"+config.host+":"+config.port,
-        function(err) {
-
-          if(err) {
-            cb(err);
-            return ;
-          }
-          cb();
-          return ;
-        });
-      });
-    });
     return cb.promise;
   }
 
