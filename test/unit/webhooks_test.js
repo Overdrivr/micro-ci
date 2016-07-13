@@ -169,7 +169,33 @@ describe('Github webhook', function() {
       });
   });
 
-  it('can be called with undefined payload without issue',
+  it('can be called with empty payload without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({ })
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository is a required arg');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('can be called with defined /repository/ arg but undefined /after/ arg without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({ repository: {} })
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository.id is undefined');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('can be called with defined payload fields with undefined values without issue',
   function(done){
     request(app)
       .post('/api/Repositories/webhook/github')
