@@ -27,8 +27,8 @@ module.exports = function(Slave) {
         cb(err);
         return ;
       }
-      if(cnt >= maxNbOfSlaves){
-        cb(new Error('Max number of slave has been reached'));
+      if(cnt >= maxNbOfSlaves){ //Max number of slave has been reached
+        cb();
         return ;
       }
 
