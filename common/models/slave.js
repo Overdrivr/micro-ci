@@ -60,20 +60,19 @@ module.exports = function(Slave) {
 
 
   Slave.boot = function(ip, cb) {
+    var slave ;
     if(!isIp(ip)) return cb(new Error("IP " + ip + " is not a valid IP"));
     //At least one slave should be in boot mode
-    Slave.findOne({where:{status:"booting"}}, function(err, slave) {
-      if(err || !slave) return cb(new Error("No slave in booting mode" + slave));
-
-      slave.updateAttributes({status: "building", IP:ip}, function(err) {
-        if(err) return cb(err);
-
-        jenkins.create_node(slave.getId(), ip, function(err) {
-          if(err) return cb(err);
-          cb(null, slave.getId());
-        });
-      });
-    });
+    Slave.findOne({where:{status:"booting"}})
+    .then(function(pslave)
+    {
+      slave = pslave;
+      if(!slave) throw new Error("No slave in booting mode" + slave);
+      return slave.updateAttributes({status: "building", IP:ip});
+    })
+    .then(function() { return jenkins.create_node(slave.getId(), ip);})
+    .then(function(){ cb(null, slave.getId());})
+    .catch(function(err) {cb(err);})
   }
 
   Slave.remoteMethod(
