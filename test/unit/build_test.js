@@ -74,7 +74,6 @@ describe('SimpleBuild', function() {
       nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
       .reply(200);
 
-      console.log("SlaveName", slaveName);
 
       app.models.Job.create({
         yaml:{build: ["sleep 3", "echo 'End of Build'"]}

@@ -56,7 +56,10 @@ module.exports = function(Build) {
     var Slave = Build.app.models.Slave;
     //Update build status to complete:
     Build.findOne({where:{id:id}})
-    .then(function(pbuild) {build = pbuild; return jenkins.get_build_status(build.getId())})
+    .then(function(pbuild) {
+      build = pbuild;
+      return jenkins.get_build_status(build.getId())
+    })
     .then(function(status) {return build.updateAttributes({status: status})})
     .then(function() {return jenkins.get_slave(build.getId())})
     .then(function(slaveName) {
@@ -64,7 +67,6 @@ module.exports = function(Build) {
         return Slave.findOne({where:{id:slave_id}});
     })
     .then(function(pslave) {
-
         if(!pslave)  throw new Error("No slave with ID:" + slave_id);
         slave = pslave;
         return jenkins.remove_node(slave.getId());
@@ -72,6 +74,7 @@ module.exports = function(Build) {
     .then(function() { return Slave.destroyById(slave.getId())})
     .then(function() { return Slave.check_and_boot_slave()})
     .then(function() { cb(null, slave.getId());})
+    .catch(function(err) { cb(err);})
 
   }
 
