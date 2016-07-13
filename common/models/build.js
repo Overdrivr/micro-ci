@@ -42,7 +42,7 @@ module.exports = function(Build) {
       return Build.app.models.Slave.check_and_boot_slave();
     })
     .then(function() {next()})
-    .catch(function(err) {console.log(err);cb(err);})
+    .catch(function(err) {cb(err);})
 
   });
 
