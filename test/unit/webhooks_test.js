@@ -169,6 +169,31 @@ describe('Github webhook', function() {
       });
   });
 
+  it('can be called with ping payload on an existing repo and return 204',
+  function(done){
+    app.models.Repository.create({
+      platform: 'github',
+      remoteId: pingPayload.repository.id
+    })
+    .catch(function(err) {
+      return done(err);
+    })
+    .then(function(repo) {
+      if(!repo) return done(Error('Test repo for ping payload not created'));
+
+      request(app)
+        .post('/api/Repositories/webhook/github')
+        .set('Accept', 'application/json')
+        .send(pingPayload)
+        .expect(204, function(err, res){
+          console.log(res.body);
+          if (err) return done(err);
+          done();
+        });
+    })
+  });
+
+
   it('can be called with empty payload without issue',
   function(done){
     request(app)
@@ -206,8 +231,8 @@ describe('Github webhook', function() {
           id: undefined
         }
       })
-      .expect(404, function(err, res){
-        assert.strictEqual(res.body.error.message, 'Repository id is undefined.');
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository.id is undefined');
         if (err) return done(err);
         done();
       });
