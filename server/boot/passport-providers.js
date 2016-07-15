@@ -1,6 +1,6 @@
 var debug = require('debug')('uci:boot:passport');
 var passport = require('passport');
-var providers = require('./providers.json');
+var providers = require('../providers.json');
 //
 // Boot script to initialize third party login and linking to all provriders
 //
