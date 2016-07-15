@@ -54,10 +54,10 @@ module.exports = function(Build) {
     Build.findOne({where:{id:id}})
     .then(function(pbuild) {
       build = pbuild;
-      return jenkins.get_build_status(build.getId())
+      return jenkins.getBuildStatus(build.getId())
     })
     .then(function(status) {return build.updateAttributes({status: status})})
-    .then(function() {return jenkins.get_slave(build.getId())})
+    .then(function() {return jenkins.getSlave(build.getId())})
     .then(function(slaveName) {
         var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
         return Slave.findOne({where:{id:slave_id}});
