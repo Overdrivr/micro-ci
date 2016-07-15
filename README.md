@@ -13,6 +13,12 @@ node .
 ```
 
 # Tests
+## Lint
+
+```
+npm run pretest
+```
+
 ## Unit
 
 ```
