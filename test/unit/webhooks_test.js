@@ -1,16 +1,18 @@
 var request     = require('supertest'),
     clear       = require('clear-require'),
-    assert      = require('chai').assert
-    pushPayload = require('./github-webhook-push-payload-repo1.json'),
-    pingPayload = require('./github-webhook-ping-payload-repo2.json'),
-    repoId      = null,
-    app         = {};
-
-var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-var serverURL =  'http://0.0.0.0:3000';
+    assert      = require('chai').assert;
 
 describe('Github webhook', function() {
-  var nock = require('nock');
+  var pushPayload = require('./github-webhook-push-payload-repo1.json'),
+      pingPayload = require('./github-webhook-ping-payload-repo2.json'),
+      repoId      = null,
+      config      = require('../../server/config'),
+      nock        = require('nock');
+      app         = {};
+
+  var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
+  var serverURL = 'http://'+config.host+':'+config.port;
+
   var nockJenkins = nock(jenkinsURL);
   var nockNode = nock(serverURL);
 
