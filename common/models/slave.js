@@ -16,7 +16,7 @@ module.exports = function(Slave) {
     cb = cb || utils.createPromiseCallback();
 
     // There are no pendings build
-    if(Slave.app.models.Build.get_nbPendingBuild() <= 0){
+    if(Slave.app.models.Build.getNbPendingBuild() <= 0){
       cb();
       return ;
     }
@@ -32,7 +32,7 @@ module.exports = function(Slave) {
     })
     .then(function()
     {
-      if(err = Slave.app.models.Build.dec_nbPendingBuild()){
+      if(err = Slave.app.models.Build.decNbPendingBuild()){
          throw err;
          return ;
       }
