@@ -1,11 +1,48 @@
-var request  = require('supertest'),
-    assert   = require('chai').assert,
-    app      = require('../../server/server');
-
+var request = require('supertest'),
+    async   = require('async'),
+    assert  = require('chai').assert,
+    clear   = require('clear-require');
 
 describe('Repositories endpoint with Unauthenticated client', function() {
-    var repodata = require('./test-setup').repo;
-    
+    var repodata = {
+      platform: "github",
+      remoteId: 12345
+    };
+
+    var commit = {
+      commithash: 'al234',
+      repositoryId: 222
+    };
+
+    var app      = {};
+
+    // Create a test user for authenticated requests
+    before(function(done) {
+      clear('../../server/server');
+      app = require('../../server/server');
+
+      async.waterfall([
+        function(callback) {
+          app.models.Repository.create(repodata, function(err, repo) {
+            if (err) return callback(err);
+            if (!repo) return callback(Error('Could not create repository.'));
+            callback(null, repo);
+          });
+        },
+        function(repository, callback) {
+          repository.commits.create(commit, function(err, inst) {
+            if (err) return done(err);
+            if (!inst) return done(Error('Could not create commit.'));
+            commit.id = inst.id;
+            callback(null, inst);
+          });
+        }
+      ], function(err, result) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
     it('hides /GET all repos', function(done) {
       request(app)
         .get('/api/Repositories')
@@ -141,7 +178,7 @@ describe('Repositories endpoint with Unauthenticated client', function() {
 
     it('/GET repo commit by repo & commit id', function(done) {
       request(app)
-        .get('/api/Repositories/1/commits/2')
+        .get('/api/Repositories/1/commits/1')
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);

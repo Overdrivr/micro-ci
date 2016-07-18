@@ -1,23 +1,32 @@
+var request    = require('supertest'),
+    assert     = require('chai').assert,
+    async      = require('async'),
+    clear      = require('clear-require');
 
 describe('Repositories endpoint with authenticated client', function() {
-  var request    = require('supertest'),
-      assert     = require('chai').assert,
-      async      = require('async'),
-      clear      = require('clear-require'),
-      repodata   = require('./test-setup').repo,
-      commit     = require('./test-setup').commit,
-      config    = require('../../server/config'),
+
+  var config     = require('../../server/config'),
+      fixtures   = require("fixturefiles"),
+      nock       = require('nock');
       app        = {},
       validtoken = {};
 
-  var nock = require('nock');
+  var repodata = {
+    platform: "github",
+    remoteId: 12345
+  };
+
+  var commit = {
+    commithash: 'al234',
+    repositoryId: 222
+  };
+
   var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
   var nockJenkins = nock(url);
 
   var url =  'http://'+config.host+':'+config.port;
   var nockNode = nock(url);
 
-  var fixtures = require("fixturefiles");
 
     after(function(done)
     {
@@ -228,7 +237,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('/GET repo commit by repo & commit id', function(done) {
       request(app)
-        .get('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
+        .get('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);
@@ -238,7 +247,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('hides /PUT repo commit by repo & commit id', function(done) {
       request(app)
-        .put('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
+        .put('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
         .send({
           commithash: 'eade'
         })
@@ -251,7 +260,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('hides /DELETE repo commit by repo & commit id', function(done) {
       request(app)
-        .delete('/api/Repositories/1/commits/2' + '?access_token=' + validtoken)
+        .delete('/api/Repositories/1/commits/1' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);
