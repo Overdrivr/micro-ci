@@ -21,6 +21,15 @@ module.exports = function(Repository) {
 
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
+      function(callback) {
+        // Check input sanity
+        if(typeof repository.id === 'undefined' || repository.id === null){
+          var err = new Error('repository.id is undefined');
+          err.status = 400;
+          return callback(err);
+        }
+        callback();
+      },
       // Identify repository
       function(callback) {
         Repository.find({
@@ -30,15 +39,19 @@ module.exports = function(Repository) {
           }
         }, function(err, repositories) {
             if(err) return callback(err)
-            if(!repositories) return callback(new Error('Github repository with id ',repository.id,' not found.'));
-            if(repositories.length > 1) return callback(new Error('Found multiple Github repositories with id ', repository.id));
-
+            if(repositories.length == 0) return callback(Error('Github repository with id '+ repository.id + ' not found.'));
+            if(repositories.length > 1) return callback(Error('Found multiple Github repositories with id ' + repository.id));
             callback(null, repositories[0]);
           });
       },
-
-      // Create a new commit if it doesn't exists already
       function(repositoryInstance, callback) {
+        // Detect ping payload (/after/ field containing commit hash will be undefined)
+        if(typeof after === 'undefined' || after === null){
+          // Call master callback to return early and avoid starting a build
+          return cb();
+        }
+
+        // Create a new commit if it doesn't exists already
         app.models.Commit.find({
           'where': {
             'commithash': after
@@ -46,9 +59,10 @@ module.exports = function(Repository) {
         },
         function(err, commits) {
           if(err) return callback(err);
-          if(commits.length > 1) return callback(Error('Found multiple Commits under hash ',after));
-          if(commits.length == 1) return callback(null, repositoryInstance, commits[0])
-
+          if(commits.length > 1) return callback(Error('Found multiple Commits under hash ' + after));
+          // If commit is found return it (this happens if a commit is being build multiple times)
+          if(commits.length == 1) return callback(null, repositoryInstance, commits[0]);
+          // Otherwise create one
           repositoryInstance.__create__commits({ commithash: after },
           function(err, createdCommit) {
             if (err) return callback(err);
@@ -63,23 +77,29 @@ module.exports = function(Repository) {
         commitInstance.__create__jobs({
           yaml: {}
         }, function (err, createdJobs) {
-          if (err) return cb(err);
-          cb();
+          if (err) return callback(err);
+          callback();
         });
       }
     ],
     // Webhook processing failed somewhere
     function(err, results) {
-      cb(err);
+      if (err) return cb(err);
+      cb();
     });
   };
 
   Repository.remoteMethod(
       'webhookGithub',
       {
-          http: {path: '/webhook/github', verb: 'post'},
+          http: {
+            path: '/webhook/github',
+            verb: 'post',
+            status: 204,
+            errorStatus: 404
+          },
           accepts: [
-            { arg: 'repository', type: 'Object' },
+            { arg: 'repository', type: 'Object', required: true },
             { arg: 'after', type: 'string'}
           ]
       }

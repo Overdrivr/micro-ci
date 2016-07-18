@@ -2,8 +2,9 @@ var request     = require('supertest'),
     clear       = require('clear-require'),
     assert      = require('chai').assert;
 
-describe('Fake github webhook', function() {
-  var fakepayload = require('./fake-github-push-payload.json'),
+describe('Github webhook', function() {
+  var pushPayload = require('./github-webhook-push-payload-repo1.json'),
+      pingPayload = require('./github-webhook-ping-payload-repo2.json'),
       repoId      = null,
       config      = require('../../server/config'),
       nock        = require('nock');
@@ -61,7 +62,7 @@ describe('Fake github webhook', function() {
 
     app.models.Repository.create({
       platform: "github",
-      remoteId: fakepayload.repository.id
+      remoteId: pushPayload.repository.id
     }, function(err, repo) {
       if (err) return done(err);
       if (!repo) return done(Error("Repository instance not created."));
@@ -71,7 +72,24 @@ describe('Fake github webhook', function() {
         id: {neq: 0}
       }, function(err, res) {
         if (err) return done(err);
-        done();
+
+        // Create a dummy commit to highlight 2+ instances side-effects
+        app.models.Commit.create({
+          commithash: 'eadebf2e36'
+        }, function(err, commit) {
+          if (err) return done(err);
+          if (!commit) return done(Error("Commit not created."));
+
+          // Create a dummy github repo to highlight 2+ instances side-effects
+          app.models.Repository.create({
+            platform: "github",
+            remoteId: 1234
+          }, function(err, repo) {
+            if (err) return done(err);
+            if (!repo) return done(Error("Repository instance not created."));
+            done();
+          });
+        });
       });
     });
   });
@@ -82,7 +100,7 @@ describe('Fake github webhook', function() {
     request(app)
       .post('/api/Repositories/webhook/github')
       .set('Accept', 'application/json')
-      .send(fakepayload)
+      .send(pushPayload)
       .expect(204, function(err, res){
         if (err) return done(err);
         done();
@@ -93,7 +111,7 @@ describe('Fake github webhook', function() {
   function(done){
       app.models.Commit.findOne({
         where: {
-          commithash: fakepayload.after
+          commithash: pushPayload.after
         },
         include: 'jobs'
       }, function(err, instance) {
@@ -109,14 +127,14 @@ describe('Fake github webhook', function() {
     app.models.Repository.findOne({
       where: {
         platform: "github",
-        remoteId: fakepayload.repository.id
+        remoteId: pushPayload.repository.id
       },
       include: 'commits'
     }, function (err, repo) {
       if (err) return done(err);
       commitData = repo.toJSON();
       assert.strictEqual(commitData.commits.length, 1);
-      assert.strictEqual(commitData.commits[0].commithash, fakepayload.after);
+      assert.strictEqual(commitData.commits[0].commithash, pushPayload.after);
       done();
     });
   });
@@ -125,18 +143,100 @@ describe('Fake github webhook', function() {
     request(app)
       .post('/api/Repositories/webhook/github')
       .set('Accept', 'application/json')
-      .send(fakepayload)
+      .send(pushPayload)
       .expect(204, function(err, res) {
         if (err) return done(err);
         app.models.Commit.find({
           'where': {
-            'commithash': fakepayload.after
+            'commithash': pushPayload.after
           }
         }, function(err, commits) {
           if (err) return done(err);
           assert.strictEqual(commits.length, 1);
           done();
         });
+      });
+  });
+
+  it('can be called with ping payload on a non-existing repo and return repo not found',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send(pingPayload)
+      .expect(404, function(err, res){
+        if (err) return done(err);
+        assert.strictEqual(res.body.error.message, 'Github repository with id '+ pingPayload.repository.id + ' not found.');
+        done();
+      });
+  });
+
+  it('can be called with ping payload on an existing repo and return 204',
+  function(done){
+    app.models.Repository.create({
+      platform: 'github',
+      remoteId: pingPayload.repository.id
+    })
+    .catch(function(err) {
+      return done(err);
+    })
+    .then(function(repo) {
+      if(!repo) return done(Error('Test repo for ping payload not created'));
+
+      request(app)
+        .post('/api/Repositories/webhook/github')
+        .set('Accept', 'application/json')
+        .send(pingPayload)
+        .expect(204, function(err, res){
+          console.log(res.body);
+          if (err) return done(err);
+          done();
+        });
+    })
+  });
+
+
+  it('can be called with empty payload without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({ })
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository is a required arg');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('can be called with defined /repository/ arg but undefined /after/ arg without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({ repository: {} })
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository.id is undefined');
+        if (err) return done(err);
+        done();
+      });
+  });
+
+  it('can be called with defined payload fields with undefined values without issue',
+  function(done){
+    request(app)
+      .post('/api/Repositories/webhook/github')
+      .set('Accept', 'application/json')
+      .send({
+        after: "",
+        repository: {
+          id: undefined
+        }
+      })
+      .expect(400, function(err, res){
+        assert.strictEqual(res.body.error.message, 'repository.id is undefined');
+        if (err) return done(err);
+        done();
       });
   });
 
