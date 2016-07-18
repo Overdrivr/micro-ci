@@ -38,7 +38,7 @@ module.exports = function(Build) {
     .then(function()
     {
       Build.incNbPendingBuild();
-      return Build.app.models.Slave.check_and_boot_slave();
+      return Build.app.models.Slave.checkAndBootSlave();
     })
     .then(function() {next();})
     .catch(function(err) {next(err);});
@@ -52,10 +52,10 @@ module.exports = function(Build) {
     Build.findOne({where:{id:id}})
     .then(function(pbuild) {
       build = pbuild;
-      return jenkins.getBuildStatus(build.getId())
+      return jenkins.getBuildStatus(build.getId());
     })
-    .then(function(status) {return build.updateAttributes({status: status})})
-    .then(function() {return jenkins.getSlave(build.getId())})
+    .then(function(status) {return build.updateAttributes({status: status});})
+    .then(function() {return jenkins.getSlave(build.getId());})
     .then(function(slaveName) {
         var slaveId = parseInt(slaveName.match(/\d+/g)[0]);
         return Slave.findOne({where:{id:slaveId}});
@@ -66,7 +66,7 @@ module.exports = function(Build) {
         return jenkins.removeNode(slave.getId());
       })
     .then(function() { return Slave.destroyById(slave.getId());})
-    .then(function() { return Slave.check_and_boot_slave();})
+    .then(function() { return Slave.checkAndBootSlave();})
     .then(function() { cb(null, slave.getId());})
     .catch(function(err) { cb(err);});
   };
