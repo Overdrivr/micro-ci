@@ -10,7 +10,9 @@ var secrets = require('./session-config.json').secrets;
 var app = module.exports = loopback();
 
 // Setup the view engine (jade)
-var p = path.join(path.dirname(__dirname), 'client');
+var p = path.join(path.dirname(__dirname), 'app');
+app.use(loopback.static(path.resolve(__dirname, '../app')));
+app.use(loopback.static(path.resolve(__dirname, '../bower_components')));
 app.set('views', p);
 
 // Configure sessions and passport
