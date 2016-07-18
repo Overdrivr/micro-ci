@@ -22,7 +22,7 @@ describe('user serialization', function(){
 
     app.models.Client.create({
       provider: 'github',
-      provider_id: 1230323810,
+      providerId: 1230323810,
       email: '1230323810@micro-ci.github.com',
       password: 'fowocnroi'
     }, function(err, instances) {
@@ -43,15 +43,15 @@ describe('user serialization', function(){
       app.models.Client.findById(serializedUserId, function(err, instances) {
         if (err) return done(err);
         assert.property(instances, 'provider');
-        assert.property(instances, 'provider_id');
+        assert.property(instances, 'providerId');
         assert.equal(instances['provider'], user.provider);
-        assert.equal(instances['provider_id'], user.id)
+        assert.equal(instances['providerId'], user.id)
         done();
       });
     });
   });
 
-  it('doesnt create two users for same provider and provider_id', function(done){
+  it('doesnt create two users for same provider and providerId', function(done){
     app.serializeUser(user, function(err, userdata) {
       if(err) return done(err);
       assert(userdata, 'userdata is empty.');
@@ -62,9 +62,9 @@ describe('user serialization', function(){
       app.models.Client.findById(serializedUserId, function(err, instances) {
         if (err) return done(err);
         assert.property(instances, 'provider');
-        assert.property(instances, 'provider_id');
+        assert.property(instances, 'providerId');
         assert.equal(instances['provider'], user.provider);
-        assert.equal(instances['provider_id'], user.id)
+        assert.equal(instances['providerId'], user.id)
         done();
       });
     });
@@ -78,9 +78,9 @@ describe('user serialization', function(){
         assert(userdata, 'userdata is empty.');
         assert.lengthOf(Object.keys(userdata), 2);
         assert.property(userdata, 'provider');
-        assert.property(userdata, 'provider_id');
+        assert.property(userdata, 'providerId');
         assert.deepEqual(userdata.provider, user.provider);
-        assert.deepEqual(userdata.provider_id, user.id);
+        assert.deepEqual(userdata.providerId, user.id);
         done();
     });
   });
@@ -88,7 +88,7 @@ describe('user serialization', function(){
   it('doesnt serialize a user with non-valid id', function(done) {
     app.serializeUser({
         provider: user2.provider,
-        provider_id: undefined
+        providerId: undefined
       }, function(err, userdata) {
         assert.isNotOk(userdata);
         if (err) return done();
@@ -99,7 +99,7 @@ describe('user serialization', function(){
   it('doesnt serialize a user with non-valid provider', function(done) {
     app.serializeUser({
         provider: undefined,
-        provider_id: user2.id
+        providerId: user2.id
       }, function(err, userdata) {
         assert.isNotOk(userdata);
         if (err) return done();
@@ -110,7 +110,7 @@ describe('user serialization', function(){
   it('doesnt serialize a user with non-valid id but same provider than another user', function(done) {
     app.serializeUser({
         provider: user.provider,
-        provider_id: undefined
+        providerId: undefined
       }, function(err, userdata) {
         assert.isNotOk(userdata);
         if (err) return done();
@@ -121,7 +121,7 @@ describe('user serialization', function(){
   it('doesnt serialize a user with non-valid provider but same id than another user', function(done) {
     app.serializeUser({
         provider: undefined,
-        provider_id: user.id
+        providerId: user.id
       }, function(err, userdata) {
         assert.isNotOk(userdata);
         if (err) return done();
