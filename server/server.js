@@ -12,7 +12,6 @@ var app = module.exports = loopback();
 // Setup the view engine (jade)
 var p = path.join(path.dirname(__dirname), 'client');
 app.set('views', p);
-app.set('view engine', 'jade');
 
 // Configure sessions and passport
 app.use(session({

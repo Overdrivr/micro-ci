@@ -1,5 +1,16 @@
+var path = require("path");
+
 module.exports = function initRoutes(app) {
   console.log("Enabling routing.");
+
+  var options = {
+    root:  app.get("views"),
+    dotfiles: 'deny',
+    headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true
+    }
+  };
 
   // Simple route middleware to ensure user is authenticated.
   //   Use this route middleware on any resource that needs to be protected.  If
@@ -13,12 +24,9 @@ module.exports = function initRoutes(app) {
 
   /// ROUTING
   app.get('/', function (req, res, next) {
-    res.render('pages/index', {
-      user: req.user,
-      url: req.url
-    });
+    res.sendFile("index.html",options);
   });
-
+/*
   app.get('/login', function (req, res, next) {
     res.render('pages/login', {
       user: req.user,
@@ -38,4 +46,5 @@ module.exports = function initRoutes(app) {
        user: req.user,
      });
   });
+  */
 };
