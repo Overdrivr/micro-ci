@@ -45,12 +45,12 @@ app.serializeUser = function(user, done) {
       app.models.Client.find({
         where: {
           provider: user.provider,
-          provider_id: user.id
+          providerId: user.id
         }
       }, function(err, clients) {
         if (err) return callback(err);
         if (clients.length > 1) return callback(Error('Multiple clients matching search pattern. Aborting'));
-        if (clients.length == 1) return callback('ok', clients[0]);
+        if (clients.length === 1) return callback('ok', clients[0]);
         callback();
       });
     },
@@ -62,8 +62,8 @@ app.serializeUser = function(user, done) {
               email: user.id + '@micro-ci.' + user.provider + '.com',
               password: buf.toString('hex'),
               provider: user.provider,
-              provider_id: user.id
-        }
+              providerId: user.id
+        };
         callback(null, userdata);
       });
     },
@@ -76,7 +76,7 @@ app.serializeUser = function(user, done) {
       });
     },
   ], function(err, client) {
-      if (err && err != 'ok') return done(err);
+      if (err && err !== 'ok') return done(err);
 
       // Generate a token to return to the client to enable client-side session persistence
       app.models.Client.generateVerificationToken(client, function(err, token) {
@@ -100,7 +100,7 @@ app.deserializeUser = function(userdata, done) {
       if (!user) return done(Error('Client [' + userdata.userId + '] not found.'));
       done(null, {
         provider: user.provider,
-        provider_id: user.provider_id
+        providerId: user.providerId
       });
   });
 };
