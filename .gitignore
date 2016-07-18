@@ -20,3 +20,6 @@ npm-debug.log
 
 # Sensitive data files
 test-credentials.json
+
+# Client-side
+bower_components/
