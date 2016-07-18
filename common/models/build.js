@@ -65,7 +65,7 @@ module.exports = function(Build) {
     .then(function(pslave) {
         if(!pslave)  throw new Error("No slave with ID:" + slave_id);
         slave = pslave;
-        return jenkins.remove_node(slave.getId());
+        return jenkins.removeNode(slave.getId());
       })
     .then(function() { return Slave.destroyById(slave.getId())})
     .then(function() { return Slave.check_and_boot_slave()})

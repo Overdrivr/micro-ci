@@ -233,7 +233,7 @@ describe('jenkins', function() {
           .post("/computer/doCreateItem?" + fixtures.nodeCreateQuery )
           .reply(302, '', { location: 'http://localhost:8080/computer/' });
 
-          jenkins.create_node(id, ip,
+          jenkins.createNode(id, ip,
             function(err, data)
             {
               should.not.exist(err);
@@ -251,7 +251,7 @@ describe('jenkins', function() {
           nockJenkins
           .head('/computer/' + name + '/api/json')
           .reply(200)
-          jenkins.create_node(id, ip,
+          jenkins.createNode(id, ip,
             function(err, data)
             {
               assert.throws(function(){throw (err);},/Node slave_62 already exist/);
@@ -270,7 +270,7 @@ describe('jenkins', function() {
           .head('/computer/' + name + '/api/json')
           .reply(404)
 
-          jenkins.remove_node(id,
+          jenkins.removeNode(id,
             function(err)
             {
               assert.throws(function(){throw (err);},/Node slave_62 does not exist/);
@@ -288,7 +288,7 @@ describe('jenkins', function() {
           .reply(200)
           .post('/computer/' + name + '/doDelete')
           .reply(302, '')
-          jenkins.remove_node(id,
+          jenkins.removeNode(id,
             function(err)
             {
               should.not.exist(err);
