@@ -36,7 +36,7 @@ module.exports = function(Slave) {
          throw err;
          return ;
       }
-      return   slave_api.boot_slave("http://"+config.host+":"+config.port);
+      return   slave_api.bootSlave("http://"+config.host+":"+config.port);
     })
     .then(function(){
       cb();
