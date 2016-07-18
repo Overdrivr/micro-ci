@@ -1,5 +1,5 @@
 module.exports = function initRoutes(app) {
-  console.log("Enabling routing.");
+  console.log('Enabling routing.');
 
   // Simple route middleware to ensure user is authenticated.
   //   Use this route middleware on any resource that needs to be protected.  If
