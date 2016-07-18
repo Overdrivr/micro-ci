@@ -36,7 +36,7 @@ module.exports = function(Slave) {
          throw err;
          return ;
       }
-      return   slave_api.boot_slave("http://"+config.host+":"+config.port);
+      return   slave_api.bootSlave("http://"+config.host+":"+config.port);
     })
     .then(function(){
       cb();
@@ -64,7 +64,7 @@ module.exports = function(Slave) {
       if(!slave) throw new Error("No slave in booting mode" + slave);
       return slave.updateAttributes({status: "building", IP:ip});
     })
-    .then(function() { return jenkins.create_node(slave.getId(), ip);})
+    .then(function() { return jenkins.createNode(slave.getId(), ip);})
     .then(function(){ cb(null, slave.getId());})
     .catch(function(err) {cb(err);})
   }
