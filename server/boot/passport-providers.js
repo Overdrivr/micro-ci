@@ -36,7 +36,7 @@ function initProvider(app, provider) {
   app.get('/auth/' + provider.name + '/callback',
     passport.authenticate(provider.name, { failureRedirect: '/login' }),
     function(req, res) {
-      res.redirect('/account');
+      res.redirect('/#/account');
     });
 
     // If accounts can be linked to this provider
@@ -50,7 +50,7 @@ function initProvider(app, provider) {
       app.get('/link/' + provider.name + '/callback',
         passport.authorize(provider.name, { failureRedirect: '/login' }),
         function(req, res) {
-          res.redirect('/account');
+          res.redirect('/#/account');
         });
     }
 };
