@@ -32,6 +32,14 @@ describe('user serialization', function(){
     });
   });
 
+  it('initially finds 0 accessToken inside the database', function(done){
+    app.models.AccessToken.count(function(err, count){
+      if (err) return done(err);
+      assert.deepEqual(count, 0);
+      done();
+    });
+  });
+
   it('creates a new user the first time', function(done){
     app.serializeUser(user, function(err, userdata){
       if (err) return done(err);
@@ -48,6 +56,14 @@ describe('user serialization', function(){
         assert.equal(instances['provider_id'], user.id)
         done();
       });
+    });
+  });
+
+  it('finds 1 accessToken inside the database afterward', function(done){
+    app.models.AccessToken.count(function(err, count){
+      if (err) return done(err);
+      assert.deepEqual(count, 1);
+      done();
     });
   });
 
