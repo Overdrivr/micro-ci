@@ -78,12 +78,13 @@ app.serializeUser = function(user, done) {
   ], function(err, client) {
       if (err && err != 'ok') return done(err);
 
-      // Generate a token to return to the client to enable client-side session persistence
-      app.models.Client.generateVerificationToken(client, function(err, token) {
+      var timetolive = 2 * 7 * 24 * 3600;
+
+      client.createAccessToken(timetolive, function(err, token){
         if(err) return done(err);
         var responsedata = {
           userId: client.id,
-          accessToken: token
+          accessToken: token.id
         };
         done(null, responsedata);
       });
