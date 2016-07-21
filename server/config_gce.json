@@ -1,0 +1,20 @@
+ {
+  "InstanceConfig" : {
+  "os": "ubuntu",
+  "networkInterfaces": [
+      {
+          "network":  "global/networks/default",
+          "accessConfigs": [
+              {
+                  "kind": "compute#accessConfig",
+                  "type": "ONE_TO_ONE_NAT",
+                  "name": "External NAT"
+              }
+          ]
+      }]
+ },
+ "zone" : "us-central1-c",
+ "projectId" : "micro-ci",
+ "keyFilename" : "micro-ci-gce-key.json"
+
+}
