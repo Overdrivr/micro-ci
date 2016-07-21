@@ -4,7 +4,7 @@ var assert   = require('assert'),
     fixtures = require("fixturefiles"),
     should = require('should');
 
-var url = process.env.JENKINS_TEST_URL || 'http://localhost:8080';
+var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
 var jenkins =  new Jenkins(url, "099c7823-795b-41b8-81b0-ad92f79492e0");
 
@@ -13,7 +13,7 @@ describe('jenkins', function() {
   afterEach(function(done)
   {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
-      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks().length))
     nock.cleanAll();
     done();
   });
@@ -26,14 +26,14 @@ describe('jenkins', function() {
         nockJenkins
         .head('/job/' + jobName + '/api/json')
         .reply(404)
-        .post('/createItem?name=' + jobName, '<project><action></action><description></description><keepDependencies>false</keepDependencies><properties><com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.10"><endpoints><com.tikal.hudson.plugins.notification.Endpoint><protocol>HTTP</protocol><format>JSON</format><url>http://localhost//api/Builds/3/complete</url><event>completed</event><timeout>30000</timeout><loglines>0</loglines></com.tikal.hudson.plugins.notification.Endpoint></endpoints></com.tikal.hudson.plugins.notification.HudsonNotificationProperty></properties><scm class="hudson.scm.NullSCM"></scm><canRoam>true</canRoam><disabled>false</disabled><blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding><blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding><triggers></triggers><concurrentBuild>false</concurrentBuild><builders><hudson.tasks.Shell><command>echo &apos;Hello&apos; \nexit 0\n</command></hudson.tasks.Shell></builders><publishers></publishers><buildWrappers></buildWrappers></project>')
+        .post('/createItem?name=' + jobName)
         .reply(200)
         .post('/job/' + jobName + '/build')
         .reply(201, '', { location: url + '/queue/item/1/' })
 
         var yaml = {build : ["echo 'Hello' ", "exit 0"]};
 
-        jenkins.build(build_id, yaml, "http://localhost/",
+        jenkins.build(build_id, yaml, 'http://localhost',
         function(err, data)
         {
           should.not.exist(err);
@@ -76,7 +76,7 @@ describe('jenkins', function() {
         nockJenkins
         .head('/job/' + jobName + '/api/json')
         .reply(404)
-        jenkins.get_build_status(build_id,
+        jenkins.getBuildStatus(build_id,
           function(err, data)
           {
             assert.throws(function(){throw (err);},/Job build_3 does not exist/);
@@ -100,7 +100,7 @@ describe('jenkins', function() {
       .reply(201, fixtures.jobSuccess)
 
 
-      jenkins.get_build_status(build_id,
+      jenkins.getBuildStatus(build_id,
         function(err, data)
         {
           assert.equal(err, null);
@@ -123,7 +123,7 @@ describe('jenkins', function() {
         .reply(201, fixtures.jobFail)
 
 
-        jenkins.get_build_status(build_id,
+        jenkins.getBuildStatus(build_id,
           function(err, data)
           {
             assert.equal(err, null);
@@ -147,7 +147,7 @@ describe('jenkins', function() {
       .reply(200, fixtures.jobOngoing)
 
 
-      jenkins.get_build_status(build_id,
+      jenkins.getBuildStatus(build_id,
         function(err, data)
         {
           assert.equal(err, null);
@@ -168,7 +168,7 @@ describe('jenkins', function() {
         .get('/queue/api/json')
         .reply(201, fixtures.jobQueue)
 
-        jenkins.get_build_status(build_id,
+        jenkins.getBuildStatus(build_id,
           function(err, data)
           {
             assert.equal(err, null);
@@ -191,7 +191,7 @@ describe('jenkins', function() {
         .get('/job/' + jobName + '/1/consoleText')
         .reply(200, fixtures.buildLog, { 'Content-Type': 'text/plain;charset=UTF-8' });
 
-        jenkins.get_build_log(build_id,
+        jenkins.getBuildLog(build_id,
           function(err, data)
           {
             should.not.exist(err);
@@ -209,7 +209,7 @@ describe('jenkins', function() {
           nockJenkins
           .head('/job/' + jobName + '/api/json')
           .reply(404)
-          jenkins.get_build_log(build_id,
+          jenkins.getBuildLog(build_id,
             function(err, data)
             {
               assert.throws(function(){throw (err);},/Job build_3 does not exist/);
@@ -233,7 +233,7 @@ describe('jenkins', function() {
           .post("/computer/doCreateItem?" + fixtures.nodeCreateQuery )
           .reply(302, '', { location: 'http://localhost:8080/computer/' });
 
-          jenkins.create_node(id, ip,
+          jenkins.createNode(id, ip,
             function(err, data)
             {
               should.not.exist(err);
@@ -251,7 +251,7 @@ describe('jenkins', function() {
           nockJenkins
           .head('/computer/' + name + '/api/json')
           .reply(200)
-          jenkins.create_node(id, ip,
+          jenkins.createNode(id, ip,
             function(err, data)
             {
               assert.throws(function(){throw (err);},/Node slave_62 already exist/);
@@ -270,7 +270,7 @@ describe('jenkins', function() {
           .head('/computer/' + name + '/api/json')
           .reply(404)
 
-          jenkins.remove_node(id,
+          jenkins.removeNode(id,
             function(err)
             {
               assert.throws(function(){throw (err);},/Node slave_62 does not exist/);
@@ -288,7 +288,7 @@ describe('jenkins', function() {
           .reply(200)
           .post('/computer/' + name + '/doDelete')
           .reply(302, '')
-          jenkins.remove_node(id,
+          jenkins.removeNode(id,
             function(err)
             {
               should.not.exist(err);
@@ -307,7 +307,7 @@ describe('jenkins', function() {
             .get('/job/'+jobName+'/1/api/json')
             .reply(201, fixtures.jobSuccess);
 
-            jenkins.get_slave(build_id,
+            jenkins.getSlave(build_id,
               function(err, data)
               {
                 assert.equal(err, null);
@@ -326,7 +326,7 @@ describe('jenkins', function() {
               .head('/job/' + jobName + '/api/json')
               .reply(404)
 
-              jenkins.get_slave(build_id,
+              jenkins.getSlave(build_id,
                 function(err, data)
                 {
                   assert.throws(function(){throw (err);},/Job build_3 does not exist/);

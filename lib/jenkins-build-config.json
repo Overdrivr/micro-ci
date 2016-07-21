@@ -1,0 +1,96 @@
+{
+  "project": [
+    {
+      "action": ""
+    },
+    {
+      "description": ""
+    },
+    {
+      "keepDependencies": false
+    },
+    {
+      "properties": [
+        {
+          "com.tikal.hudson.plugins.notification.HudsonNotificationProperty": [
+            {
+              "_attr": {
+                "plugin": "notification@1.10"
+              }
+            },
+            {
+              "endpoints": [
+                {
+                  "com.tikal.hudson.plugins.notification.Endpoint": [
+                    {
+                      "protocol": "HTTP"
+                    },
+                    {
+                      "format": "JSON"
+                    },
+                    {
+                      "url": ""
+                    },
+                    {
+                      "event": "completed"
+                    },
+                    {
+                      "timeout": 30000
+                    },
+                    {
+                      "loglines": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "scm": [
+        {
+          "_attr": {
+            "class": "hudson.scm.NullSCM"
+          }
+        }
+      ]
+    },
+    {
+      "canRoam": true
+    },
+    {
+      "disabled": false
+    },
+    {
+      "blockBuildWhenDownstreamBuilding": false
+    },
+    {
+      "blockBuildWhenUpstreamBuilding": false
+    },
+    {
+      "triggers": ""
+    },
+    {
+      "concurrentBuild": false
+    },
+    {
+      "builders": [
+        {
+          "hudson.tasks.Shell": [
+            {
+              "command": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "publishers": ""
+    },
+    {
+      "`PbuildWrappers": ""
+    }
+  ]
+}

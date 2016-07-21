@@ -24,7 +24,7 @@ describe('user serialization', function(){
 
     app.models.Client.create({
       provider: 'github',
-      provider_id: 1230323810,
+      providerId: 1230323810,
       email: '1230323810@micro-ci.github.com',
       password: 'fowocnroi'
     }, function(err, instances) {
@@ -53,9 +53,9 @@ describe('user serialization', function(){
       app.models.Client.findById(serializedUserId, function(err, instances) {
         if (err) return done(err);
         assert.property(instances, 'provider');
-        assert.property(instances, 'provider_id');
+        assert.property(instances, 'providerId');
         assert.equal(instances['provider'], user.provider);
-        assert.equal(instances['provider_id'], user.id)
+        assert.equal(instances['providerId'], user.id)
         done();
       });
     });
@@ -85,9 +85,9 @@ describe('user serialization', function(){
       app.models.Client.findById(serializedUserId, function(err, instances) {
         if (err) return done(err);
         assert.property(instances, 'provider');
-        assert.property(instances, 'provider_id');
+        assert.property(instances, 'providerId');
         assert.equal(instances['provider'], user.provider);
-        assert.equal(instances['provider_id'], user.id)
+        assert.equal(instances['providerId'], user.id)
         done();
       });
     });
@@ -101,9 +101,9 @@ describe('user serialization', function(){
         assert(userdata, 'userdata is empty.');
         assert.lengthOf(Object.keys(userdata), 2);
         assert.property(userdata, 'provider');
-        assert.property(userdata, 'provider_id');
+        assert.property(userdata, 'providerId');
         assert.deepEqual(userdata.provider, user.provider);
-        assert.deepEqual(userdata.provider_id, user.id);
+        assert.deepEqual(userdata.providerId, user.id);
         done();
     });
   });

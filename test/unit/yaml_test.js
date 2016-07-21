@@ -4,7 +4,7 @@ var inArray = require("in-array"),
 
 describe('emptyYaml', function(){
   it('Empty yaml file', function(){
-    assert.throws( function() { yaml.yaml_parser(""); }, Error );
+    assert.throws( function() { yaml.yamlParser(""); }, Error );
   });
 });
 
@@ -29,7 +29,7 @@ deploy:\n\
   -Do Stuff2\n\
 platforms: KL25Z\
 "
-    assert.deepEqual( yaml.yaml_parser(yamlContent), expected);
+    assert.deepEqual( yaml.yamlParser(yamlContent), expected);
   });
 });
 
@@ -46,7 +46,7 @@ deploy:\n\
   -Do Stuff2\n\
 platforms: KL25Z\
 "
-    assert.throws( function() { yaml.yaml_parser(yamlContent); }, /Unspecified/ );
+    assert.throws( function() { yaml.yamlParser(yamlContent); }, /Unspecified/ );
   });
 });
 
@@ -65,6 +65,6 @@ deploy:\n\
 unknowOption: toto\n\
 platforms: KL25Z\
 "
-    assert.throws( function() { yaml.yaml_parser(yamlContent); }, /Unsupported/ );
+    assert.throws( function() { yaml.yamlParser(yamlContent); }, /Unsupported/ );
   });
 });
