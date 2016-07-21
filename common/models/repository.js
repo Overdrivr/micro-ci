@@ -38,9 +38,13 @@ module.exports = function(Repository) {
             'remoteId': repository.id
           }
         }, function(err, repositories) {
-            if(err) return callback(err)
-            if(repositories.length == 0) return callback(Error('Github repository with id '+ repository.id + ' not found.'));
-            if(repositories.length > 1) return callback(Error('Found multiple Github repositories with id ' + repository.id));
+            if(err) return callback(err);
+            if(repositories.length === 0) {
+              return callback(Error('Github repository with id '+ repository.id + ' not found.'));
+            }
+            if(repositories.length > 1) {
+              return callback(Error('Found multiple Github repositories with id ' + repository.id));
+            }
             callback(null, repositories[0]);
           });
       },
@@ -61,7 +65,7 @@ module.exports = function(Repository) {
           if(err) return callback(err);
           if(commits.length > 1) return callback(Error('Found multiple Commits under hash ' + after));
           // If commit is found return it (this happens if a commit is being build multiple times)
-          if(commits.length == 1) return callback(null, repositoryInstance, commits[0]);
+          if(commits.length === 1) return callback(null, repositoryInstance, commits[0]);
           // Otherwise create one
           repositoryInstance.__create__commits({ commithash: after },
           function(err, createdCommit) {

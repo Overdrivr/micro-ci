@@ -65,7 +65,7 @@ describe('Repositories endpoint with authenticated client', function() {
             email: "foo@foo123112eae1.com",
             password: "bar",
             provider: 'foobarprovider',
-            provider_id: 87334702902
+            providerId: 87334702902
           }, function(err, user) {
             if (err) return callback(err);
             if (!user) return callback(new Error('User could not be created'));

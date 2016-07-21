@@ -2,16 +2,16 @@
   {
     "name": "github",
     "module": "passport-github2",
-    "client_id": "4120fdd8fbdae8a65e2d",
-    "client_secret": "c607f5e599b0b6dbf54228eeae8c388a73f5c98d",
+    "clientId": "4120fdd8fbdae8a65e2d",
+    "clientSecret": "c607f5e599b0b6dbf54228eeae8c388a73f5c98d",
     "link": true,
     "scope": "user:email,repo,write:repo_hook"
   },
   {
     "name": "google",
     "module": "passport-google-oauth20",
-    "client_id": "137968292615-degfvgs90u2c0r4e800tlrv0gti0dosf.apps.googleusercontent.com",
-    "client_secret": "NkPmr4_uv123GcCUGz_zdUBK",
+    "clientId": "137968292615-degfvgs90u2c0r4e800tlrv0gti0dosf.apps.googleusercontent.com",
+    "clientSecret": "NkPmr4_uv123GcCUGz_zdUBK",
     "link": false,
     "scope": "profile email"
   }
