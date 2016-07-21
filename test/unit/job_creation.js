@@ -1,22 +1,18 @@
-
+var assert = require('assert'),
+    clear  = require('clear-require');
 
 describe('CreateJob', function() {
 
-  var fixtures = require("fixturefiles")
-  var app = require('../../server/server');
-  var assert = require('assert');
-  var config    = require('../../server/config');
+  var fixtures = require("fixturefiles"),
+      config   = require('../../server/config'),
+      nock     = require('nock'),
+      app      = {};
 
-  var nock = require('nock');
   var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
   var nockJenkins = require('nock')(url);
 
   var url = 'http://'+config.host+':'+config.port;
   var nockNode = require('nock')(url);
-
-  var clear = require('clear-require');
-
-
 
   before(function(){
     clear('../../server/server');

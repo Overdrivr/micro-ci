@@ -1,17 +1,25 @@
 var request = require('supertest'),
     assert  = require('chai').assert,
-    clear   = require('clear-require'),
-    config    = require('../../server/config'),
-    nock    = require('nock');
-    app     = {};
-
-var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
-var serverURL =   'http://'+config.host+':'+config.port;
+    clear   = require('clear-require');
 
 describe('Commits endpoint with Unauthenticated client', function() {
 
-  var commit   = require('./test-setup').commit,
-      repodata = require('./test-setup').repo;
+  var config  = require('../../server/config'),
+      nock    = require('nock'),
+      app     = {};
+
+  var jenkinsURL = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
+  var serverURL =   'http://'+config.host+':'+config.port;
+
+  var commit = {
+    commithash: 'al234',
+    repositoryId: 222
+  };
+
+  repodata = {
+    platform: "github",
+    remoteId: 12345
+  };
 
   var nockJenkins = nock(jenkinsURL);
   var nockNode = nock(serverURL);

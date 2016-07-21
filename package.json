@@ -4,7 +4,7 @@
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
-    "unit": "mocha ./test/unit --timeout 5000",
+    "unit": "istanbul cover node_modules/mocha/bin/_mocha ./test/unit -- --timeout 5000",
     "e2e": "protractor ./test/e2e/conf.js"
   },
   "dependencies": {
@@ -25,7 +25,6 @@
     "passport-local": "^1.0.0",
     "serve-favicon": "^2.0.1",
     "yaml": "~0.3.0",
-    "mocha": "~2.4.5",
     "xml": "~1.0.1",
     "should": "~8.3.1",
     "nock": "~8.0.0",
@@ -37,11 +36,12 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "decache": "~3.1.0",
+    "istanbul": "^0.4.4",
     "jshint": "^2.5.6",
     "mocha": "~2.4.5",
     "supertest": "^1.2.0",
-    "url-parse": "^1.1.1",
-    "decache": "~3.1.0"
+    "url-parse": "^1.1.1"
   },
   "repository": {
     "type": "",
