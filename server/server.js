@@ -39,8 +39,10 @@ app.serializeUser = function(user, done) {
       // Data validation
       if(!user.hasOwnProperty('provider')) return callback(Error('Incomplete user informations. Missing provider.'));
       if(!user.hasOwnProperty('id')) return callback(Error('Incomplete user informations. Missing id.'));
+      if(!user.hasOwnProperty('accessToken')) return callback(Error('Incomplete user informations. Missing accessToken.'));
       if(!user.provider) return callback(Error('Incomplete user informations. Undefined provider.'));
       if(!user.id) return callback(Error('Incomplete user informations. Undefined id.'));
+      if(!user.accessToken) return callback(Error('Incomplete user informations. Undefined accessToken.'));
 
       app.models.Client.find({
         where: {
@@ -78,12 +80,16 @@ app.serializeUser = function(user, done) {
   ], function(err, client) {
       if (err && err !== 'ok') return done(err);
 
-      // Generate a token to return to the client to enable client-side session persistence
-      app.models.Client.generateVerificationToken(client, function(err, token) {
+      client.__create__accessTokens({
+        ttl: 1209600,
+        created: Date.now(),
+        id: user.accessToken
+      }, function(err, tok){
         if(err) return done(err);
+
         var responsedata = {
           userId: client.id,
-          accessToken: token
+          accessToken: tok.id
         };
         done(null, responsedata);
       });
