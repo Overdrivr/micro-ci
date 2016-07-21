@@ -1,5 +1,8 @@
-var app = require('../../server/server');
-var async = require('async');
+var app          = require('../../server/server'),
+    async        = require('async'),
+    GitHubApi    = require('github'),
+    githubConfig = require('../../server/providers.json').github;
+    loopback     = require('loopback');
 
 module.exports = function(Repository) {
 
@@ -18,6 +21,19 @@ module.exports = function(Repository) {
   Repository.disableRemoteMethod('__delete__commits', false);
   Repository.disableRemoteMethod('__destroyById__commits', false);
   Repository.disableRemoteMethod('__updateById__commits', false);
+
+  var github = new GitHubApi({
+    // optional
+    debug: true,
+    protocol: "https",
+    host: "api.github.com", // should be api.github.com for GitHub
+    headers: {
+        "user-agent": "My-Cool-GitHub-App" // GitHub is happy with a unique user agent
+    },
+    Promise: require('bluebird'),
+    followRedirects: false, // default: true; there's currently an issue with non-get redirects, so allow ability to disable follow-redirects
+    timeout: 5000
+  });
 
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
@@ -38,13 +54,9 @@ module.exports = function(Repository) {
             'remoteId': repository.id
           }
         }, function(err, repositories) {
-            if(err) return callback(err);
-            if(repositories.length === 0) {
-              return callback(Error('Github repository with id '+ repository.id + ' not found.'));
-            }
-            if(repositories.length > 1) {
-              return callback(Error('Found multiple Github repositories with id ' + repository.id));
-            }
+            if(err) return callback(err)
+            if(repositories.length == 0) return callback(Error('Github repository with id '+ repository.id + ' not found.'));
+            if(repositories.length > 1) return callback(Error('Found multiple Github repositories with id ' + repository.id));
             callback(null, repositories[0]);
           });
       },
@@ -65,7 +77,7 @@ module.exports = function(Repository) {
           if(err) return callback(err);
           if(commits.length > 1) return callback(Error('Found multiple Commits under hash ' + after));
           // If commit is found return it (this happens if a commit is being build multiple times)
-          if(commits.length === 1) return callback(null, repositoryInstance, commits[0]);
+          if(commits.length == 1) return callback(null, repositoryInstance, commits[0]);
           // Otherwise create one
           repositoryInstance.__create__commits({ commithash: after },
           function(err, createdCommit) {
@@ -106,6 +118,43 @@ module.exports = function(Repository) {
             { arg: 'repository', type: 'Object', required: true },
             { arg: 'after', type: 'string'}
           ]
+      }
+  );
+
+  Repository.listGithub = function(cb) {
+    var ctx = loopback.getCurrentContext();
+    var currentToken = ctx.get('accessToken');
+
+    if(!currentToken) return cb(Error('You need to be authenticated'));
+
+    github.authenticate({
+        type: "oauth",
+        token: currentToken.id
+    });
+
+    github.repos.getAll({}, function(err, repos) {
+      if (err) return cb(err);
+      var repoNames = []
+      for(repo in repos) {
+        repoNames.append(repo.full_name);
+      }
+      console.log(repoNames);
+      cb(null, repoNames);
+    });
+  };
+
+  Repository.remoteMethod(
+      'listGithub',
+      {
+          http: {
+            path: '/me/github',
+            verb: 'get',
+            status: 200,
+            errorStatus: 404
+          },
+          returns: {
+            repositories: 'Object'
+          }
       }
   );
 
