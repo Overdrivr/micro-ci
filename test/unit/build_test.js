@@ -71,7 +71,7 @@ describe('SimpleBuild', function() {
       .get('/job/'+jobName+'/1/api/json')
       .reply(201, {"actions":[{"causes":[{"shortDescription":"Started by user anonymous","userId":null,"userName":"anonymous"}]}],"artifacts":[],"building":true,"description":null,"displayName":"#1","duration":0,"estimatedDuration":-1,"executor":{},"fullDisplayName":"Test3 #1","id":"1","keepLog":false,"number":1,"queueId":9,"result":"SUCCESS","timestamp":1461214209569,"url":"http://127.0.0.1:8080/job/Test3/1/","builtOn":slaveName,"changeSet":{"items":[],"kind":null},"culprits":[]});
 
-      nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
       .reply(200);
 
 
@@ -80,6 +80,7 @@ describe('SimpleBuild', function() {
       },
       function(err, job)
       {
+
         if(err) return done(err);
         app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
           if(err) return done(err);
@@ -88,17 +89,17 @@ describe('SimpleBuild', function() {
           //Simulate booted slave:
 
           request(app)
-          .get('/api/Slaves/127.0.0.1/boot')
+          .post('/api/Slaves/'+slave_id+'/boot')
+          .send({ip: '127.0.0.1'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(200, function(err, res){
+          .expect(204, function(err, res){
+
             if(err) return done(err);
-            assert.equal(res.body.id, slave_id);
 
             app.models.Slave.findOne({},function(err, slave) {
               if(err) return done(err);
               assert.equal(slave.status, "building");
-
 
               //Simulate build end
               request(app)

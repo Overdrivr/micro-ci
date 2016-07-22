@@ -44,7 +44,7 @@ describe('CreateJob', function() {
     .reply(201, '', { location: url + '/queue/item/1/' })
     .post("/computer/doCreateItem?name="+slaveName+"&type=hudson.slaves.DumbSlave%24DescriptorImpl&json=%7B%22name%22%3A%22"+slaveName+"%22%2C%22nodeDescription%22%3A%22%22%2C%22numExecutors%22%3A1%2C%22remoteFS%22%3A%22~%2F%22%2C%22labelString%22%3A%22%22%2C%22mode%22%3A%22NORMAL%22%2C%22type%22%3A%22hudson.slaves.DumbSlave%24DescriptorImpl%22%2C%22retentionStrategy%22%3A%7B%22stapler-class%22%3A%22hudson.slaves.RetentionStrategy%24Always%22%7D%2C%22nodeProperties%22%3A%7B%22stapler-class-bag%22%3A%22true%22%2C%22hudson-slaves-EnvironmentVariablesNodeProperty%22%3A%7B%22env%22%3A%7B%22key%22%3A%22slave_id%22%2C%22value%22%3A"+slave_id+"%7D%7D%7D%2C%22launcher%22%3A%7B%22stapler-class%22%3A%22hudson.plugins.sshslaves.SSHLauncher%22%2C%22credentialsId%22%3A%2241bc3d31-9703-40dc-887f-f16561a4d3a6%22%2C%22host%22%3A%22127.0.0.1%22%2C%22port%22%3A22%7D%7D")
 
-    nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+    nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
     .reply(200);
 
     app.models.Job.create({

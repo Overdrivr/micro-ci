@@ -27,11 +27,11 @@ module.exports = function(Slave) {
       }
       return Slave.create({status:'booting'});
     })
-    .then(function()
+    .then(function(slave)
     {
       var err = Slave.app.models.Build.decNbPendingBuild();
       if(err) throw err;
-      return slaveApi.bootSlave('http://' + config.host + ':' + config.port);
+      return slaveApi.bootSlave(slave.id, 'http://' + config.host + ':' + config.port);
     })
     .then(function(){
       cb();
@@ -48,15 +48,16 @@ module.exports = function(Slave) {
   };
 
 
-  Slave.boot = function(ip, cb) {
+  Slave.boot = function(id, ip, cb) {    
     var slave ;
     if(!isIp(ip)) return cb(new Error('IP ' + ip + ' is not a valid IP'));
     //At least one slave should be in boot mode
-    Slave.findOne({where:{status:'booting'}})
+    Slave.findOne({where:{id:id}})
     .then(function(pslave)
     {
       slave = pslave;
-      if(!slave) throw new Error('No slave in booting mode' + slave);
+      if(!slave) throw new Error('No slave with id ' + slave);
+      if(slave.status != "booting") throw new Error('Slave is not booting but in ' + slave.status + ' mode');
       return slave.updateAttributes({status: 'building', IP:ip});
     })
     .then(function() { return jenkins.createNode(slave.getId(), ip);})
@@ -67,9 +68,9 @@ module.exports = function(Slave) {
   Slave.remoteMethod(
     'boot',
     {
-      accepts: [{arg: 'ip', type: 'string'}],
-      returns: {arg: 'id', type:'number'},
-      http: {path:'/:ip/boot'}
+
+      accepts: [{arg: 'id', type: 'number'}, {arg: 'ip', type: 'string'}],
+      http: {path:'/:id/boot'}
     }
   );
 };

@@ -55,7 +55,7 @@ describe('Repositories endpoint with authenticated client', function() {
       .post('/job/' + jobName + '/build')
       .reply(201, '', { location: url + '/queue/item/1/' })
 
-      nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
       .reply(200);
 
       async.waterfall([
