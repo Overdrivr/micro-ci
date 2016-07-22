@@ -24,7 +24,7 @@ module.exports = function(Repository) {
 
   var github = new GitHubApi({
     // optional
-    debug: true,
+    debug: false,
     protocol: "https",
     host: "api.github.com", // should be api.github.com for GitHub
     headers: {
@@ -134,12 +134,12 @@ module.exports = function(Repository) {
 
     github.repos.getAll({}, function(err, repos) {
       if (err) return cb(err);
-      var repoNames = []
-      for(repo in repos) {
-        repoNames.append(repo.full_name);
+
+      var names = [];
+      for(var i = 0 ; i < repos.length ; i++) {
+        names.push(repos[i].full_name);
       }
-      console.log(repoNames);
-      cb(null, repoNames);
+      cb(null, names);
     });
   };
 
@@ -153,7 +153,8 @@ module.exports = function(Repository) {
             errorStatus: 404
           },
           returns: {
-            repositories: 'Object'
+            arg: 'repositories',
+            type: 'Array'
           }
       }
   );
