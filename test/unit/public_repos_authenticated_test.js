@@ -333,16 +333,20 @@ describe('Repositories endpoint with authenticated client', function() {
 
     it('/GET /me/github returns user repo list when authenticated',
     function(done) {
-      var nockGithub = nock('https://api.github.com')
-        .get('/user/repos/')
-        .reply(repoPayload);
+      var nockGithub = nock('https://api.github.com/')
+        .get('/user/repos')
+        .query({access_token: validtoken})
+        .reply(200, repoPayload);
 
       request(app)
         .get('/api/Repositories/me/github' + '?access_token=' + validtoken)
         .set('Accept', 'application/json')
         .expect(200, function(err, res) {
           if (err) return done(err);
-          assert.deepEqual(res.body.repositories, repoPayload);
+          assert.lengthOf(res.body.repositories,3);
+          assert.deepEqual(res.body.repositories[0], "miccibart/bartjs");
+          assert.deepEqual(res.body.repositories[1], "miccibart/Datung");
+          assert.deepEqual(res.body.repositories[2], "miccibart/ReadDat");
           done();
         });
     });
