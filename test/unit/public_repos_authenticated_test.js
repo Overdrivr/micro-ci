@@ -1,7 +1,8 @@
-var request    = require('supertest'),
-    assert     = require('chai').assert,
-    async      = require('async'),
-    clear      = require('clear-require');
+var request     = require('supertest'),
+    assert      = require('chai').assert,
+    async       = require('async'),
+    clear       = require('clear-require'),
+    repoPayload = require('./github-repos-getall-payload.json');
 
 describe('Repositories endpoint with authenticated client', function() {
 
@@ -327,6 +328,22 @@ describe('Repositories endpoint with authenticated client', function() {
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);
+          done();
+        });
+    });
+
+    it('/GET /me/github returns user repo list when authenticated',
+    function(done) {
+      var nockGithub = nock('https://api.github.com')
+        .get('/user/repos/')
+        .reply(repoPayload);
+
+      request(app)
+        .get('/api/Repositories/me/github' + '?access_token=' + validtoken)
+        .set('Accept', 'application/json')
+        .expect(200, function(err, res) {
+          if (err) return done(err);
+          assert.deepEqual(res.body.repositories, repoPayload);
           done();
         });
     });
