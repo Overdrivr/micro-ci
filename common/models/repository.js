@@ -1,7 +1,6 @@
 var app          = require('../../server/server'),
     async        = require('async'),
-    GitHubApi    = require('github'),
-    githubConfig = require('../../server/providers.json').github;
+    github       = require('../../server/helpers/github-setup.js'),
     loopback     = require('loopback');
 
 module.exports = function(Repository) {
@@ -22,18 +21,7 @@ module.exports = function(Repository) {
   Repository.disableRemoteMethod('__destroyById__commits', false);
   Repository.disableRemoteMethod('__updateById__commits', false);
 
-  var github = new GitHubApi({
-    // optional
-    debug: false,
-    protocol: "https",
-    host: "api.github.com", // should be api.github.com for GitHub
-    headers: {
-        "user-agent": "My-Cool-GitHub-App" // GitHub is happy with a unique user agent
-    },
-    Promise: require('bluebird'),
-    followRedirects: false, // default: true; there's currently an issue with non-get redirects, so allow ability to disable follow-redirects
-    timeout: 5000
-  });
+
 
   Repository.webhookGithub = function webhookGithubCallback(repository, after, cb) {
     async.waterfall([
