@@ -74,11 +74,10 @@ describe('Repositories endpoint with authenticated client', function() {
           });
         },
         function(user, callback) {
-          app.models.Client.generateVerificationToken(user,
-          function(err, token) {
+          user.createAccessToken(1209600, function(err, token) {
             if (err) return callback(err);
             if (!token) return callback(new Error('token could not be created'));
-            validtoken = token;
+            validtoken = token.id;
             callback();
           });
         },
