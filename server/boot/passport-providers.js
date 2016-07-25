@@ -22,7 +22,12 @@ function initProvider(app, provider) {
     },
     function(accessToken, refreshToken, profile, done) {
       process.nextTick(function () {
-        return done(null, profile);
+        var responsedata = {
+          provider: profile.provider,
+          id: profile.id,
+          accessToken: accessToken
+        }
+        return done(null, responsedata);
       });
     }
   ));
