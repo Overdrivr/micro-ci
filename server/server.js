@@ -26,6 +26,13 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(function(req, res, next) {
+  if (req.session.passport) {
+    req.headers['Authorization'] = req.session.passport.user.accessToken;
+  }
+  next();
+});
+
 app.serializeUser = function(user, done) {
   // PassportJS is signalling the creation of a new User.
   // Since this user will authenticate through OAuth and not our LB app
