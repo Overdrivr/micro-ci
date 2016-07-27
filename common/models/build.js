@@ -31,7 +31,7 @@ module.exports = function(Build) {
       build.job(function(err, job)
       {
         if(err) throw err;
-        if(job === undefined) throw new Error('Build should be link to a job');        
+        if(job === undefined) throw new Error('Build should be link to a job');
         return  jenkins.build(build.getId(), job.yaml, 'http://' + config.host + ':' + config.port);
       });
     })

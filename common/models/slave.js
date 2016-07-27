@@ -1,7 +1,8 @@
 var jenkins   = require('../../server/jenkinsInstance').jenkinsInstance,
     config    = require('../../server/config'),
     isIp      = require('is-ip'),
-    slaveApi  = require('../../lib/localhost_slave_api'),
+    //slaveApi  = require('../../lib/localhost_slave_api'),
+    slaveApi  = require('../../lib/gce_api'),
     utils     = require('../../lib/utils');
 var maxNbOfSlaves = config.nbOfSlaves;
 
@@ -10,7 +11,6 @@ module.exports = function(Slave) {
   // This function check if we can powerup a slave and will power up if possible
   // Callback is used to inform that you can reate a slave
   Slave.checkAndBootSlave = function(cb) {
-
     cb = cb || utils.createPromiseCallback();
 
     // There are no pendings build
@@ -48,7 +48,7 @@ module.exports = function(Slave) {
   };
 
 
-  Slave.boot = function(id, ip, cb) {    
+  Slave.boot = function(id, ip, cb) {
     var slave ;
     if(!isIp(ip)) return cb(new Error('IP ' + ip + ' is not a valid IP'));
     //At least one slave should be in boot mode
@@ -73,4 +73,14 @@ module.exports = function(Slave) {
       http: {path:'/:id/boot'}
     }
   );
+
+
+  //A build is created
+  Slave.observe('before delete', function (ctx, next) {
+    var slaveId = ctx.where.id;
+
+    slaveApi.deleteSlave(slaveId)
+    .then(function() {next();})
+    .catch(function(err) {next(err);});
+  });
 };
