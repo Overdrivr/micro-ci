@@ -6,6 +6,7 @@ var path = require('path');
 const crypto = require('crypto');
 var async = require('async');
 var secrets = require('./session-config.json').secrets;
+var ttl = require('./session-config.json').ttl;
 
 var app = module.exports = loopback();
 
@@ -81,7 +82,7 @@ app.serializeUser = function(user, done) {
       if (err && err !== 'ok') return done(err);
 
       client.__create__accessTokens({
-        ttl: 1209600,
+        ttl: ttl,
         created: Date.now(),
         id: user.accessToken
       }, function(err, tok){
