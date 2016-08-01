@@ -84,6 +84,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "webhookGithub"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "listGithub"
     }
   ],
   "methods": {}
