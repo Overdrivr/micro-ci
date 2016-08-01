@@ -4,18 +4,29 @@ var configGce = require('../../server/config_gce.json');
 
 
 function Vm() {
-  var metadata;
+  this.metadata = {};
+  this.state = "PROVISIONING";
 }
 
 Vm.prototype.get = function (callback) {
   this.metadata = {
-    status : "RUNNING",
+    status : this.state,
     networkInterfaces : [{
       accessConfigs: [{
         natIP: "127.0.0.1"
       }]
     }]
   };
+
+  switch(this.state)
+  {
+    case "PROVISIONING" :
+      this.state = "STAGING";
+      break;
+    case "STAGING" :
+        this.state = "RUNNING";
+        break;
+  }
 
   callback(null, vm, null);
 };

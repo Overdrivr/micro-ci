@@ -44,6 +44,7 @@ describe('gce-api', function() {
     var gce = require('../../lib/gce_api.js');
     gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
     {
+      console.log(err);
       assert(err == null, "No error should be raised");
       done();
     });
