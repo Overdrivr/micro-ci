@@ -1,5 +1,6 @@
 var assert = require('assert'),
-    clear  = require('clear-require');
+    clear  = require('clear-require'),
+    mockery = require('mockery-next');
 
 describe('CreateJob', function() {
 
@@ -15,6 +16,12 @@ describe('CreateJob', function() {
   var nockNode = require('nock')(url);
 
   before(function(){
+    mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
+    mockery.enable({
+      useCleanCache: true,
+      warnOnUnregistered: false
+    });
+
     clear('../../server/server');
     app = require('../../server/server');
   });
@@ -24,11 +31,23 @@ describe('CreateJob', function() {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
       return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
     nock.cleanAll();
+
+    mockery.deregisterAll();
+    mockery.disable();
+
+    done();
+  });
+
+  after(function(done)
+  {
+    mockery.deregisterAll();
+    mockery.disable();
+
     done();
   });
 
 
-  it('Create a job and check a builds are created', function(done) {
+  it('Create a job and check a build is created', function(done) {
 
 
     var build_id=1;

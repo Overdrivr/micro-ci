@@ -5,7 +5,8 @@ var fixtures = require("fixturefiles"),
     clear    = require('clear-require')
     nock     = require('nock'),
     config    = require('../../server/config'),
-    app      = {};
+    app      = {},
+    mockery = require('mockery-next');
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
@@ -16,6 +17,12 @@ var nockNode = nock(url);
 describe('QueuedBuild', function() {
 
   before(function(){
+    mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
+    mockery.enable({
+      useCleanCache: true,
+      warnOnUnregistered: false
+    });
+
     clear('../../server/server');
     app = require('../../server/server');
   });
@@ -24,6 +31,10 @@ describe('QueuedBuild', function() {
   {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
       return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+
+    mockery.deregisterAll();
+    mockery.disable();
+
     nock.cleanAll();
     done();
   });
@@ -81,6 +92,7 @@ describe('QueuedBuild', function() {
       },
       function(err, job)
       {
+
         if(err) return done(err);
         app.models.Slave.findOne({where:{id:build_id}},function(err, slave) {
           if(err) return done(err);

@@ -5,7 +5,8 @@ var fixtures = require("fixturefiles"),
     async    = require('async'),
     clear    = require('clear-require'),
     config    = require('../../server/config'),
-    app      = {};
+    app      = {},
+    mockery = require('mockery-next');
 
 var url = process.env.JENKINS_TEST_URL || 'http://127.0.0.1:8080';
 var nockJenkins = nock(url);
@@ -17,6 +18,13 @@ var nockNode = nock(url);
 describe('SimpleBuild', function() {
 
   before(function(){
+    mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
+    mockery.enable({
+      useCleanCache: true,
+      warnOnUnregistered: false
+    });
+
+
     clear('../../server/server');
     app = require('../../server/server');
   });
@@ -26,6 +34,10 @@ describe('SimpleBuild', function() {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
       return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
     nock.cleanAll();
+
+    mockery.deregisterAll();
+    mockery.disable();
+
     done();
   });
 
