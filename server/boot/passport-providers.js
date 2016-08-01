@@ -6,23 +6,28 @@ var providers = require('../providers.json');
 //
 
 module.exports = function initPassportProviders(app) {
-  debug("Initializing providers.");
+  debug('Initializing providers.');
   for(var i = 0 ; i < providers.length ; i++) {
     initProvider(app, providers[i]);
-    debug("Enabled provider : " + providers[i].name);
+    debug('Enabled provider : ' + providers[i].name);
   }
 };
 
 function initProvider(app, provider) {
   var Strategy = require(provider.module).Strategy;
   passport.use(new Strategy({
-      clientID: provider.client_id,
-      clientSecret: provider.client_secret,
+      clientID: provider.clientId,
+      clientSecret: provider.clientSecret,
       callbackURL: 'http://127.0.0.1:3000/auth/' + provider.name + '/callback'
     },
     function(accessToken, refreshToken, profile, done) {
       process.nextTick(function () {
-        return done(null, profile);
+        var responsedata = {
+          provider: profile.provider,
+          id: profile.id,
+          accessToken: accessToken
+        }
+        return done(null, responsedata);
       });
     }
   ));
@@ -53,4 +58,4 @@ function initProvider(app, provider) {
           res.redirect('/#/account');
         });
     }
-};
+}

@@ -1,7 +1,9 @@
-var request    = require('supertest'),
-    assert     = require('chai').assert,
-    async      = require('async'),
-    clear      = require('clear-require');
+var request     = require('supertest'),
+    assert      = require('chai').assert,
+    async       = require('async'),
+    clear       = require('clear-require'),
+    ttl         = require('../../server/session-config.json').ttl;
+    repoPayload = require('./github-repos-getall-payload.json');
 
 describe('Repositories endpoint with authenticated client', function() {
 
@@ -65,7 +67,7 @@ describe('Repositories endpoint with authenticated client', function() {
             email: "foo@foo123112eae1.com",
             password: "bar",
             provider: 'foobarprovider',
-            provider_id: 87334702902
+            providerId: 87334702902
           }, function(err, user) {
             if (err) return callback(err);
             if (!user) return callback(new Error('User could not be created'));
@@ -73,11 +75,10 @@ describe('Repositories endpoint with authenticated client', function() {
           });
         },
         function(user, callback) {
-          app.models.Client.generateVerificationToken(user,
-          function(err, token) {
+          user.createAccessToken(ttl, function(err, token) {
             if (err) return callback(err);
             if (!token) return callback(new Error('token could not be created'));
-            validtoken = token;
+            validtoken = token.id;
             callback();
           });
         },
@@ -327,6 +328,26 @@ describe('Repositories endpoint with authenticated client', function() {
         .set('Accept', 'application/json')
         .expect(404, function(err, res) {
           if (err) return done(err);
+          done();
+        });
+    });
+
+    it('/GET /me/github returns user repo list when authenticated',
+    function(done) {
+      var nockGithub = nock('https://api.github.com/')
+        .get('/user/repos')
+        .query({access_token: validtoken})
+        .reply(200, repoPayload);
+
+      request(app)
+        .get('/api/Repositories/me/github' + '?access_token=' + validtoken)
+        .set('Accept', 'application/json')
+        .expect(200, function(err, res) {
+          if (err) return done(err);
+          assert.lengthOf(res.body.repositories,3);
+          assert.deepEqual(res.body.repositories[0], "miccibart/bartjs");
+          assert.deepEqual(res.body.repositories[1], "miccibart/Datung");
+          assert.deepEqual(res.body.repositories[2], "miccibart/ReadDat");
           done();
         });
     });

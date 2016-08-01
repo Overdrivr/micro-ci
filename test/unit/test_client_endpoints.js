@@ -15,7 +15,7 @@ describe('Client endpoint', function() {
       email: 'foo@foo.com',
       password: 'dummy',
       provider: 'local',
-      provider_id: 1
+      providerId: 1
     }, function(err, user) {
       if (err) return done(err);
       token = user.token;

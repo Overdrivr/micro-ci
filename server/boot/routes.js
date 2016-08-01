@@ -1,7 +1,7 @@
 var path = require("path");
 
 module.exports = function initRoutes(app) {
-  console.log("Enabling routing.");
+  console.log('Enabling routing.');
 
   var options = {
     root:  app.get("views"),

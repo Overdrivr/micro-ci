@@ -1,49 +1,47 @@
 var jenkins = require('../../server/jenkinsInstance').jenkinsInstance;
 var config  = require('../../server/config.json');
 
-
 module.exports = function(Build) {
   var pendingBuild = 0;
 
-  Build.get_nbPendingBuild = function() {
+  Build.getNbPendingBuild = function() {
     return pendingBuild;
-  }
+  };
 
-  Build.inc_nbPendingBuild = function() {
+  Build.incNbPendingBuild = function() {
     pendingBuild++;
-  }
+  };
 
-  Build.dec_nbPendingBuild = function() {
+  Build.decNbPendingBuild = function() {
     if(pendingBuild > 0) {
       pendingBuild--;
     } else {
-      return new Error("There is no pendingBuild. Cannot decrease the counter.");
+      return new Error('There is no pendingBuild. Cannot decrease the counter.');
     }
-  }
+  };
 
   //A build is created
   Build.observe('after save', function (ctx, next) {
     if(!ctx.isNewInstance) return  next();
     var build = ctx.instance;
-    if(build.status !== "created") return  next();
+    if(build.status !== 'created') return  next();
 
-    build.updateAttributes({ status: "waiting" })
+    build.updateAttributes({ status: 'waiting'})
     .then(function() {
       build.job(function(err, job)
       {
         if(err) throw err;
-        if(job === undefined) throw new Error("Build should be link to a job");
-        return  jenkins.build(build.getId(), job.yaml, "http://"+config.host+":"+config.port);
-      })
+        if(job === undefined) throw new Error('Build should be link to a job');
+        return  jenkins.build(build.getId(), job.yaml, 'http://' + config.host + ':' + config.port);
+      });
     })
     .then(function()
     {
-      Build.inc_nbPendingBuild();
-      return Build.app.models.Slave.check_and_boot_slave();
+      Build.incNbPendingBuild();
+      return Build.app.models.Slave.checkAndBootSlave();
     })
-    .then(function() {next()})
-    .catch(function(err) {cb(err);})
-
+    .then(function() {next();})
+    .catch(function(err) {next(err);});
   });
 
   Build.complete = function(id, cb) {
@@ -54,25 +52,24 @@ module.exports = function(Build) {
     Build.findOne({where:{id:id}})
     .then(function(pbuild) {
       build = pbuild;
-      return jenkins.get_build_status(build.getId())
+      return jenkins.getBuildStatus(build.getId());
     })
-    .then(function(status) {return build.updateAttributes({status: status})})
-    .then(function() {return jenkins.get_slave(build.getId())})
+    .then(function(status) {return build.updateAttributes({status: status});})
+    .then(function() {return jenkins.getSlave(build.getId());})
     .then(function(slaveName) {
-        var slave_id = parseInt(slaveName.match(/\d+/g)[0]);
-        return Slave.findOne({where:{id:slave_id}});
+        var slaveId = parseInt(slaveName.match(/\d+/g)[0]);
+        return Slave.findOne({where:{id:slaveId}});
     })
     .then(function(pslave) {
-        if(!pslave)  throw new Error("No slave with ID:" + slave_id);
+        if(!pslave)  throw new Error('No slave found with the requested id');
         slave = pslave;
-        return jenkins.remove_node(slave.getId());
+        return jenkins.removeNode(slave.getId());
       })
-    .then(function() { return Slave.destroyById(slave.getId())})
-    .then(function() { return Slave.check_and_boot_slave()})
+    .then(function() { return Slave.destroyById(slave.getId());})
+    .then(function() { return Slave.checkAndBootSlave();})
     .then(function() { cb(null, slave.getId());})
-    .catch(function(err) { cb(err);})
-
-  }
+    .catch(function(err) { cb(err);});
+  };
 
   Build.remoteMethod(
     'complete',
