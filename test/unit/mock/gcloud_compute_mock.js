@@ -1,6 +1,6 @@
 var assert = require('assert');
 var extend = require('extend');
-var configGce = require('../../server/config_gce.json');
+var configGce = require('../../../server/config_gce.json');
 
 
 function Vm() {
@@ -31,6 +31,11 @@ Vm.prototype.get = function (callback) {
   callback(null, vm, null);
 };
 
+Vm.prototype.delete = function (callback) {
+
+  return callback(null, null, null);
+};
+
 
 function Zone(compute, name) {
   this.compute = compute;
@@ -40,8 +45,6 @@ function Zone(compute, name) {
 }
 
 Zone.prototype.createVM = function(name, config, callback) {
-  var self = this;
-
   assert(name != null, "Please provide a valid slave name");
   assert.deepEqual(config, configGce.InstanceConfig, "Unexpected slave configuration");
 
@@ -50,7 +53,17 @@ Zone.prototype.createVM = function(name, config, callback) {
 
   vm  = new Vm();
   callback(null, vm, operation, resp);
+};
 
+
+Zone.prototype.vm = function(name, callback) {
+  assert(name != null, "Please provide a valid slave name");
+
+  operation = null;
+  resp = null;
+  vm  = new Vm();
+
+  return vm;
 };
 
 

@@ -14,38 +14,46 @@ describe('gce-api', function() {
   afterEach(function(done)
   {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
-      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+    return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
     nock.cleanAll();
+    mockery.deregisterAll();
+    mockery.disable();
+
     done();
   });
 
 
-  before(function() {
-    mockery.registerSubstitute('gcloud', "./gcloud_mock.js");
+  describe('gce-api-normal', function() {
+    beforeEach(function() {
+      mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false
+      });
 
-    mockery.enable({
-      useCleanCache: true,
-      warnOnUnregistered: false
     });
 
-    nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
-    .reply(200);
+    it('Boot a slave', function(done) {
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
+      .reply(200);
 
-  });
-
-  after(function() {
-    mockery.deregisterAll();
-    mockery.disable();
-  });
-
-
-
-  it('should format a given machine type', function(done) {
-    var gce = require('../../lib/gce_api.js');
-    gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
-    {      
-      assert(err == null, "No error should be raised");
-      done();
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {
+        assert(err == null, "No error should be raised");
+        done();
+      });
     });
+
+    it('Delete a slave', function(done) {
+      var gce = require('../../lib/gce_api.js');
+      gce.deleteSlave(slave_id, function (err)
+      {
+        console.log(err);
+        assert(err == null, "No error should be raised");
+        done();
+      });
+    });
+
   });
 });
