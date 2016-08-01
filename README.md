@@ -4,6 +4,12 @@
 # Micro-ci
 > Continuous Integration service for embedded systems
 
+# Install
+
+```
+npm install
+bower install
+```
 
 # Run
 1. Copy `providers.example.json` and rename to `providers.json`.
