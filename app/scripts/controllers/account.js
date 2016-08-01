@@ -8,10 +8,10 @@
  * Controller of the microCiApp
  */
 angular.module('microCiApp')
-  .controller('AccountCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+  .controller('AccountCtrl', function (Repository) {
+    console.log("Fetching repos");
+    Repository.listGithub(function(err, repos) {
+      if (err) console.log(err);
+      console.log(repos);
+    });
   });
