@@ -2,6 +2,7 @@ var request     = require('supertest'),
     assert      = require('chai').assert,
     async       = require('async'),
     clear       = require('clear-require'),
+    ttl         = require('../../server/session-config.json').ttl;
     repoPayload = require('./github-repos-getall-payload.json');
 
 describe('Repositories endpoint with authenticated client', function() {
@@ -74,7 +75,7 @@ describe('Repositories endpoint with authenticated client', function() {
           });
         },
         function(user, callback) {
-          user.createAccessToken(1209600, function(err, token) {
+          user.createAccessToken(ttl, function(err, token) {
             if (err) return callback(err);
             if (!token) return callback(new Error('token could not be created'));
             validtoken = token.id;
