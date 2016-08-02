@@ -271,4 +271,14 @@ describe('Repositories endpoint with Unauthenticated client', function() {
           done();
         });
     });
+
+    it('fails if /GET /me/github while not authenticated', function(done) {
+      request(app)
+        .get('/api/Repositories/me/github')
+        .set('Accept', 'application/json')
+        .expect(401, function(err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
 });

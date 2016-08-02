@@ -10,6 +10,7 @@
   "dependencies": {
     "arrify": "^1.0.1",
     "async": "^1.5.2",
+    "bluebird": "^3.4.1",
     "clear-require": "~1.0.1",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
@@ -19,6 +20,7 @@
     "extend": "^3.0.0",
     "fixturefiles": "~0.3.0",
     "gcloud": "^0.37.0",
+    "github": "^2.2.0",
     "in-array": "~0.1.2",
     "is-ip": "~1.0.0",
     "jenkins": "~0.17.0",
