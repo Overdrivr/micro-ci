@@ -9,9 +9,8 @@
  */
 angular.module('microCiApp')
   .controller('AccountCtrl', function (Repository) {
-    console.log("Fetching repos");
-    Repository.listGithub(function(err, repos) {
-      if (err) console.log(err);
-      console.log(repos);
+    var ctrl = this;
+    Repository.listGithub(function(res) {
+      ctrl.repositories = res.repositories;
     });
   });

@@ -1,1 +1,6 @@
-<p>This is the account view.</p>
+<p>List of your repositories</p>
+<ul>
+  <li ng-repeat="repo in account.repositories">
+    <span>{{repo}}</span>
+  </li>
+</ul>
