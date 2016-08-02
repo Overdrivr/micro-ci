@@ -48,7 +48,7 @@ describe('gce-api', function() {
     it('Delete a slave', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.deleteSlave(slave_id, function (err)
-      {        
+      {
         assert(err == null, "No error should be raised");
         done();
       });
@@ -67,7 +67,7 @@ describe('gce-api', function() {
 
     });
 
-    it('Boot a slave', function(done) {
+    it('Boot a slave and but an error occured', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
       {
@@ -76,7 +76,7 @@ describe('gce-api', function() {
       });
     });
 
-    it('Delete a slave', function(done) {
+    it('Delete a slave but an error occured', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.deleteSlave(slave_id, function (err)
       {
@@ -84,6 +84,29 @@ describe('gce-api', function() {
         done();
       });
     });
+
+  });
+
+  describe('gce-api-vm-state-err', function() {
+    beforeEach(function() {
+      mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
+      mockery.registerSubstitute('./mock/gcloud_vm_mock', "./mock/gcloud_vm_err_state_mock");
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false
+      });
+
+    });
+
+    it('Boot a slave but unknow state happen', function(done) {
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {        
+        assert(err == "Error: Unexpected status during instance boot: UNKNOW", "An error should be raised");
+        done();
+      });
+    });
+
 
   });
 });
