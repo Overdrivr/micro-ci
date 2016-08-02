@@ -30,7 +30,7 @@ app.use(passport.session());
 
 app.use(function(req, res, next) {
   if (req.session.passport) {
-    req.headers['Authorization'] = req.session.passport.user.accessToken;
+    req.headers['authorization'] = req.session.passport.user.accessToken;
   }
   next();
 });
