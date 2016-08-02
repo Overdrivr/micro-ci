@@ -27,7 +27,7 @@ describe('gce-api', function() {
     beforeEach(function() {
       mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
       mockery.enable({
-        useCleanCache: true,
+        useCleanCache: false,
         warnOnUnregistered: false
       });
 

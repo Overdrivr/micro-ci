@@ -48,7 +48,6 @@ describe('Repositories endpoint with authenticated client', function() {
     before(function(done) {
       mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
       mockery.enable({
-        useCleanCache: true,
         warnOnUnregistered: false
       });
 

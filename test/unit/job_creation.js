@@ -18,7 +18,7 @@ describe('CreateJob', function() {
   before(function(){
     mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
     mockery.enable({
-      useCleanCache: true,
+      useCleanCache: false,
       warnOnUnregistered: false
     });
 

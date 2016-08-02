@@ -1,6 +1,7 @@
 var request = require('supertest'),
     assert  = require('chai').assert,
-    clear   = require('clear-require');
+    clear   = require('clear-require'),
+    mockery = require('mockery-next');
 
 describe('Commits endpoint with Unauthenticated client', function() {
 
@@ -40,7 +41,7 @@ describe('Commits endpoint with Unauthenticated client', function() {
   before(function(done) {
     mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
     mockery.enable({
-      useCleanCache: true,
+      useCleanCache: false,
       warnOnUnregistered: false
     });
 
