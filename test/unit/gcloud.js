@@ -101,8 +101,29 @@ describe('gce-api', function() {
     it('Boot a slave but unknow state happen', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
-      {        
+      {
         assert(err == "Error: Unexpected status during instance boot: UNKNOW", "An error should be raised");
+        done();
+      });
+    });
+  });
+
+  describe('gce-api-zone-err', function() {
+    beforeEach(function() {
+      mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
+      mockery.registerSubstitute('./mock/gcloud_zone_mock', "./mock/gcloud_zone_err_mock");
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false
+      });
+
+    });
+
+    it('Boot a slave but error on createVM', function(done) {
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {        
+        assert(err == "An error occured", "An error should be raised");
         done();
       });
     });
