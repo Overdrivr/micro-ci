@@ -2,7 +2,7 @@ var request     = require('supertest'),
     assert      = require('chai').assert,
     async       = require('async'),
     clear       = require('clear-require'),
-    ttl         = require('../../server/session-config.json').ttl;
+    ttl         = require('../../server/session-config.json').ttl,
     repoPayload = require('./github-repos-getall-payload.json'),
     mockery = require('mockery-next');
 
@@ -46,7 +46,6 @@ describe('Repositories endpoint with authenticated client', function() {
 
     // Create a test user for authenticated requests
     before(function(done) {
-
       mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
       mockery.enable({
         useCleanCache: true,
