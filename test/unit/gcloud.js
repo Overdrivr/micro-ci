@@ -48,9 +48,39 @@ describe('gce-api', function() {
     it('Delete a slave', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.deleteSlave(slave_id, function (err)
-      {
-        console.log(err);
+      {        
         assert(err == null, "No error should be raised");
+        done();
+      });
+    });
+
+  });
+
+  describe('gce-api-vm-err', function() {
+    beforeEach(function() {
+      mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
+      mockery.registerSubstitute('./mock/gcloud_vm_mock', "./mock/gcloud_vm_err_mock");
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false
+      });
+
+    });
+
+    it('Boot a slave', function(done) {
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {
+        assert(err == "An error occured", "An error should be raised");
+        done();
+      });
+    });
+
+    it('Delete a slave', function(done) {
+      var gce = require('../../lib/gce_api.js');
+      gce.deleteSlave(slave_id, function (err)
+      {
+        assert(err == "An error occured", "An error should be raised");
         done();
       });
     });
