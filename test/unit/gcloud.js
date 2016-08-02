@@ -122,7 +122,7 @@ describe('gce-api', function() {
     it('Boot a slave but error on createVM', function(done) {
       var gce = require('../../lib/gce_api.js');
       gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
-      {        
+      {
         assert(err == "An error occured", "An error should be raised");
         done();
       });
@@ -130,4 +130,43 @@ describe('gce-api', function() {
 
 
   });
+
+  describe('gce-api-webhook-err', function() {
+    beforeEach(function() {
+      mockery.registerSubstitute('gcloud', "./mock/gcloud_mock.js");
+      mockery.enable({
+        useCleanCache: true,
+        warnOnUnregistered: false
+      });
+
+    });
+
+    it('Boot a slave but 404', function(done) {
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
+      .reply(404);
+
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {
+        assert.throws(function(){throw (err);},/Unexpected status code: 404/);
+        done();
+      });
+    });
+
+
+    it('Boot a slave but error', function(done) {
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
+      .replyWithError('An error occured');
+
+      var gce = require('../../lib/gce_api.js');
+      gce.bootSlave(slave_id,'http://' + config.host + ':' + config.port, function (err)
+      {
+        assert.throws(function(){throw (err);},/An error occured/);
+        done();
+      });
+    });
+
+
+  });
+
 });
