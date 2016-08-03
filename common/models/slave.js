@@ -57,7 +57,7 @@ module.exports = function(Slave) {
     {
       slave = pslave;
       if(!slave) throw new Error('No slave with id ' + slave);
-      if(slave.status != "booting") throw new Error('Slave is not booting but in ' + slave.status + ' mode');
+      if(slave.status !== 'booting') throw new Error('Slave is not booting but in ' + slave.status + ' mode');
       return slave.updateAttributes({status: 'building', IP:ip});
     })
     .then(function() { return jenkins.createNode(slave.getId(), ip);})
