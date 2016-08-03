@@ -2,8 +2,10 @@ var request     = require('supertest'),
     assert      = require('chai').assert,
     async       = require('async'),
     clear       = require('clear-require'),
-    ttl         = require('../../server/session-config.json').ttl;
-    repoPayload = require('./github-repos-getall-payload.json');
+    ttl         = require('../../server/session-config.json').ttl,
+    repoPayload = require('./github-repos-getall-payload.json'),
+    mockery = require('mockery-next');
+
 
 describe('Repositories endpoint with authenticated client', function() {
 
@@ -35,14 +37,22 @@ describe('Repositories endpoint with authenticated client', function() {
       if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
         return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
       nock.cleanAll();
+
+      mockery.deregisterAll();
+      mockery.disable();
+
       done();
     });
 
     // Create a test user for authenticated requests
     before(function(done) {
+      mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
+      mockery.enable({
+        warnOnUnregistered: false
+      });
+
       clear('../../server/server');
       app = require('../../server/server');
-
 
       var build_id = 1;
       var jobName = 'build_' + build_id;
@@ -57,7 +67,7 @@ describe('Repositories endpoint with authenticated client', function() {
       .post('/job/' + jobName + '/build')
       .reply(201, '', { location: url + '/queue/item/1/' })
 
-      nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+      nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
       .reply(200);
 
       async.waterfall([

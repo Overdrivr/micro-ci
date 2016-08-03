@@ -1,6 +1,7 @@
 var request     = require('supertest'),
     clear       = require('clear-require'),
-    assert      = require('chai').assert;
+    assert      = require('chai').assert,
+    mockery = require('mockery-next');
 
 describe('Github webhook', function() {
   var pushPayload = require('./github-webhook-push-payload-repo1.json'),
@@ -21,11 +22,20 @@ describe('Github webhook', function() {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
       return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
     nock.cleanAll();
+
+    mockery.deregisterAll();
+    mockery.disable();
     done();
   });
 
   // Create a test repository
   before(function(done){
+    mockery.registerSubstitute('../../lib/gce_api', "../../lib/localhost_slave_api");
+    mockery.enable({
+      useCleanCache: false,
+      warnOnUnregistered: false
+    });
+
     clear('../../server/server');
     app = require('../../server/server');
 
@@ -42,7 +52,7 @@ describe('Github webhook', function() {
     .post('/job/' + jobName + '/build')
     .reply(201, '', { location: serverURL + '/queue/item/1/' })
 
-    nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+    nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
     .reply(200);
 
     build_id = 2;
@@ -57,7 +67,7 @@ describe('Github webhook', function() {
     .post('/job/' + jobName + '/build')
     .reply(201, '', { location: serverURL + '/queue/item/1/' })
 
-    nockNode.get('/api/Slaves/127.0.0.1/boot')//localhost boot
+    nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
     .reply(200);
 
     app.models.Repository.create({

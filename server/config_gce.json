@@ -1,0 +1,30 @@
+ {
+  "InstanceConfig" : {
+    "disks": [
+      {
+        "boot": true,
+        "initializeParams": {
+          "sourceImage": "https://www.googleapis.com/compute/v1/projects/micro-ci/global/images/micro-ci"
+        },
+        "autoDelete":true
+      }
+    ],
+  "networkInterfaces": [
+      {
+          "network":  "global/networks/default",
+          "accessConfigs": [
+              {
+                  "kind": "compute#accessConfig",
+                  "type": "ONE_TO_ONE_NAT",
+                  "name": "External NAT"
+              }
+          ]
+      }]
+
+
+ },
+ "zone" : "us-central1-c",
+ "projectId" : "micro-ci",
+ "keyFilename" : "gce-key.json"
+
+}
