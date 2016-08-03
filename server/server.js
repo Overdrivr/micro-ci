@@ -11,9 +11,10 @@ var ttl = require('./session-config.json').ttl;
 var app = module.exports = loopback();
 
 // Setup the view engine (jade)
-var p = path.join(path.dirname(__dirname), 'client');
+var p = path.join(path.dirname(__dirname), 'app');
+app.use(loopback.static(path.resolve(__dirname, '../app')));
+app.use(loopback.static(path.resolve(__dirname, '../bower_components')));
 app.set('views', p);
-app.set('view engine', 'jade');
 
 // Configure sessions and passport
 app.use(session({
@@ -29,7 +30,7 @@ app.use(passport.session());
 
 app.use(function(req, res, next) {
   if (req.session.passport) {
-    req.headers['Authorization'] = req.session.passport.user.accessToken;
+    req.headers['authorization'] = req.session.passport.user.accessToken;
   }
   next();
 });

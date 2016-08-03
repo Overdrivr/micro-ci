@@ -5,7 +5,8 @@
   "scripts": {
     "pretest": "jshint .",
     "unit": "istanbul cover node_modules/mocha/bin/_mocha ./test/unit -- --timeout 5000",
-    "e2e": "protractor ./test/e2e/conf.js"
+    "e2e": "protractor ./test/e2e/conf.js",
+    "lbservices": "lb-ng ./server/server.js ./app/lb-services/lb-services.js"
   },
   "dependencies": {
     "async": "^1.5.2",

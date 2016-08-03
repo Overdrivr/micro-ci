@@ -4,6 +4,16 @@
 # Micro-ci
 > Continuous Integration service for embedded systems
 
+# Install
+
+```
+npm install
+bower install
+npm run lbservices
+```
+
+The last command is required to generate the angular API from loopback models
+automatically.
 
 # Run
 1. Copy `providers.example.json` and rename to `providers.json`.
