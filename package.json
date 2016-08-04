@@ -47,7 +47,9 @@
     "istanbul": "^0.4.4",
     "jshint": "^2.5.6",
     "mocha": "~2.4.5",
+    "passport-mocked": "0.0.5",
     "supertest": "^1.2.0",
+    "supertest-session": "^2.0.1",
     "url-parse": "^1.1.1"
   },
   "repository": {

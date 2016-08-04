@@ -1,0 +1,10 @@
+[
+  {
+    "name": "mock",
+    "module": "passport-mocked",
+    "clientId": "12345",
+    "clientSecret": "e3d4a5b6",
+    "link": false,
+    "scope": ""
+  }
+]
