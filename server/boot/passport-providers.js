@@ -1,6 +1,8 @@
 var debug = require('debug')('uci:boot:passport');
 var passport = require('passport');
 var providers = require('../providers.json');
+
+
 //
 // Boot script to initialize third party login and linking to all provriders
 //
@@ -33,10 +35,7 @@ function initProvider(app, provider) {
   ));
 
   app.get('/auth/' + provider.name,
-    passport.authenticate(provider.name, { scope: provider.scope }),
-    function(req, res){
-      // The request will be redirected, this is not called.
-    });
+    passport.authenticate(provider.name, { scope: provider.scope }));
 
   app.get('/auth/' + provider.name + '/callback',
     passport.authenticate(provider.name, { failureRedirect: '/login' }),
@@ -44,18 +43,16 @@ function initProvider(app, provider) {
       res.redirect('/#/account');
     });
 
-    // If accounts can be linked to this provider
-    if(provider.link) {
-      app.get('/link/' + provider.name,
-         passport.authorize(provider.name, { failureRedirect: '/login' }),
-        function(req, res){
-          // The request will be redirected, this is not called.
-        });
+  // If accounts can be linked to this provider
+  if(provider.link) {
 
-      app.get('/link/' + provider.name + '/callback',
-        passport.authorize(provider.name, { failureRedirect: '/login' }),
-        function(req, res) {
-          res.redirect('/#/account');
-        });
-    }
+    app.get('/link/' + provider.name,
+       passport.authorize(provider.name, { failureRedirect: '/login' }));
+
+    app.get('/link/' + provider.name + '/callback',
+      passport.authorize(provider.name, { failureRedirect: '/login' }),
+      function(req, res) {
+        res.redirect('/#/account');
+      });
+  }
 }
