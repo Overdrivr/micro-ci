@@ -27,14 +27,16 @@ describe('Commits endpoint with Unauthenticated client', function() {
 
   after(function(done)
   {
-    if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
-      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
-    nock.cleanAll();
+    var err = null;
 
+    if(nock.pendingMocks().length >  0)
+      err = new Error(nock.pendingMocks().length + " pending mocks in nock.");
+
+    nock.cleanAll();
     mockery.deregisterAll();
     mockery.disable();
 
-    done();
+    done(err);
   });
 
 

@@ -27,16 +27,17 @@ describe('QueuedBuild', function() {
     app = require('../../server/server');
   });
 
-  afterEach(function(done)
+  after(function(done)
   {
-    if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
-      return done(new Error("Pending mocks in nock :"+ nock.pendingMocks()))
+    var err = null;
+    if(nock.pendingMocks().length >  0)
+      err = new Error(nock.pendingMocks().length + " pending mocks in nock.");
 
     mockery.deregisterAll();
     mockery.disable();
-
+    clear('../../lib/gce_api');
     nock.cleanAll();
-    done();
+    done(err);
   });
 
 
