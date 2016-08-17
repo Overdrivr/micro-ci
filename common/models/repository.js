@@ -147,4 +147,94 @@ module.exports = function(Repository) {
       }
   );
 
+  Repository.activate = function(platform, remoteId, cb) {
+    async.waterfall([
+      function(callback) {
+        // Check input sanity
+        if(typeof platform === 'undefined' || platform === null){
+          return callback(Error('platform is undefined'));
+        }
+
+        if(typeof remoteId === 'undefined' || remoteId === null){
+          return callback(Error('remoteId is undefined'));
+        }
+
+        // Try to get the accessToken to identify the user
+        var ctx = loopback.getCurrentContext();
+        var currentToken = ctx.get('accessToken');
+        var currentUserId = currentToken.userId;
+        if(!currentToken) return callback(Error('You need to be authenticated'));
+
+        github.authenticate({
+            type: "oauth",
+            token: currentToken.id
+        });
+
+        // Check the repository exists
+        github.repos.getById({
+          id: remoteId
+        }, function(err, repository) {
+          if (err) return callback(err);
+          if(!repository) return callback(Error('Requested repository does not exist'));
+          callback(null, repository, currentUserId);
+        });
+
+      },
+      // Check the user requesting the activation is the owner
+      function(githubRepoData, currentUserId, callback) {
+        app.models.Client.findById(currentUserId, function(err, user){
+          if(err) return callback(err);
+          if(githubRepoData.owner.id !== user.providerId) {
+            var error = Error('You are not the owner of this repository');
+            error.status = 401;
+            return callback(error);
+          }
+          callback();
+        });
+      },
+      function(callback) {
+        // Try to find an already existing repo in the database
+        Repository.find({
+          where: {
+            "platform": platform,
+            "remoteId": remoteId
+          }
+        }, function(err, repositories) {
+          if (err) return callback(err);
+          if(repositories.length > 1) return callback(Error('Found multiple Github repositories matching.'));
+          callback(null, repositories);
+        });
+      },
+      // Create a new repository if it doesnt exist
+      function(repositories, callback) {
+        if(repositories.length == 1) return callback(null, repositories[0]);
+
+        Repository.create({
+          "platform": platform,
+          "remoteId": remoteId
+        }, function(err, createdRepository) {
+          if (err) return callback(err);
+          callback(null, createdRepository);
+        });
+      }
+    ], function(err, repository){
+      if(err) return cb(err);
+      cb();
+    });
+  };
+
+  Repository.remoteMethod(
+    'activate',
+    {
+      http: {
+        path: '/activate',
+        verb: 'post',
+        status: 204
+      },
+      accepts: [
+        { arg: 'platform', type: 'string', required: true},
+        { arg: 'remoteId', type: 'number', required: true}
+      ]
+    }
+  );
 };
