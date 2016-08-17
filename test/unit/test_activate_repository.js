@@ -10,6 +10,8 @@ describe('Repositories /activate endpoint', function() {
   var validtoken  = {},
       secondtoken = {};
 
+  var validclient = {};
+
   var repodata = {
     platform: 'github',
     remoteId: githubrepo.id
@@ -37,6 +39,7 @@ describe('Repositories /activate endpoint', function() {
         });
       },
       function(user, callback) {
+        validclient = user;
         user.createAccessToken(1000000, function(err, token) {
           if (err) return callback(err);
           if (!token) return callback(new Error('token could not be created'));
@@ -72,6 +75,10 @@ describe('Repositories /activate endpoint', function() {
     });
   });
 
+  afterEach(function(){
+    nock.cleanAll();
+  });
+
   it('doesnt allow unauthenticated clients to activate a repository',
   function(done){
     request(app)
@@ -85,23 +92,68 @@ describe('Repositories /activate endpoint', function() {
       })
   });
 
+  it('doesnt allows the remote owner of a repository to activate it with unvalid data',
+  function(done){
+    request(app)
+      .post('/api/Repositories/activate')
+      .set('authorization', validtoken)
+      .send({
+        platform: repodata.platform,
+        remoteId: ''
+      })
+      .expect(500, function (err, res){
+        done(err);
+      });
+  });
+
+  it('doesnt allows the remote owner of a repository to activate it with unvalid data bis',
+  function(done){
+    request(app)
+      .post('/api/Repositories/activate')
+      .set('authorization', validtoken)
+      .send({
+        platform: '',
+        remoteId: repodata.remoteId
+      })
+      .expect(500, function (err, res){
+        done(err);
+      });
+  });
+
   it('allows the remote owner of a repository to activate it',
   function(done){
     var nockGithub = nock('https://api.github.com/')
       .get('/repositories/' + githubrepo.id)
       .query({access_token: validtoken})
-      .reply(200, githubrepo);
+      .reply(200, githubrepo)
+      .post('/repositories/'+ githubrepo.owner.login + '/' + githubrepo.name + '/hooks')
+      .reply(201, {
+        id: 1,
+        url: "https://api.github.com/repos/octocat/Hello-World/hooks/1",
+        test_url: "https://api.github.com/repos/octocat/Hello-World/hooks/1/test",
+        ping_url: "https://api.github.com/repos/octocat/Hello-World/hooks/1/pings",
+        name: "web",
+        events: [
+          'push',
+          'pull_request'
+        ],
+        active: true,
+        config: {
+          url: "http://example.com/webhook",
+          content_type: "json"
+        },
+        updated_at: "2011-09-06T20:39:23Z",
+        created_at: "2011-09-06T17:26:27Z"
+      });
+
 
     request(app)
       .post('/api/Repositories/activate')
       .set('authorization', validtoken)
       .send(repodata)
       .expect(204, function (err, res){
-        console.log(res.body);
-        assert.lengthOf(nock.pendingMocks(), 0);
-        if (err) return done(err);
-        nock.cleanAll();
-        done();
+        assert.lengthOf(nock.pendingMocks(), 0, 'Not all nocked endpoints were called');
+        done(err);
       })
   });
 
@@ -113,6 +165,17 @@ describe('Repositories /activate endpoint', function() {
     });
   });
 
+  it('finds the created repository through the client instance requesting it',
+  function(done){
+    validclient.__get__repositories({}, function(err, repos){
+      if (err) return done(err);
+      assert.lengthOf(repos,1);
+      done();
+    });
+  });
+
+  // TODO : Intended behavior ? No impact if called on active repo ?
+  // Or testing a deactivated repository ?
   it('allows the remote owner of a repository to activate it again',
   function(done){
     var nockGithub = nock('https://api.github.com/')
@@ -125,17 +188,14 @@ describe('Repositories /activate endpoint', function() {
       .set('authorization', validtoken)
       .send(repodata)
       .expect(204, function (err, res){
-        assert.lengthOf(nock.pendingMocks(), 0);
-        if (err) return done(err);
-        nock.cleanAll();
-        done();
+        assert.lengthOf(nock.pendingMocks(), 0, 'Not all nocked endpoints were called');
+        done(err);
       });
   });
 
   it('still only finds a single repository', function(done){
     app.models.Repository.find({ where: repodata }, function(err, repos) {
       if (err) return done(err);
-      console.log(repos);
       assert.lengthOf(repos, 1);
       done();
     });
@@ -153,11 +213,8 @@ describe('Repositories /activate endpoint', function() {
       .set('authorization', secondtoken)
       .send(repodata)
       .expect(401, function (err, res){
-        console.log(res.body);
-        assert.lengthOf(nock.pendingMocks(), 0);
-        if (err) return done(err);
-        nock.cleanAll();
-        done();
+        assert.lengthOf(nock.pendingMocks(), 0, 'Not all nocked endpoints were called');
+        done(err);
       });
   });
 
