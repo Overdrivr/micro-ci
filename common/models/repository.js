@@ -151,13 +151,8 @@ module.exports = function(Repository) {
     async.waterfall([
       function(callback) {
         // Check input sanity
-        if(typeof platform === 'undefined' || platform === null){
-          return callback(Error('platform is undefined'));
-        }
-
-        if(typeof remoteId === 'undefined' || remoteId === null){
-          return callback(Error('remoteId is undefined'));
-        }
+        if(!platform) return callback(Error('platform is undefined'));
+        if(!remoteId) return callback(Error('remoteId is undefined'));
 
         // Try to get the accessToken to identify the user
         var ctx = loopback.getCurrentContext();
@@ -189,11 +184,11 @@ module.exports = function(Repository) {
             error.status = 401;
             return callback(error);
           }
-          callback();
+          callback(null, user);
         });
       },
-      function(callback) {
-        // Try to find an already existing repo in the database
+      // Try to find an already existing repo in the database
+      function(user, callback) {
         Repository.find({
           where: {
             "platform": platform,
@@ -202,14 +197,13 @@ module.exports = function(Repository) {
         }, function(err, repositories) {
           if (err) return callback(err);
           if(repositories.length > 1) return callback(Error('Found multiple Github repositories matching.'));
-          callback(null, repositories);
+          callback(null, user, repositories);
         });
       },
       // Create a new repository if it doesnt exist
-      function(repositories, callback) {
+      function(user, repositories, callback) {
         if(repositories.length == 1) return callback(null, repositories[0]);
-
-        Repository.create({
+        user.__create__repositories({
           "platform": platform,
           "remoteId": remoteId
         }, function(err, createdRepository) {
