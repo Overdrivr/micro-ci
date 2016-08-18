@@ -174,9 +174,7 @@ describe('Repositories /activate endpoint', function() {
     });
   });
 
-  // TODO : Intended behavior ? No impact if called on active repo ?
-  // Or testing a deactivated repository ?
-  it('allows the remote owner of a repository to activate it again',
+  it('doesnt do anything if remote owner of a repository activate an already active repo',
   function(done){
     var nockGithub = nock('https://api.github.com/')
       .get('/repositories/' + githubrepo.id)
