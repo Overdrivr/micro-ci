@@ -17,6 +17,30 @@ describe('Github webhook', function() {
   var nockJenkins = nock(jenkinsURL);
   var nockNode = nock(serverURL);
 
+  var repodata1 = {
+    platform: "github",
+    remoteId: pushPayload.repository.id,
+    name: "foorepo",
+    html_url: "foo@github.com",
+    clone_url: "foo@github.com"
+  };
+
+  var repodata2 = {
+    platform: "github",
+    remoteId: 1234,
+    name: "foorepo",
+    html_url: "foo@github.com",
+    clone_url: "foo@github.com"
+  };
+
+  var repodata3 = {
+    platform: "github",
+    remoteId: pingPayload.repository.id,
+    name: "foorepo",
+    html_url: "foo@github.com",
+    clone_url: "foo@github.com"
+  };
+  
   after(function(done)
   {
     if(nock.pendingMocks().length >  0) //Make sure no pending mocks are available. Else it could influence the next test
@@ -70,10 +94,7 @@ describe('Github webhook', function() {
     nockNode.post('/api/Slaves/'+slave_id+'/boot')//localhost boot
     .reply(200);
 
-    app.models.Repository.create({
-      platform: "github",
-      remoteId: pushPayload.repository.id
-    }, function(err, repo) {
+    app.models.Repository.create(repodata1, function(err, repo) {
       if (err) return done(err);
       if (!repo) return done(Error("Repository instance not created."));
 
@@ -91,10 +112,7 @@ describe('Github webhook', function() {
           if (!commit) return done(Error("Commit not created."));
 
           // Create a dummy github repo to highlight 2+ instances side-effects
-          app.models.Repository.create({
-            platform: "github",
-            remoteId: 1234
-          }, function(err, repo) {
+          app.models.Repository.create(repodata2, function(err, repo) {
             if (err) return done(err);
             if (!repo) return done(Error("Repository instance not created."));
             done();
@@ -183,10 +201,7 @@ describe('Github webhook', function() {
 
   it('can be called with ping payload on an existing repo and return 204',
   function(done){
-    app.models.Repository.create({
-      platform: 'github',
-      remoteId: pingPayload.repository.id
-    })
+    app.models.Repository.create(repodata3)
     .catch(function(err) {
       return done(err);
     })
