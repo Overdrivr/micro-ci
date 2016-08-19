@@ -17,9 +17,12 @@ describe('Commits endpoint with Unauthenticated client', function() {
     repositoryId: 222
   };
 
-  repodata = {
+  var repodata = {
     platform: "github",
-    remoteId: 12345
+    remoteId: 12345,
+    name: "foorepo",
+    html_url: "foo@github.com",
+    clone_url: "foo@github.com"
   };
 
   var nockJenkins = nock(jenkinsURL);

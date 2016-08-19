@@ -6,7 +6,10 @@ var request = require('supertest'),
 describe('Repositories endpoint with Unauthenticated client', function() {
     var repodata = {
       platform: "github",
-      remoteId: 12345
+      remoteId: 12345,
+      name: "foorepo",
+      html_url: "foo@github.com",
+      clone_url: "foo@github.com"
     };
 
     var commit = {
