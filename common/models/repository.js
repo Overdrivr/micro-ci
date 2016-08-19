@@ -1,7 +1,9 @@
 var app          = require('../../server/server'),
     async        = require('async'),
     github       = require('../../server/helpers/github-setup.js'),
-    loopback     = require('loopback');
+    loopback     = require('loopback'),
+    webhookConfig= require('../../server/webhook-config.json').config,
+    webhookEvents= require('../../server/webhook-config.json').events;
 
 module.exports = function(Repository) {
 
@@ -149,6 +151,7 @@ module.exports = function(Repository) {
 
   Repository.activate = function(platform, remoteId, cb) {
     async.waterfall([
+
       function(callback) {
         // Check input sanity
         if(!platform) return callback(Error('platform is undefined'));
@@ -171,12 +174,16 @@ module.exports = function(Repository) {
         }, function(err, repository) {
           if (err) return callback(err);
           if(!repository) return callback(Error('Requested repository does not exist'));
-          callback(null, repository, currentUserId);
+          callback(null, currentToken, repository);
         });
 
       },
+
       // Check the user requesting the activation is the owner
-      function(githubRepoData, currentUserId, callback) {
+      function(currentToken, githubRepoData, callback) {
+
+        var currentUserId = currentToken.userId;
+
         app.models.Client.findById(currentUserId, function(err, user){
           if(err) return callback(err);
           if(githubRepoData.owner.id !== user.providerId) {
@@ -184,11 +191,12 @@ module.exports = function(Repository) {
             error.status = 401;
             return callback(error);
           }
-          callback(null, user);
+          callback(null, currentToken, user);
         });
       },
+
       // Try to find an already existing repo in the database
-      function(user, callback) {
+      function(currentToken, user, callback) {
         Repository.find({
           where: {
             "platform": platform,
@@ -197,18 +205,45 @@ module.exports = function(Repository) {
         }, function(err, repositories) {
           if (err) return callback(err);
           if(repositories.length > 1) return callback(Error('Found multiple Github repositories matching.'));
-          callback(null, user, repositories);
+          // TODO : Check whether repo is active or not
+          callback(null, currentToken, user, repositories);
         });
       },
+
       // Create a new repository if it doesnt exist
-      function(user, repositories, callback) {
+      function(currentToken, user, repositories, callback) {
         if(repositories.length == 1) return callback(null, repositories[0]);
         user.__create__repositories({
           "platform": platform,
           "remoteId": remoteId
         }, function(err, createdRepository) {
           if (err) return callback(err);
-          callback(null, createdRepository);
+          callback(null, currentToken, user, createdRepository);
+        });
+      },
+
+      // Tell github to generate the webhook
+      // TODO: Activate webhook if not already done ? Or update it anyway ?
+      function(currentToken, user, createdRepository, callback) {
+
+        github.authenticate({
+            type: "oauth",
+            token: currentToken.id
+        });
+
+        github.repos.createHook({
+          // TODO : Use actual user data
+          user: 'foo',
+          repo: 'bar',
+          name: 'micro-ci-webhook',
+          config: webhookConfig,
+          events: webhookEvents
+        }, function(err, hook) {
+          console.log(hook);
+          console.log(err);
+          if (err) return callback(err);
+          if(!hook) return callback(Error('Error creating hook'));
+          callback(null, repository);
         });
       }
     ], function(err, repository){

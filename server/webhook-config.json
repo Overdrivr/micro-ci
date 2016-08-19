@@ -1,0 +1,10 @@
+{
+  "config": {
+    "url": "https://micro-ci.com/api/webhook/github",
+    "content_type": "json"
+ },
+ "events": [
+   "push",
+   "pull_request"
+   ]
+}
