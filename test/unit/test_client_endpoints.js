@@ -6,17 +6,23 @@ var clear   = require('clear-require'),
 
 describe('Client endpoint', function() {
 
+  var clientdata1 = {
+      username: "foo",
+      email: 'foo@foo.com',
+      password: 'dummy',
+      provider: 'local',
+      providerId: 1,
+      remoteLogin: "Roger",
+      remoteName: "Roger F.",
+      avatarUrl: "123@456.789"
+    };
+
   before(function(done) {
     clear('../../server/server');
     app = require('../../server/server');
     // Create a dummy user to ensure endpoints won't return 404 because model is not found
     // Rather than endpoint does not exist
-    app.models.Client.create({
-      email: 'foo@foo.com',
-      password: 'dummy',
-      provider: 'local',
-      providerId: 1
-    }, function(err, user) {
+    app.models.Client.create(clientdata1, function(err, user) {
       if (err) return done(err);
       token = user.token;
       done();

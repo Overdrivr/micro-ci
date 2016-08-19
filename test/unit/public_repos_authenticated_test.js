@@ -31,6 +31,16 @@ describe('Repositories endpoint with authenticated client', function() {
   var url =  'http://'+config.host+':'+config.port;
   var nockNode = nock(url);
 
+  var clientdata1 = {
+    username: "foo",
+    email: "foo@foo123112eae1.com",
+    password: "bar",
+    provider: 'foobarprovider',
+    providerId: 87334702902,
+    remoteLogin: "Roger",
+    remoteName: "Roger F.",
+    avatarUrl: "123@456.789"
+  };
 
     after(function(done)
     {
@@ -72,13 +82,7 @@ describe('Repositories endpoint with authenticated client', function() {
 
       async.waterfall([
         function(callback) {
-          app.models.Client.create({
-            username: "foo",
-            email: "foo@foo123112eae1.com",
-            password: "bar",
-            provider: 'foobarprovider',
-            providerId: 87334702902
-          }, function(err, user) {
+          app.models.Client.create(clientdata1, function(err, user) {
             if (err) return callback(err);
             if (!user) return callback(new Error('User could not be created'));
             callback(null, user);

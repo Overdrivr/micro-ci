@@ -2,32 +2,38 @@ var clear  = require('clear-require'),
     assert = require('chai').assert,
     app    = {};
 
-var user = {
-  provider: 'gitlabfoobaryo',
-  id: 9683543,
-  accessToken: 'eade123'
-};
-
-var user2 = {
-  provider: 'gitbob',
-  id: 96232424032,
-  accessToken: '1ade22f3'
-}
-
-var serializedUserId;
 
 describe('user serialization', function(){
+  var user = {
+    provider: 'gitlabfoobaryo',
+    id: 9683543,
+    accessToken: 'eade123'
+  };
+
+  var user2 = {
+    provider: 'gitbob',
+    id: 96232424032,
+    accessToken: '1ade22f3'
+  }
+
+  var serializedUserId = {};
+
+  var clientdata1 = {
+      provider: 'github',
+      providerId: 1230323810,
+      email: '1230323810@micro-ci.github.com',
+      password: 'fowocnroi',
+      username: "foo",
+      remoteLogin: "Roger",
+      remoteName: "Roger F.",
+      avatarUrl: "123@456.789"
+    };
 
   before(function(done) {
     clear('../../server/server');
     app = require('../../server/server');
 
-    app.models.Client.create({
-      provider: 'github',
-      providerId: 1230323810,
-      email: '1230323810@micro-ci.github.com',
-      password: 'fowocnroi'
-    }, function(err, instances) {
+    app.models.Client.create(clientdata1, function(err, instances) {
       if (err) return done(err);
       if (!instances) return done(Error('Client could not be created'));
       done();
