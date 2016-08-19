@@ -17,8 +17,12 @@ describe('Repositories endpoint with authenticated client', function() {
 
   var repodata = {
     platform: "github",
-    remoteId: 12345
+    remoteId: 12345,
+    name: "foorepo",
+    html_url: "foo@github.com",
+    clone_url: "foo@github.com"
   };
+
 
   var commit = {
     commithash: 'al234',
