@@ -1,33 +1,43 @@
 var clear  = require('clear-require'),
     assert = require('chai').assert,
+    nock   = require('nock'),
+    userPayload = require('./responses/get-user.json'),
     app    = {};
 
-var user = {
-  provider: 'gitlabfoobaryo',
-  id: 9683543,
-  accessToken: 'eade123'
-};
-
-var user2 = {
-  provider: 'gitbob',
-  id: 96232424032,
-  accessToken: '1ade22f3'
-}
-
-var serializedUserId;
+// TODO: Make tests with failing responses from github
+// TODO: Make tests with partial/corrupted responses from github
 
 describe('user serialization', function(){
+  var user = {
+    provider: 'gitlabfoobaryo',
+    id: 9683543,
+    accessToken: 'eade123'
+  };
+
+  var user2 = {
+    provider: 'gitbob',
+    id: 96232424032,
+    accessToken: '1ade22f3'
+  }
+
+  var serializedUserId = {};
+
+  var clientdata1 = {
+      provider: 'github',
+      providerId: 1230323810,
+      email: '1230323810@micro-ci.github.com',
+      password: 'fowocnroi',
+      username: "foo",
+      remoteLogin: "Roger",
+      remoteName: "Roger F.",
+      avatarUrl: "123@456.789"
+    };
 
   before(function(done) {
     clear('../../server/server');
     app = require('../../server/server');
 
-    app.models.Client.create({
-      provider: 'github',
-      providerId: 1230323810,
-      email: '1230323810@micro-ci.github.com',
-      password: 'fowocnroi'
-    }, function(err, instances) {
+    app.models.Client.create(clientdata1, function(err, instances) {
       if (err) return done(err);
       if (!instances) return done(Error('Client could not be created'));
       done();
@@ -43,6 +53,11 @@ describe('user serialization', function(){
   });
 
   it('creates a new user the first time', function(done){
+    var nockGithub = nock('https://api.github.com/')
+      .get('/user')
+      .query({access_token : user.accessToken})
+      .reply(200, userPayload);
+
     app.serializeUser(user, function(err, userdata){
       if (err) return done(err);
       assert(userdata, 'userdata is empty.');

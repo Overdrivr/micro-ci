@@ -13,6 +13,18 @@
     "providerId": {
       "type": "number",
       "required": true
+    },
+    "remoteLogin": {
+      "type": "string",
+      "required": true
+    },
+    "remoteName": {
+      "type": "string",
+      "required": true
+    },
+    "avatarUrl": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],

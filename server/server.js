@@ -7,6 +7,7 @@ const crypto = require('crypto');
 var async = require('async');
 var secrets = require('./session-config.json').secrets;
 var ttl = require('./session-config.json').ttl;
+var github = require('./helpers/github-setup.js');
 
 var app = module.exports = loopback();
 
@@ -65,20 +66,39 @@ app.serializeUser = function(user, done) {
         callback();
       });
     },
-    // Then generate unique email and strong password for new user
+
+    // Gather required profile information from github
     function(callback) {
+      github.authenticate({
+        type: "oauth",
+        token: user.accessToken
+      });
+
+      github.users.get({}, function(err, user){
+        if (err) return callback(err);
+        if (!user) return callback(Error("User information could not be fetched from github"));
+        callback(null, user);
+      });
+    },
+
+    // Then generate unique email and strong password for new user
+    function(extraUserData, callback) {
       crypto.randomBytes(256, function(err, buf) {
         if (err) return callback(err);
         var userdata = {
               email: user.id + '@micro-ci.' + user.provider + '.com',
               password: buf.toString('hex'),
               provider: user.provider,
-              providerId: user.id
+              providerId: user.id,
+              remoteName: extraUserData.name,
+              remoteLogin: extraUserData.login,
+              avatarUrl: extraUserData.avatar_url
         };
         callback(null, userdata);
       });
     },
-    // Persist it into the database
+
+    // Persist the new user into the database
     function(userdata, callback) {
       app.models.Client.create(userdata, function(err, client) {
         if (err) return callback(err);
