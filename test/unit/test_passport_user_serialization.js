@@ -1,7 +1,11 @@
 var clear  = require('clear-require'),
     assert = require('chai').assert,
+    nock   = require('nock'),
+    userPayload = require('./responses/get-user.json'),
     app    = {};
 
+// TODO: Make tests with failing responses from github
+// TODO: Make tests with partial/corrupted responses from github
 
 describe('user serialization', function(){
   var user = {
@@ -49,6 +53,11 @@ describe('user serialization', function(){
   });
 
   it('creates a new user the first time', function(done){
+    var nockGithub = nock('https://api.github.com/')
+      .get('/user')
+      .query({access_token : user.accessToken})
+      .reply(200, userPayload);
+
     app.serializeUser(user, function(err, userdata){
       if (err) return done(err);
       assert(userdata, 'userdata is empty.');
