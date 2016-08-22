@@ -1,8 +1,10 @@
 <div class="container">
-  <p>List of your repositories</p>
-  <ul>
-    <li ng-repeat="repo in account.repositories">
+  <h2>List of your repositories</h2>
+  <ul class="list-group">
+    <li class="list-group-item" ng-repeat="repo in account.repositories">
+      <a class="btn" href="#/"><i class="glyphicon glyphicon-plus"></i></a>
       <span>{{repo}}</span>
+
     </li>
   </ul>
 </div>
